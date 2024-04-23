@@ -14,7 +14,7 @@ import {
 import {signUp} from '../../lib/auth';
 import {createUser} from '../../lib/user';
 import firestore from '@react-native-firebase/firestore';
-import auth from '@react-native-firebase/auth'; // Firebase auth 추가
+import auth from '@react-native-firebase/auth'; 
 
 const signUpBackIcon = require('../../assets/icons/signUpBack.png');
 const passwordHideIcon = require('../../assets/icons/passwordHide.png');
