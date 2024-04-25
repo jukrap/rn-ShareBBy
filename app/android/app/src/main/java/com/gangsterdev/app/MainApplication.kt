@@ -1,4 +1,4 @@
-package com.hobbyshare
+package com.gangsterdev.app
 
 import android.app.Application
 import com.facebook.react.PackageList
