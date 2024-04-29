@@ -1,262 +1,151 @@
-import React, {useState} from 'react';
-import {
-  SafeAreaView,
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  Text,
-  TextInput,
-  Dimensions,
-  Alert,
-} from 'react-native';
-import firestore from '@react-native-firebase/firestore';
-const signUpBackIcon = require('../../assets/icons/signUpBack.png');
-const {width, height} = Dimensions.get('window');
+// SignPassword.jsx
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, TextInput, Alert, Image, Modal} from 'react-native';
 
-const SearchPassword = ({navigation}) => {
-  const [email, setEmail] = useState(''); // 유저 이메일
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [isVerificationCodeSent, setIsVerificationCodeSent] = useState(false);
-  const [verificationCode, setVerificationCode] = useState('');
-  const [isPhoneVerified, setIsPhoneVerified] = useState(false);
+import auth from '@react-native-firebase/auth';
 
-  // 아이디 중복 확인 함수
-  const checkIdDuplicate = async () => {
+const backIcon = require('../../assets/icons/back.png');
+
+
+const SignPassword = ({ navigation }) => {
+  const [email, setEmail] = useState('');
+  
+
+  const handleResetPassword = async () => {
+    if (!validateEmail(email)) {
+      Alert.alert('유효하지 않은 이메일', '올바른 이메일 형식이 아닙니다.');
+      return;
+    }
     try {
-      const userQuery = await firestore()
-        .collection('users')
-        .where('email', '==', email)
-        .get();
-
-      if (!userQuery.empty) {
-        Alert.alert('존재하는 이메일', '존재하는 이메일입니다.');
-      } else {
-        Alert.alert('사용 가능한 이메일', '사용할 수 있는 이메일입니다.');
-      }
+      await auth().sendPasswordResetEmail(email);
+      Alert.alert('이메일 전송 성공', '비밀번호 재설정 이메일을 전송했습니다.');
     } catch (error) {
-      console.error('이메일 중복 확인 오류:', error);
+      console.error('비밀번호 재설정 이메일 전송 오류:', error);
       Alert.alert(
-        '이메일 중복 확인 실패',
-        '이메일 중복 확인 중 오류가 발생했습니다.',
+        '이메일 전송 실패',
+        '비밀번호 재설정 이메일 전송 중 오류가 발생했습니다.',
       );
     }
   };
 
-  // 인증번호 발송 함수
-  const sendVerificationCode = async () => {
-    try {
-      const formattedPhoneNumber = '+82' + phoneNumber;
-      const confirmation = await auth().signInWithPhoneNumber(
-        formattedPhoneNumber,
-      );
-      setConfirmation(confirmation);
-      setIsVerificationCodeSent(true); // 인증번호가 발송되었음을 표시합니다.
-      console.log('인증번호가 성공적으로 발송되었습니다.');
-    } catch (error) {
-      console.error('인증번호 발송에 실패했습니다:', error);
-      Alert.alert('인증번호 발송 실패', '인증번호 발송에 실패했습니다.');
-    }
+  const validateEmail = (email) => {
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailPattern.test(email);
   };
 
-  // 인증번호 확인 함수
-  const confirmVerificationCode = async () => {
-    try {
-      if (!confirmation) {
-        throw new Error('확인 객체가 없습니다.'); // 예외 처리 추가
-      }
-      const credential = auth.PhoneAuthProvider.credential(
-        confirmation.verificationId,
-        verificationCode,
-      );
-      await auth().signInWithCredential(credential);
-      console.log('사용자가 성공적으로 인증되었습니다.');
-      setIsPhoneVerified(true); // 전화번호 인증이 완료되었음을 표시합니다.
-      setVerificationCode(''); // 인증이 성공하면 verificationCode를 초기화합니다.
-    } catch (error) {
-      console.error('인증 오류:', error);
-      Alert.alert('인증 실패', '인증에 실패했습니다.');
-    }
-  };
+
 
   return (
-    <SafeAreaView>
-      <View style={styles.firstContainer}>
-        <TouchableOpacity style={{}} onPress={() => navigation.goBack()}>
-          <Image source={signUpBackIcon} />
-        </TouchableOpacity>
-        <View style={styles.titleTextContainer}>
-          <Text style={styles.firstTItle}>비밀번호 찾기</Text>
-          <Text style={styles.secondTitle}>
-            비밀번호를 찾기 위해 정보를 입력해 주세요
-          </Text>
-        </View>
-      </View>
-      <Text style={styles.idText}>아이디</Text>
-      <View style={styles.idCantainer}>
-        <View style={styles.idInputConainer}>
-          <TextInput
-            style={{fontSize: 16}}
-            value={email}
-            onChangeText={text => setEmail(text)}
-            placeholder="이메일 형식으로 입력해주세요"
-          />
-        </View>
-        <TouchableOpacity
-          onPress={checkIdDuplicate}
-          style={styles.idCheckButton}>
-          <Text style={styles.checkButtonText}>중복확인</Text>
-        </TouchableOpacity>
-      </View>
-
-      <Text style={styles.phoneNumberText}>전화번호</Text>
-      <View style={styles.phoneNumberContainer}>
-        <View style={styles.phoneNumberInputContainer}>
-          <TextInput
-            style={{fontSize: 16}}
-            value={phoneNumber}
-            onChangeText={setPhoneNumber}
-            placeholder="- 제외 휴대전화 번호"
-          />
-        </View>
-        <TouchableOpacity
-          onPress={sendVerificationCode}
-          style={[styles.numberButton]}>
-          <Text style={styles.numberButtonText}>인증번호 발송</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.phoneNumberContainer}>
-        <View style={styles.phoneNumberInputContainer}>
-          <TextInput
-            style={{fontSize: 16}}
-            value={verificationCode}
-            onChangeText={setVerificationCode}
-            placeholder="인증번호를 입력해주세요"
-          />
-        </View>
-        <TouchableOpacity
-          onPress={confirmVerificationCode}
-          style={[
-            styles.numberButton,
-            verificationCode ? {} : {backgroundColor: '#ccc'},
-          ]}
-          disabled={!verificationCode}>
-          <Text style={styles.numberButtonText}>확인</Text>
-        </TouchableOpacity>
-      </View>
-
-      <TouchableOpacity
-        style={[
-          styles.signInButton,
-          isPhoneVerified ? {} : {backgroundColor: '#ccc'},
-        ]}
-        disabled={!isPhoneVerified}>
-        <Text style={[styles.signInText,
-        !isPhoneVerified ? {} : {color:'#07AC7D'}]}>완료</Text>
+    <SafeAreaView style={{ flex: 1 }}>
+       <TouchableOpacity style={styles.backIcon} onPress={()=> navigation.goBack()}>
+        <Image source={backIcon} />
       </TouchableOpacity>
+      <View style={{ justifyContent: 'space-between', flex: 1 }}>
+        <View>
+          <View style={styles.textContainer}>
+            <Text style={styles.text}>비밀번호 찾기</Text>
+            <Text style={styles.secondText}>비밀번호를 찾기 위해 이메일 인증을 진행해 주세요.</Text>
+          </View>
+          <TextInput
+            style={styles.input}
+            placeholder="이메일을 입력해주세요."
+            onChangeText={setEmail}
+            value={email}
+          />
+        </View>
+        <View>
+          <TouchableOpacity style={styles.button} onPress={handleResetPassword}>
+            <Text style={styles.buttonText}>인증 요청</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  titleTextContainer: {
-    padding: 16,
-    gap: 8,
+  textContainer: {
+    marginTop: 40,
+    marginLeft: 16,
+    marginBottom: 32,
   },
-  firstTItle: {
+  text: {
+    color: '#07AC7D',
+    fontWeight: 'bold',
     fontSize: 24,
+  },
+  secondText: {
+    color: '#A7A7A7',
     fontWeight: 'bold',
-    color: '#07AC7D',
-  },
-  secondTitle: {
     fontSize: 16,
-    color: '#a5a5a5',
+    marginTop: 45,
   },
-
-  idText: {
-    marginLeft: 16,
+  input: {
+    borderBottomWidth: 2,
+    borderColor: '#07AC7D',
+    marginHorizontal: 16,
+    paddingBottom: 8,
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#07AC7D',
   },
-  idCantainer: {
-    paddingHorizontal: 25,
-    marginTop: 7,
-    flexDirection: 'row',
-    gap: 7,
-    height: height / 25,
-  },
-  idInputConainer: {
-    justifyContent: 'center',
-    paddingLeft: 10,
-    borderWidth: 1,
-    borderRadius: 4,
-    backgroundColor: '#fff',
-    width: width / 1.7,
-  },
-  signInButton: {
-    borderRadius: 4,
+  button: {
+    borderRadius: 10,
+    backgroundColor: '#07AC7D',
     alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: 35,
+    marginHorizontal: 16,
     marginTop: 16,
-    backgroundColor: '#07AC7D',
-    width: width / 1.2,
-    height: height / 20,
+    paddingVertical: 16,
+    marginBottom: 36,
   },
-  signInText: {
+  buttonText: {
     color: '#fff',
+    fontSize: 16,
     fontWeight: 'bold',
-    fontSize: 15,
   },
-  idCheckButton: {
+  modalContainer: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 4,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
     backgroundColor: '#fff',
-    backgroundColor: '#07AC7D',
-    width: width / 3.5,
+    borderRadius: 10,
+    padding: 20,
+    width:'80%',
+    alignItems: 'center',
   },
-  checkButtonText: {
-    fontSize: 16,
+  modalText: {
+    fontSize: 18,
     fontWeight: 'bold',
-    color: '#fff',
+    marginBottom: 16,
   },
-  phoneNumberText: {
-    marginLeft: 16,
-    marginTop: 16,
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#07AC7D',
-  },
-  phoneNumberContainer: {
-    paddingHorizontal: 25,
-    marginTop: 7,
+  modalButtonContainer: {
     flexDirection: 'row',
-    gap: 7,
-    height: height / 25,
+    gap:8,
+    marginTop:16,
+    
   },
-  phoneNumberInputContainer: {
-    justifyContent: 'center',
-    paddingLeft: 10,
-    borderWidth: 1,
-    borderRadius: 4,
-    backgroundColor: '#fff',
-    width: width / 1.7,
-  },
-  numberButton: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 4,
-    backgroundColor: '#fff',
+  modalButton1: {
     backgroundColor: '#07AC7D',
-    width: width / 3.5,
+    paddingVertical: 10,
+    width: 130,
+    borderRadius: 5,
+    alignItems:'center'
   },
-  numberButtonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
+  modalButton: {
+    backgroundColor: '#07AC7D',
+    paddingVertical: 10,
+    width: 130,
+    borderRadius: 5,
+    alignItems:'center'
+  },
+  modalButtonText: {
     color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 });
-export default SearchPassword;
+
+export default SignPassword;
