@@ -1,229 +1,184 @@
+// SignUpEmail.jsx
 import React, { useState } from 'react';
-import {
-  SafeAreaView,
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  Text,
-  TextInput,
-  Dimensions,
-  FlatList,
-} from 'react-native';
-import firestore from '@react-native-firebase/firestore'; // firebase 대신 firestore만 import
-import auth from '@react-native-firebase/auth'; // Firebase auth 모듈 추가
-import signUpBackIcon from '../../assets/icons/signUpBack.png';
+import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, TextInput, Alert, Image, Modal} from 'react-native';
+import firestore from '@react-native-firebase/firestore'; // firestore import 추가
+
+const backIcon = require('../../assets/icons/back.png');
+
+const SignUpEmail = ({ navigation }) => {
+  const [email, setEmail] = useState('');
+  const [showModal, setShowModal] = useState(false); // 모달 표시 여부 상태 추가
 
 
-const { width, height } = Dimensions.get('window');
-
-const SearchLogin = ({ navigation }) => {
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [isVerificationCodeSent, setIsVerificationCodeSent] = useState(false);
-  const [verificationCode, setVerificationCode] = useState('');
-  const [isPhoneVerified, setIsPhoneVerified] = useState(false);
-  const [confirmation, setConfirmation] = useState(null);
-  const [userEmail, setUserEmail] = useState('');
-
-  const saveUserPhoneNumber = async (phoneNumber, email) => {
-    try {
-      await firestore().collection('users').doc(phoneNumber).set({
-        email: email
-      });
-      console.log('전화번호와 이메일이 저장되었습니다.');
-    } catch (error) {
-      console.error('데이터 저장 중 오류 발생:', error);
-    }
+  const validateEmail = (email) => {
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailPattern.test(email);
   };
-  
-  const getUserEmailByPhoneNumber = async (phoneNumber) => {
+
+  const handleNext = async () => {
+    if (!validateEmail(email)) {
+      Alert.alert('유효하지 않은 이메일', '올바른 이메일 형식이 아닙니다.');
+      return;
+    }
     try {
-      const doc = await firestore().collection('users').doc(phoneNumber).get();
-      if (doc.exists) {
-        return doc.data().email;
+      // 파이어베이스에서 이메일 중복 확인
+      const userQuery = await firestore()
+        .collection('users')
+        .where('email', '==', email)
+        .get();
+      if (!userQuery.empty) {
+        // 중복된 이메일이 있으면 알림 표시
+        Alert.alert('가입된 이메일', '같은 주소로 가입된 계정이 있어요!');
       } else {
-        console.log('해당 전화번호에 대한 사용자 데이터가 없습니다.');
-        return null;
+        // 중복된 이메일이 없으면 모달 표시
+        setShowModal(true);
       }
     } catch (error) {
-      console.error('데이터 조회 중 오류 발생:', error);
-      return null;
-    }
-  };
-  
-
-  const sendVerificationCode = async () => {
-    try {
-      const formattedPhoneNumber = '+82' + phoneNumber;
-      const confirmation = await auth().signInWithPhoneNumber(formattedPhoneNumber);
-      setConfirmation(confirmation);
-      setIsVerificationCodeSent(true); // 인증번호가 발송되었음을 표시합니다.
-      console.log('인증번호가 성공적으로 발송되었습니다.');
-    } catch (error) {
-      console.error('인증번호 발송에 실패했습니다:', error);
+      console.error('이메일 중복 확인 오류:', error);
+      Alert.alert(
+        '이메일 중복 확인 실패',
+        '이메일 중복 확인 중 오류가 발생했습니다.',
+      );
     }
   };
 
-  const confirmVerificationCode = async () => {
-    try {
-      if (!confirmation) {
-        throw new Error('확인 객체가 없습니다.'); // 예외 처리 추가
-      }
-      const credential = auth.PhoneAuthProvider.credential(confirmation.verificationId, verificationCode);
-      await auth().signInWithCredential(credential);
-      console.log('사용자가 성공적으로 인증되었습니다.');
-      setIsPhoneVerified(true); // 전화번호 인증이 완료되었음을 표시합니다.
-      setVerificationCode(''); // 인증이 성공하면 verificationCode를 초기화합니다.
-      const email = auth().currentUser.email;
-      setUserEmail(email);
-      // 전화번호와 이메일을 데이터베이스에 저장
-      saveUserPhoneNumber(phoneNumber, email);
-    } catch (error) {
-      console.error('인증 오류:', error);
-    }
+  const handleModalClose = () => {
+    // 모달 닫기
+    setShowModal(false);
   };
-  
+
+  const handleSignUp = () => {
+    // 회원가입 화면으로 이동
+    navigation.navigate('SignUp');
+    setShowModal(false);
+  };
 
   return (
-    <SafeAreaView>
-      <View style={styles.firstContainer}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Image source={signUpBackIcon} />
-        </TouchableOpacity>
-        <View style={styles.titleTextContainer}>
-          <Text style={styles.firstTItle}>아이디 찾기</Text>
-          <Text style={styles.secondTitle}>
-            아이디를 찾기 위해 정보를 입력해 주세요
-          </Text>
-        </View>
-      </View>
-      <Text style={styles.phoneNumberText}>전화번호</Text>
-      <View style={styles.phoneNumberContainer}>
-        <View style={styles.phoneNumberInputContainer}>
+    <SafeAreaView style={{ flex: 1 }}>
+       <TouchableOpacity style={styles.backIcon} onPress={()=> navigation.goBack()}>
+        <Image source={backIcon} />
+      </TouchableOpacity>
+      <View style={{ justifyContent: 'space-between', flex: 1 }}>
+        <View>
+          <View style={styles.textContainer}>
+            <Text style={styles.text}>아이디 찾기</Text>
+            <Text style={styles.secondText}>이메일 주소를 입력하여 가입여부를 확인해 주세요.</Text>
+          </View>
           <TextInput
-            style={{fontSize: 16}}
-            value={phoneNumber}
-            onChangeText={setPhoneNumber}
-            placeholder="- 제외 휴대전화 번호"
+            style={styles.input}
+            placeholder="이메일을 입력해주세요."
+            onChangeText={setEmail}
+            value={email}
           />
         </View>
-        <TouchableOpacity
-          onPress={sendVerificationCode}
-          style={[styles.numberButton]}>
-          <Text style={styles.numberButtonText}>인증번호 발송</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.phoneNumberContainer}>
-        <View style={styles.phoneNumberInputContainer}>
-          <TextInput
-            style={{fontSize: 16}}
-            value={verificationCode}
-            onChangeText={setVerificationCode}
-            placeholder="인증번호를 입력해주세요"
-          />
+        <View>
+          <TouchableOpacity style={styles.button} onPress={handleNext}>
+            <Text style={styles.buttonText}>확인</Text>
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity
-          onPress={confirmVerificationCode}
-          style={[
-            styles.numberButton,
-            verificationCode ? {} : {backgroundColor: '#ccc'},
-          ]}
-          disabled={!verificationCode}>
-          <Text style={styles.numberButtonText}>확인</Text>
-        </TouchableOpacity>
       </View>
-
-      <TouchableOpacity
-  style={[
-    styles.signInButton,
-    isPhoneVerified ? {} : {backgroundColor: '#ccc'},
-  ]}
-  disabled={!isPhoneVerified}
-  onPress={async () => {
-    const email = await getUserEmailByPhoneNumber(phoneNumber);
-    if (email) {
-      console.log('사용 중인 아이디:', email);
-      // 사용자 아이디를 화면에 출력하거나 다른 작업을 수행할 수 있습니다.
-      Alert.alert('사용 중인 아이디:', email);
-    } else {
-      console.log('해당 전화번호에 대한 사용자 데이터가 없습니다.');
-    }
-  }}>
-  <Text style={[styles.signInText,
-    !isPhoneVerified ? {} : {color:'#07AC7D'}]}>완료</Text>
-</TouchableOpacity>
-
-
-      
+      <Modal visible={showModal} transparent animationType="slide">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalText}>아이디 찾기 결과</Text>
+            <Text>입력하신 이메일로 가입된 계정을 찾을 수 없어요</Text>
+            <View style={styles.modalButtonContainer}>
+              <TouchableOpacity style={styles.modalButton1} onPress={handleModalClose}>
+                <Text style={styles.modalButtonText}>취소</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.modalButton} onPress={handleSignUp}>
+                <Text style={styles.modalButtonText}>회원가입</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  titleTextContainer: {
-    padding: 16,
-    gap: 8,
-  },
-  firstTItle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#07AC7D',
-  },
-  secondTitle: {
-    fontSize: 16,
-    color: '#a5a5a5',
-  },
-  phoneNumberText: {
+  textContainer: {
+    marginTop: 40,
     marginLeft: 16,
-    marginTop: 16,
-    fontSize: 16,
-    fontWeight: 'bold',
+    marginBottom: 32,
+  },
+  text: {
     color: '#07AC7D',
+    fontWeight: 'bold',
+    fontSize: 24,
   },
-  phoneNumberContainer: {
-    paddingHorizontal: 25,
-    marginTop: 7,
-    flexDirection: 'row',
-    gap: 7,
-    height: height / 25,
+  secondText: {
+    color: '#A7A7A7',
+    fontWeight: 'bold',
+    fontSize: 16,
+    marginTop: 45,
   },
-  phoneNumberInputContainer: {
-    justifyContent: 'center',
-    paddingLeft: 10,
-    borderWidth: 1,
-    borderRadius: 4,
-    backgroundColor: '#fff',
-    width: width / 1.7,
-  },
-  numberButton: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 4,
-    backgroundColor: '#fff',
-    backgroundColor: '#07AC7D',
-    width: width / 3.5,
-  },
-  numberButtonText: {
+  input: {
+    borderBottomWidth: 2,
+    borderColor: '#07AC7D',
+    marginHorizontal: 16,
+    paddingBottom: 8,
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#fff',
   },
-  signInButton: {
-    borderRadius: 4,
+  button: {
+    borderRadius: 10,
+    backgroundColor: '#07AC7D',
     alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: 35,
+    marginHorizontal: 16,
     marginTop: 16,
-    backgroundColor: '#D7FFF3',
-    width: width / 1.2,
-    height: height / 20,
+    paddingVertical: 16,
+    marginBottom: 36,
   },
-  signInText: {
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 20,
+    width:'80%',
+    alignItems: 'center',
+  },
+  modalText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
+  modalButtonContainer: {
+    flexDirection: 'row',
+    gap:8,
+    marginTop:16,
+    
+  },
+  modalButton1: {
+    backgroundColor: '#07AC7D',
+    paddingVertical: 10,
+    width: 130,
+    borderRadius: 5,
+    alignItems:'center'
+  },
+  modalButton: {
+    backgroundColor: '#07AC7D',
+    paddingVertical: 10,
+    width: 130,
+    borderRadius: 5,
+    alignItems:'center'
+  },
+  modalButtonText: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 15,
+    fontSize: 16,
   },
 });
 
-export default SearchLogin;
+export default SignUpEmail;
