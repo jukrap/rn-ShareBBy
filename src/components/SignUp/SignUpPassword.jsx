@@ -78,7 +78,6 @@ const SignUpPassword = ({onNextStep}) => {
 
   return (
     <SafeAreaView style={{flex: 1}}>
-      
       <View style={{justifyContent: 'space-between', flex: 1}}>
         <View>
           <View>
