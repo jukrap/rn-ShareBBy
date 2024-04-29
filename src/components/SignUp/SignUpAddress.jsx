@@ -23,9 +23,9 @@ const SignUpAddress = ({ navigation, checkboxState, email, nickname, password })
 
       // 회원 정보를 Firestore에 저장
       await firestore().collection('users').doc(user.uid).set({
+        id: user.uid,
         checkboxState,
         email,
-        password,
         address,
         nickname
         // 기타 회원 정보 필드 추가 가능
