@@ -2,12 +2,14 @@
 #import <Firebase.h>
 #import <RNKakaoLogins.h>
 #import <React/RCTBundleURLProvider.h>
+#import <GoogleMaps/GoogleMaps.h>
 
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
    [FIRApp configure];
+   [GMSServices provideAPIKey:@"AIzaSyCKEnmMSbRzEbeqOwoO_zKm7qLhNhhhDKs"]; // add this line using the api key obtained from Google Console
   self.moduleName = @"HobbyShare";
   // You can add your custom initial props in the dictionary below.
   // They will be passed down to the ViewController used by React Native.
