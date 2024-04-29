@@ -166,7 +166,7 @@ const Login = ({navigation}) => {
                 onChangeText={setName}
             /> */}
 
-        <TouchableOpacity onPress={() => onSignIn()} style={styles.loginButton}>
+        <TouchableOpacity onPress={() => navigation.navigate('BottomTab')} style={styles.loginButton}>
           <Text style={styles.loginButtonText}>로그인</Text>
         </TouchableOpacity>
 
