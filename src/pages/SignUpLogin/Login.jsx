@@ -74,18 +74,46 @@ const Login = ({navigation}) => {
   }, []);
 
   const onGoogleButtonPress = async () => {
-    const {idToken} = await GoogleSignin.signIn();
-    const googleCredential = auth.GoogleAuthProvider.credential(idToken);
-    navigation.navigate('Main');
-    return auth().signInWithCredential(googleCredential);
+    try {
+      const { idToken } = await GoogleSignin.signIn();
+      const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+      await auth().signInWithCredential(googleCredential);
+      const currentUser = auth().currentUser;
+  
+      // 사용자 정보 가져오기
+      const email = currentUser.email;
+      const displayName = currentUser.displayName;
+      const photoURL = currentUser.photoURL;
+  
+      console.log('구글 사용자 정보:', {
+        email: email,
+        displayName: displayName,
+        photoURL: photoURL,
+      });
+  
+      // Firestore에 사용자 정보 저장
+      await firestore().collection('users').doc(currentUser.uid).set({
+        email: email,
+        displayName: displayName,
+        photoURL: photoURL,
+      });
+  
+      // Main 화면으로 이동
+      navigation.navigate('Main');
+    } catch (error) {
+      console.error('구글 로그인 오류:', error);
+      Alert.alert('구글 로그인 실패');
+    }
   };
+  
 
   const kakaoLogins = () => {
     KakaoLogin.login()
       .then(result => {
         console.log('Login Success', JSON.stringify(result));
         getProfile();
-        navigation.navigate('Main');
+
+
       })
       .catch(error => {
         if (error.code === 'E_CANCELLED_OPERATION') {
@@ -100,11 +128,18 @@ const Login = ({navigation}) => {
     KakaoLogin.getProfile()
       .then(result => {
         console.log('GetProfile Success', JSON.stringify(result));
+        const email = result.email;
+        const nickName = result.nickname;
+        console.log('이메일:', email);
+        console.log('닉네임:', nickName);
+        navigation.navigate('Main', { userId: email, nickname: nickName });
       })
       .catch(error => {
         console.log(`GetProfile Fail(code:${error.code})`, error.message);
       });
   };
+  
+  
 
   // 로그인
 
@@ -113,6 +148,7 @@ const Login = ({navigation}) => {
   // console.log((await userCollection.doc(user.uid).get()).data());
   // await userCollection.doc(user.uid).update({phoneNumber})
   // console.log((await userCollection.doc(user.uid).get()).data());
+  
   const onSignIn = async () => {
     try {
       const {user} = await signIn({email, password});
@@ -147,6 +183,7 @@ const Login = ({navigation}) => {
             value={email}
             placeholder="아이디를 입력해주세요"
             onChangeText={setEmail}
+            placeholderTextColor={'#A7A7A7'}
           />
         </View>
         <View style={styles.passwordTextInput}>
@@ -156,6 +193,7 @@ const Login = ({navigation}) => {
             secureTextEntry={true}
             placeholder="비밀번호를 입력해주세요"
             onChangeText={setPass}
+            placeholderTextColor={'#A7A7A7'}
           />
         </View>
 

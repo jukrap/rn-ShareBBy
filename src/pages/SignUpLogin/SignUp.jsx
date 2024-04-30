@@ -8,8 +8,6 @@ import SignUpAddress from '../../components/SignUp/SignUpAddress.jsx';
 import ProgressBar from '../../components/SignUp/ProgressBar.jsx';
 import SignUpPassword from '../../components/SignUp/SignUpPassword.jsx';
 
-import SignUpAddressSelection from '../../components/SignUp/SignUpAddressSelection.jsx';
-
 const backIcon = require('../../assets/icons/back.png');
 
 const SignUp = ({ navigation }) => {
@@ -21,7 +19,7 @@ const SignUp = ({ navigation }) => {
     2: <SignUpEmail onNextStep={handleNextStep} onPreviousStep={handlePreviousStep} />,
     3: <SignUpPassword onNextStep={handleNextStep} onPreviousStep={handlePreviousStep} />,
     4: <SignUpNickname onNextStep={handleNextStep} onPreviousStep={handlePreviousStep} />,
-    5: <SignUpAddress navigation={navigation} email={email} nickname={nickname} password={password} checkboxState={checkboxState} onPreviousStep={handlePreviousStep} />,
+    5: <SignUpAddress navigation={navigation} email={email} nickname={nickname} password={password} checkboxState={checkboxState}  onPreviousStep={handlePreviousStep} />,
   
   };
 
