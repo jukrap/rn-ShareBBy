@@ -1,4 +1,4 @@
-// SignPassword.jsx
+// SearchPassword.jsx
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, TextInput, Alert, Image, Modal} from 'react-native';
 
@@ -7,7 +7,7 @@ import auth from '@react-native-firebase/auth';
 const backIcon = require('../../assets/icons/back.png');
 
 
-const SignPassword = ({ navigation }) => {
+const SearchPassword = ({ navigation }) => {
   const [email, setEmail] = useState('');
   
 
@@ -149,4 +149,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SignPassword;
+export default SearchPassword;
