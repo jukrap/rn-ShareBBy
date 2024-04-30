@@ -154,8 +154,8 @@ const Login = ({navigation}) => {
       const {user} = await signIn({email, password});
       // 로그인 정보 가져오기
       const userCollection = firestore().collection('users');
-      console.log((await userCollection.doc(user.uid).get()).data());
-      navigation.navigate('Main', {userId: user.uid});
+      // console.log((await userCollection.doc(user.uid).get()).data());
+      navigation.navigate('BottomTab', {userId: user.uid});
     } catch (e) {
       console.error('로그인 실패:', e);
       Alert.alert('로그인 실패');
@@ -204,7 +204,7 @@ const Login = ({navigation}) => {
                 onChangeText={setName}
             /> */}
 
-        <TouchableOpacity onPress={() => navigation.navigate('BottomTab')} style={styles.loginButton}>
+        <TouchableOpacity onPress={onSignIn} style={styles.loginButton}>
           <Text style={styles.loginButtonText}>로그인</Text>
         </TouchableOpacity>
 
