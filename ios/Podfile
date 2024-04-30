@@ -23,6 +23,8 @@ target 'HobbyShare' do
   pod 'GoogleUtilities', :modular_headers => true
   pod 'FirebaseAuth'
   pod 'FirebaseFirestore'
+  pod 'Firebase/Storage'
+
   use_frameworks! :linkage => :static
   use_react_native!(
     :path => config[:reactNativePath],

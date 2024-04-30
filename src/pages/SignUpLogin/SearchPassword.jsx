@@ -49,6 +49,7 @@ const SignPassword = ({ navigation }) => {
           <TextInput
             style={styles.input}
             placeholder="이메일을 입력해주세요."
+            placeholderTextColor={'#A7A7A7'}
             onChangeText={setEmail}
             value={email}
           />

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -13,28 +13,30 @@ import {
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore'; // firestore import 추가
 
-const SignUpNickname = ({ onNextStep }) => { // onNextStep props 추가
-  const { width, height } = Dimensions.get('window');
+const SignUpNickname = ({onNextStep}) => {
+  // onNextStep props 추가
+  const {width, height} = Dimensions.get('window');
   const [nickname, setNickname] = useState('');
 
-  const handleNext = async () => { // async 키워드 추가
+  const handleNext = async () => {
+    // async 키워드 추가
     try {
       // 파이어베이스에서 닉네임 중복 확인
       const userQuery = await firestore() // firestore() 호출 추가
         .collection('users')
         .where('nickname', '==', nickname)
         .get();
-        
+
       if (nickname.trim() === '') {
-          Alert.alert('닉네임 입력', '닉네임을 입력해주세요.');
-          return;
-        }
+        Alert.alert('닉네임 입력', '닉네임을 입력해주세요.');
+        return;
+      }
       if (!userQuery.empty) {
         // 중복된 닉네임이 있으면 알림 표시
         Alert.alert('중복된 닉네임', '이미 사용 중인 닉네임입니다.');
       } else {
         // 중복된 닉네임이 없으면 다음 단계로 진행
-        onNextStep({ nickname });
+        onNextStep({nickname});
       }
     } catch (error) {
       console.error('닉네임 중복 확인 오류:', error);
@@ -46,21 +48,26 @@ const SignUpNickname = ({ onNextStep }) => { // onNextStep props 추가
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <View style={{ justifyContent: 'space-between', flex: 1 }}>
+    <SafeAreaView style={styles.container}>
+      <View style={{justifyContent: 'space-between', flex: 1}}>
         <View>
           <View>
             <View style={styles.textContainer}>
               <Text style={styles.text}>닉네임을 </Text>
               <Text style={styles.text}>입력해주세요.</Text>
-              <Text style={{color: '#A7A7A7',
-    fontWeight: 'bold',
-    fontSize: 16,
-    marginTop: 45,}}>띄어쓰기 포함 촤대 15자까지 가능합니다.</Text>
+              <Text
+                style={{
+                  color: '#A7A7A7',
+                  fontWeight: 'bold',
+                  fontSize: 16,
+                  marginTop: 45,
+                }}>
+                띄어쓰기 포함 촤대 15자까지 가능합니다.
+              </Text>
             </View>
           </View>
 
-          <View style={{ flexDirection: 'row' }}>
+          <View style={{flexDirection: 'row'}}>
             <TextInput
               style={{
                 width: width * 0.92,
@@ -73,9 +80,11 @@ const SignUpNickname = ({ onNextStep }) => { // onNextStep props 추가
                 fontWeight: 'bold',
               }}
               placeholder="닉네임 입력"
+              placeholderTextColor={'#A7A7A7'}
               value={nickname}
-              onChangeText={(text) => {
-                if (text.length <= 15) { // 최대 길이 제한
+              onChangeText={text => {
+                if (text.length <= 15) {
+                  // 최대 길이 제한
                   setNickname(text);
                 }
               }}
@@ -85,9 +94,9 @@ const SignUpNickname = ({ onNextStep }) => { // onNextStep props 추가
 
         <View>
           <TouchableOpacity
-            style={[styles.button, { backgroundColor: '#07AC7D' }]}
+            style={[styles.button, {backgroundColor: '#07AC7D'}]}
             onPress={handleNext}>
-            <Text style={{ color: '#fff', fontSize: 16, fontWeight: 'bold' }}>
+            <Text style={{color: '#fff', fontSize: 16, fontWeight: 'bold'}}>
               다음
             </Text>
           </TouchableOpacity>
@@ -98,6 +107,9 @@ const SignUpNickname = ({ onNextStep }) => { // onNextStep props 추가
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1
+  },
   textContainer: {
     marginTop: 40,
     marginLeft: 16,

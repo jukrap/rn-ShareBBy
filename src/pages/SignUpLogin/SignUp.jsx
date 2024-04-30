@@ -21,7 +21,7 @@ const SignUp = ({ navigation }) => {
     2: <SignUpEmail onNextStep={handleNextStep} onPreviousStep={handlePreviousStep} />,
     3: <SignUpPassword onNextStep={handleNextStep} onPreviousStep={handlePreviousStep} />,
     4: <SignUpNickname onNextStep={handleNextStep} onPreviousStep={handlePreviousStep} />,
-    5: <SignUpAddress navigation={navigation} email={email} nickname={nickname} password={password} checkboxState={checkboxState} onPreviousStep={handlePreviousStep} />,
+    5: <SignUpAddress navigation={navigation} email={email} nickname={nickname} password={password} checkboxState={checkboxState}  onPreviousStep={handlePreviousStep} />,
   
   };
 

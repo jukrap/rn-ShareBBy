@@ -1,38 +1,68 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Dimensions, TextInput, Alert } from 'react-native';
-import auth from '@react-native-firebase/auth'; 
+import React, {useState} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  SafeAreaView,
+  TouchableOpacity,
+  Dimensions,
+  TextInput,
+  Alert,
+} from 'react-native';
+import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import Postcode from '@actbase/react-daum-postcode';
+import storage from '@react-native-firebase/storage'; // Firebase Storage 추가
 
-const SignUpAddress = ({ navigation, checkboxState, email, nickname, password }) => {
-  const { width } = Dimensions.get('window');
+const SignUpAddress = ({
+  navigation,
+  checkboxState,
+  email,
+  nickname,
+  password,
+}) => {
+  const {width} = Dimensions.get('window');
   const [address, setAddress] = useState('');
   const [showPostcode, setShowPostcode] = useState(false);
 
   // 주소 입력 시 state 업데이트
-  const handleChangeAddress = (text) => {
+  const handleChangeAddress = text => {
     setAddress(text);
   };
 
   const onSignUp = async () => {
     try {
       // Firebase를 사용하여 회원가입 처리
-      console.log('회원가입 데이터:', { checkboxState, email, password, address, nickname }); 
-      const userCredential = await auth().createUserWithEmailAndPassword(email, password);
-      const user = userCredential.user;
-
-      // 회원 정보를 Firestore에 저장
-      await firestore().collection('users').doc(user.uid).set({
+      console.log('회원가입 데이터:', {
         checkboxState,
         email,
-        password,
         address,
-        nickname
-        // 기타 회원 정보 필드 추가 가능
+        nickname,
+        profileImageUrl,
+      });
+
+      // Firebase Storage에서 프로필 이미지 다운로드 URL 가져오기
+      const profileImageUrl = await storage()
+        .ref('dummyprofile.png') // Storage 경로 지정
+        .getDownloadURL();
+
+      // 회원 생성 및 Firestore에 저장
+      const userCredential = await auth().createUserWithEmailAndPassword(
+        email,
+        password,
+      );
+      const user = userCredential.user;
+      await firestore().collection('users').doc(user.uid).set({
+        id: user.uid,
+        checkboxState,
+        email,
+        address,
+        nickname,
+        profileImage: profileImageUrl, // Firebase Storage에서 가져온 URL 사용
       });
 
       Alert.alert('회원가입 성공');
-      navigation.navigate('Login')
+      navigation.navigate('Login');
     } catch (error) {
       console.error('회원가입 실패:', error);
       Alert.alert('회원가입 실패');
@@ -40,14 +70,14 @@ const SignUpAddress = ({ navigation, checkboxState, email, nickname, password })
   };
 
   // 다음 주소 API 모달에서 주소 선택 시 처리
-  const handleCompleteDaumPostcode = (data) => {
+  const handleCompleteDaumPostcode = data => {
     setAddress(data.address); // 선택된 주소로 state 업데이트
     setShowPostcode(false); // 모달 닫기
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <View style={{ justifyContent: 'space-between', flex: 1 }}>
+    <SafeAreaView style={styles.Container}>
+      <View style={{justifyContent: 'space-between', flex: 1}}>
         <View>
           <View>
             <View style={styles.textContainer}>
@@ -55,7 +85,7 @@ const SignUpAddress = ({ navigation, checkboxState, email, nickname, password })
             </View>
           </View>
 
-          <View style={{ flexDirection: 'row' }}>
+          <View style={{flexDirection: 'row'}}>
             <TextInput
               style={{
                 width: width * 0.92,
@@ -68,30 +98,30 @@ const SignUpAddress = ({ navigation, checkboxState, email, nickname, password })
                 fontWeight: 'bold',
               }}
               placeholder="지번, 도로명, 건물명으로 검색"
+              placeholderTextColor={'#A7A7A7'}
               value={address}
-              onChangeText={handleChangeAddress} // 주소 입력 시 state 업데이트
-              onPress={() => setShowPostcode(true)} // 다음 주소 API 모달 열기
+              onChangeText={handleChangeAddress}
+              onPress={() => setShowPostcode(true)}
             />
           </View>
         </View>
 
         <View>
           <TouchableOpacity
-            style={[styles.button, { backgroundColor: '#07AC7D' }]}
+            style={[styles.button, {backgroundColor: '#07AC7D'}]}
             onPress={onSignUp}>
-            <Text style={{ color: '#fff', fontSize: 16, fontWeight: 'bold' }}>
+            <Text style={{color: '#fff', fontSize: 16, fontWeight: 'bold'}}>
               회원가입 완료
             </Text>
           </TouchableOpacity>
         </View>
       </View>
-      
-      {/* 다음 주소 API 모달 */}
+
       {showPostcode && (
         <Postcode
-          style={{ flex: 1, position:'absolute', width:'100%', height:'100%'}}
-          jsOptions={{ animated: true }}
-          onSelected={(data) => handleCompleteDaumPostcode(data)} // 다음 주소 선택 시 처리
+          style={{flex: 1, position: 'absolute', width: '100%', height: '100%'}}
+          jsOptions={{animated: true}}
+          onSelected={data => handleCompleteDaumPostcode(data)}
         />
       )}
     </SafeAreaView>
@@ -99,6 +129,9 @@ const SignUpAddress = ({ navigation, checkboxState, email, nickname, password })
 };
 
 const styles = StyleSheet.create({
+  Container: {
+    flex: 1,
+  },
   textContainer: {
     marginTop: 40,
     marginLeft: 16,
