@@ -970,6 +970,9 @@ PODS:
   - Firebase/Firestore (10.24.0):
     - Firebase/CoreOnly
     - FirebaseFirestore (~> 10.24.0)
+  - Firebase/Storage (10.24.0):
+    - Firebase/CoreOnly
+    - FirebaseStorage (~> 10.24.0)
   - FirebaseAppCheckInterop (10.24.0)
   - FirebaseAuth (10.24.0):
     - FirebaseAppCheckInterop (~> 10.17)
@@ -978,6 +981,7 @@ PODS:
     - GoogleUtilities/Environment (~> 7.8)
     - GTMSessionFetcher/Core (< 4.0, >= 2.1)
     - RecaptchaInterop (~> 100.0)
+  - FirebaseAuthInterop (10.24.0)
   - FirebaseCore (10.24.0):
     - FirebaseCoreInternal (~> 10.0)
     - GoogleUtilities/Environment (~> 7.12)
@@ -1007,6 +1011,12 @@ PODS:
     - leveldb-library (~> 1.22)
     - nanopb (< 2.30911.0, >= 2.30908.0)
   - FirebaseSharedSwift (10.24.0)
+  - FirebaseStorage (10.24.0):
+    - FirebaseAppCheckInterop (~> 10.0)
+    - FirebaseAuthInterop (~> 10.0)
+    - FirebaseCore (~> 10.0)
+    - FirebaseCoreExtension (~> 10.0)
+    - GTMSessionFetcher/Core (< 4.0, >= 2.1)
   - fmt (9.1.0)
   - glog (0.3.5)
   - Google-Maps-iOS-Utils (4.2.2):
@@ -2392,6 +2402,10 @@ PODS:
     - nanopb (< 2.30910.0, >= 2.30908.0)
     - React-Core
     - RNFBApp
+  - RNFBStorage (19.2.2):
+    - Firebase/Storage (= 10.24.0)
+    - React-Core
+    - RNFBApp
   - RNGestureHandler (2.16.0):
     - DoubleConversion
     - glog
@@ -2466,6 +2480,7 @@ DEPENDENCIES:
   - boost (from `../node_modules/react-native/third-party-podspecs/boost.podspec`)
   - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
+  - Firebase/Storage
   - FirebaseAuth
   - FirebaseFirestore
   - fmt (from `../node_modules/react-native/third-party-podspecs/fmt.podspec`)
@@ -2531,6 +2546,7 @@ DEPENDENCIES:
   - "RNFBApp (from `../node_modules/@react-native-firebase/app`)"
   - "RNFBAuth (from `../node_modules/@react-native-firebase/auth`)"
   - "RNFBFirestore (from `../node_modules/@react-native-firebase/firestore`)"
+  - "RNFBStorage (from `../node_modules/@react-native-firebase/storage`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - "RNGoogleSignin (from `../node_modules/@react-native-google-signin/google-signin`)"
   - "RNNaverLogin (from `../node_modules/@react-native-seoul/naver-login`)"
@@ -2546,12 +2562,14 @@ SPEC REPOS:
     - Firebase
     - FirebaseAppCheckInterop
     - FirebaseAuth
+    - FirebaseAuthInterop
     - FirebaseCore
     - FirebaseCoreExtension
     - FirebaseCoreInternal
     - FirebaseFirestore
     - FirebaseFirestoreInternal
     - FirebaseSharedSwift
+    - FirebaseStorage
     - Google-Maps-iOS-Utils
     - GoogleMaps
     - GoogleSignIn
@@ -2698,6 +2716,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-firebase/auth"
   RNFBFirestore:
     :path: "../node_modules/@react-native-firebase/firestore"
+  RNFBStorage:
+    :path: "../node_modules/@react-native-firebase/storage"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
   RNGoogleSignin:
@@ -2720,12 +2740,14 @@ SPEC CHECKSUMS:
   Firebase: 91fefd38712feb9186ea8996af6cbdef41473442
   FirebaseAppCheckInterop: fecc08c89936c8acb1428d8088313aabedb348e4
   FirebaseAuth: 711d01cccefaf10035b3090a92956d0dd4f99088
+  FirebaseAuthInterop: 29336ab84df12fc0f340ba5fe58d3e5811a4192d
   FirebaseCore: 11dc8a16dfb7c5e3c3f45ba0e191a33ac4f50894
   FirebaseCoreExtension: af5fd85e817ea9d19f9a2659a376cf9cf99f03c0
   FirebaseCoreInternal: bcb5acffd4ea05e12a783ecf835f2210ce3dc6af
   FirebaseFirestore: 6df1bc70a56c15921286ff2a3096fa2d350b8823
   FirebaseFirestoreInternal: d9a6e08e9bb4016ce7c0b3544f1cf7abcd7cf26f
   FirebaseSharedSwift: 76e1529c32101d80e4f1ca2fba7c39d59f0a390a
+  FirebaseStorage: 03710f9a0e3824d3069ed1128601a3d3a5e7d817
   fmt: 4c2741a687cc09f0634a2e2c72a838b99f1ff120
   glog: c5d68082e772fa1c511173d6b30a9de2c05a69a2
   Google-Maps-iOS-Utils: f77eab4c4326d7e6a277f8e23a0232402731913a
@@ -2802,13 +2824,14 @@ SPEC CHECKSUMS:
   RNFBApp: 91311b27bc9a33e23b76a62825afd1635501018a
   RNFBAuth: 92172d8976baaa829825017174106e2b2c550319
   RNFBFirestore: 58f9f2f1d61eadcf16bf6d75737d92ad651bb264
+  RNFBStorage: 2ef3bcc956d6c771f94efda0c3714c04019dde86
   RNGestureHandler: 72574cf7d3910bdbdf8136c1caf70cd45ede9d9f
   RNGoogleSignin: 24d3b3261f78b0fae0aa013f8ab6f8d25e369b0c
   RNNaverLogin: af12cf085682b1160609505f2554c78c5a364b9b
   RNScreens: cfe03c0356f5d19e1f04e45b7e2ff6edd92fe6e1
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
-  Yoga: 3f9165051bbc60b66f6a88c5eeafd9e9faa29500
+  Yoga: d97d4830fe26d7abad29a92f2b11012d2e1f58d1
 
-PODFILE CHECKSUM: 00859281f23d497cafcc5dd895e43d7ee9ade6bb
+PODFILE CHECKSUM: b4bae90d5aa4b6543f82ee95ea7448bf2a617686
 
 COCOAPODS: 1.15.2

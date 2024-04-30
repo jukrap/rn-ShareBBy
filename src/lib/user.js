@@ -4,16 +4,16 @@ export const userCollection = firestore().collection('users');
 
 export function createUser({
   id,
-  password,
   nickname,
   address,
   email,
   checkboxState,
+  profileImage,
 }) {
   return userCollection.doc(id).set({
     id,
     nickname,
-    password,
+    profileImage,
     email,
     address,
     checkboxState,

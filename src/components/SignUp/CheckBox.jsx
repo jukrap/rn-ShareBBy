@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   StyleSheet,
@@ -12,7 +12,7 @@ const OffCheckBox = require('../../assets/icons/offCheckBox.png');
 const onCheckIcon = require('../../assets/icons/onCheck.png');
 const offCheckIcon = require('../../assets/icons/offCheck.png');
 
-const CheckBox = ({ onChange }) => {
+const CheckBox = ({onChange}) => {
   const [checkboxes, setCheckboxes] = useState({
     isChecked1: false,
     isChecked2: false,
@@ -20,8 +20,6 @@ const CheckBox = ({ onChange }) => {
     isChecked4: false,
     isChecked5: false,
   });
-
-  
 
   // 체크 상태를 토글하는 함수
   const toggleCheckBox = checkboxName => {
@@ -35,7 +33,6 @@ const CheckBox = ({ onChange }) => {
     onChange && onChange(checkboxes); // 상위 컴포넌트에 체크박스 상태 전달
   }, [checkboxes, onChange]);
 
-
   // 모두 동의하기 체크박스의 상태를 변경하는 함수
   const toggleAllCheckboxes = () => {
     const allChecked = Object.values(checkboxes).every(checked => checked);
@@ -47,7 +44,7 @@ const CheckBox = ({ onChange }) => {
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{flex: 1}}>
       <TouchableWithoutFeedback onPress={toggleAllCheckboxes}>
         <View style={styles.container}>
           {Object.values(checkboxes).every(checked => checked) ? (
@@ -106,7 +103,6 @@ const CheckBox = ({ onChange }) => {
     </View>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {

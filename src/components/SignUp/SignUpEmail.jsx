@@ -1,12 +1,20 @@
 // SignUpEmail.jsx
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, TextInput, Alert } from 'react-native';
+import React, {useState} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  SafeAreaView,
+  TouchableOpacity,
+  TextInput,
+  Alert,
+} from 'react-native';
 import firestore from '@react-native-firebase/firestore'; // firestore import 추가
 
-const SignUpEmail = ({ onNextStep }) => {
+const SignUpEmail = ({onNextStep}) => {
   const [email, setEmail] = useState('');
 
-  const validateEmail = (email) => {
+  const validateEmail = email => {
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return emailPattern.test(email);
   };
@@ -28,7 +36,7 @@ const SignUpEmail = ({ onNextStep }) => {
         Alert.alert('중복된 이메일', '이미 사용 중인 이메일입니다.');
       } else {
         // 중복된 이메일이 없으면 다음 단계로 진행
-        onNextStep({ email });
+        onNextStep({email});
       }
     } catch (error) {
       console.error('이메일 중복 확인 오류:', error);
@@ -40,16 +48,19 @@ const SignUpEmail = ({ onNextStep }) => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <View style={{ justifyContent: 'space-between', flex: 1 }}>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.secondContariner}>
         <View>
           <View style={styles.textContainer}>
             <Text style={styles.text}>이메일을 입력해주세요.</Text>
-            <Text style={styles.secondText}>가입을 위해 이메일 인증을 진행해 주세요.</Text>
+            <Text style={styles.secondText}>
+              가입을 위해 이메일 인증을 진행해 주세요.
+            </Text>
           </View>
           <TextInput
             style={styles.input}
             placeholder="이메일을 입력해주세요."
+            placeholderTextColor={'#A7A7A7'}
             onChangeText={setEmail}
             value={email}
           />
@@ -65,6 +76,12 @@ const SignUpEmail = ({ onNextStep }) => {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1
+  },
+  secondContariner: {
+    justifyContent: 'space-between', flex: 1
+  },
   textContainer: {
     marginTop: 40,
     marginLeft: 16,

@@ -10,6 +10,7 @@ const Main = ({ navigation, route }) => {
         setOptionClick(id);
     }
 
+    // eventBar index
     // const viewabilityConfig = useRef({
     //     itemVisiblePercentThreshold : 50
     // });
@@ -26,7 +27,6 @@ const Main = ({ navigation, route }) => {
             <View>
                 <Image source={item.bgImg} opacity={0.6} style={{ width: width }} />
                 <Text style={{ width: 260, left: 50, top: 120, position: 'absolute', zIndex: 2, fontSize: 28, fontWeight: 600, color: '#fff' }}>{item.content}</Text>
-                
             </View>
         )
     }
@@ -78,65 +78,65 @@ const Main = ({ navigation, route }) => {
                 </View>
                 <View style={styles.divisionView} />
                 <View style={{ marginBottom: 20, paddingHorizontal: 16, gap: 6 }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', paddingVertical: 15, gap: 10 }}>
+                    <View style={styles.hobbyNameView}>
                         <Image source={dummyProfileIcon} style={{ width: 20, height: 20 }} />
                         <Text style={[styles.nomalText, { fontSize: 16, color: '#07AC7D' }]}>김준엽<Text style={[styles.nomalText, { fontWeight: '500' }]}> 님, 취미활동 하러 가보실까요?</Text></Text>
                     </View>
                     <View style={{ justifyContent: 'space-between', flexDirection: 'row' }}>
                         <TouchableOpacity activeOpacity={0.8}
-                            style={{ width: 170, height: 170, overflow: 'hidden', borderRadius: 15, backgroundColor: '#703CA0' }}
+                            style={[styles.hobbyBox, {backgroundColor : '#703CA0'}]}
                             onPress={() => navigation.navigate('Recruit')}>
                             <Image source={goRecruit} style={{ width: 100, height: 100, marginTop: 'auto' }} />
-                            <Text style={{ left: 45, top: 70, fontSize: 24, fontWeight: 700, color: '#fff', position: 'absolute', zIndex: 2 }}>모집하기</Text>
+                            <Text style={styles.hobbyText}>모집하기</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
-                            style={{ width: 170, height: 170, overflow: 'hidden', borderRadius: 15, backgroundColor: '#E8C257' }}
+                            style={[styles.hobbyBox, {backgroundColor : '#E8C257'}]}
                             onPress={() => navigation.navigate('Join')}>
                             <Image source={goJoin} style={{ width: 100, height: 100, marginTop: 'auto' }} />
-                            <Text style={{ left: 45, top: 70, fontSize: 24, fontWeight: 700, color: '#fff', position: 'absolute', zIndex: 2 }}>참여하기</Text>
+                            <Text style={styles.hobbyText}>참여하기</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
                 <View style={styles.divisionView} />
-                <View style={{ marginBottom: 20, paddingHorizontal: 16, paddingTop: 15, gap: 6 }}>
+                <View style={styles.joinBox}>
                     <Text style={[styles.nomalText, { fontSize: 16, fontWeight: '600' }]}>이달의 참여왕은? 🔥</Text>
                     <Text style={[styles.nomalText, { fontSize: 14, fontWeight: '600', color: '#7B7B7B' }]}>현재 가장 많이 취미활동에 참여한 유저는 누구일까요?</Text>
                     <View style={{ gap: 10, marginTop: 10 }}>
-                        <View style={{ justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row', paddingHorizontal: 16 }}>
-                            <View style={{ gap: 16, alignItems: 'center', justifyContent: 'center', top: 20 }}>
+                        <View style={styles.gradeUpView}>
+                            <View style={[styles.gradeUp, {top : 20}]}>
                                 <Image source={dummyProfileIcon} style={{ width: 55, height: 55 }} />
-                                <View style={{ width: 24, height: 24, bottom: 20, position: 'absolute', zIndex: 2, borderRadius: 50, alignItems: 'center', justifyContent: 'center', backgroundColor: '#4AABFF' }}>
+                                <View style={styles.gradeNum}>
                                     <Text style={{ color: '#fff', fontWeight: 'bold' }}>2</Text>
                                 </View>
                                 <Text style={{ fontSize: 16, fontWeight: '600' }}>장혜림</Text>
                             </View>
-                            <View style={{ gap: 16, alignItems: 'center', justifyContent: 'center' }}>
+                            <View style={styles.gradeUp}>
                                 <Image source={dummyProfileIcon} />
-                                <View style={{ width: 24, height: 24, bottom: 20, position: 'absolute', zIndex: 2, borderRadius: 50, alignItems: 'center', justifyContent: 'center', backgroundColor: '#4AABFF' }}>
+                                <View style={styles.gradeNum}>
                                     <Text style={{ color: '#fff', fontWeight: 'bold' }}>1</Text>
                                 </View>
                                 <Text style={{ fontSize: 16, fontWeight: '600' }}>김한솔</Text>
                             </View>
-                            <View style={{ gap: 16, alignItems: 'center', justifyContent: 'center', top: 20 }}>
+                            <View style={[styles.gradeUp, {top : 20}]}>
                                 <Image source={dummyProfileIcon} style={{ width: 55, height: 55 }} />
-                                <View style={{ width: 24, height: 24, bottom: 20, position: 'absolute', zIndex: 2, borderRadius: 50, alignItems: 'center', justifyContent: 'center', backgroundColor: '#4AABFF' }}>
+                                <View style={styles.gradeNum}>
                                     <Text style={{ color: '#fff', fontWeight: 'bold' }}>3</Text>
                                 </View>
                                 <Text style={{ fontSize: 16, fontWeight: '600' }}>김선구</Text>
                             </View>
                         </View>
                         <View style={{ marginTop: 20, borderTopWidth: 1, borderTopColor: '#DBDBDB' }}>
-                            <View style={{ justifyContent: 'flex-start', alignItems: 'center', flexDirection: 'row', paddingVertical: 12, paddingHorizontal: 16, gap: 10, borderBottomWidth: 1, borderBottomColor: '#DBDBDB' }}>
+                            <View style={styles.gradeLow}>
                                 <Text>4등</Text>
                                 <Image source={dummyProfileIcon} style={{ width: 36, height: 36 }} />
                                 <Text>김준엽</Text>
                             </View>
-                            <View style={{ justifyContent: 'flex-start', alignItems: 'center', flexDirection: 'row', paddingVertical: 12, paddingHorizontal: 16, gap: 10, borderBottomWidth: 1, borderBottomColor: '#DBDBDB' }}>
+                            <View style={styles.gradeLow}>
                                 <Text>5등</Text>
                                 <Image source={dummyProfileIcon} style={{ width: 36, height: 36 }} />
                                 <Text>박주철</Text>
                             </View>
-                            <View style={{ justifyContent: 'flex-start', alignItems: 'center', flexDirection: 'row', paddingVertical: 12, paddingHorizontal: 16, gap: 10, borderBottomWidth: 1, borderBottomColor: '#DBDBDB' }}>
+                            <View style={styles.gradeLow}>
                                 <Text>6등</Text>
                                 <Image source={dummyProfileIcon} style={{ width: 36, height: 36 }} />
                                 <Text>이나겸</Text>
@@ -183,7 +183,6 @@ const eventBanner = [
         content: '성수동에 테니스 카페 착륙!',
     },
 ]
-
 const topOption = [
     {
         id: 0,
@@ -239,6 +238,66 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.5,
         shadowRadius: 4,
         elevation: 5,
+    },
+    hobbyNameView : {
+        flexDirection: 'row',
+        alignItems: 'center', 
+        ustifyContent: 'flex-start', 
+        paddingVertical: 15, 
+        gap: 10 
+    },
+    hobbyBox : {
+        width: 176, 
+        height: 176, 
+        overflow: 'hidden', 
+        borderRadius: 15, 
+    },
+    hobbyText : {
+        left: 45, 
+        top: 70, 
+        fontSize: 24, 
+        fontWeight: '700', 
+        color: '#fff', 
+        position: 'absolute', 
+        zIndex: 2
+    },
+    joinBox : {
+        marginBottom: 20, 
+        paddingHorizontal: 16, 
+        paddingTop: 15, 
+        gap: 6
+    },
+    gradeUpView : {
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        flexDirection: 'row', 
+        paddingHorizontal: 16 
+    },
+    gradeUp : {
+        gap: 16, 
+        alignItems: 'center', 
+        justifyContent: 'center',
+    },
+    gradeLow : {
+        justifyContent: 'flex-start', 
+        alignItems: 'center', 
+        flexDirection: 'row', 
+        paddingVertical: 12, 
+        paddingHorizontal: 16,
+        gap: 10, 
+        borderBottomWidth: 1, 
+        borderBottomColor: '#DBDBDB'
+    },
+    gradeNum : {
+        width: 24, 
+        height: 24, 
+        bottom: 20, 
+        position: 'absolute', 
+        zIndex: 2, 
+        borderRadius: 50, 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        backgroundColor: '#4AABFF'
     },
     divisionView: {
         width: width,

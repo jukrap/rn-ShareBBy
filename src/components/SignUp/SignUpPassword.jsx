@@ -12,9 +12,9 @@ import {
 } from 'react-native';
 
 const passwordHideIcon = require('../../assets/icons/passwordHide.png');
+const {width, height} = Dimensions.get('window');
 
 const SignUpPassword = ({onNextStep}) => {
-  const {width} = Dimensions.get('window');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -77,49 +77,32 @@ const SignUpPassword = ({onNextStep}) => {
   };
 
   return (
-    <SafeAreaView style={{flex: 1}}>
-      <View style={{justifyContent: 'space-between', flex: 1}}>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.secondContainer}>
         <View>
           <View>
             <View style={styles.textContainer}>
               <Text style={styles.text}>비밀번호를 입력해주세요.</Text>
             </View>
           </View>
-          <View style={{flexDirection: 'row'}}>
+          <View style={styles.passwordInputContainer}>
             <TextInput
-              style={{
-                width: width * 0.92,
-                borderBottomWidth: 2,
-                borderColor: '#07AC7D',
-                marginHorizontal: 16,
-                paddingBottom: 8,
-                fontSize: 16,
-                fontWeight: 'bold',
-                marginBottom: 8,
-              }}
+              style={styles.passwordInput}
               secureTextEntry={!showPassword}
               value={password}
               onChangeText={handlePasswordChange}
               placeholder="비밀번호 입력"
+              placeholderTextColor={'#A7A7A7'}
             />
             <TouchableOpacity onPress={passwordShow}>
               <Image
                 source={passwordHideIcon}
-                style={{
-                  position: 'absolute',
-                  width: 24,
-                  height: 24,
-                  right: width * 0.04,
-                }}
+                style={styles.passwordHideIcon}
               />
             </TouchableOpacity>
           </View>
           <View
-            style={{
-              flexDirection: 'row',
-              marginBottom: 40,
-              paddingHorizontal: 16,
-            }}>
+            style={styles.validationTextContainer}>
             <Text
               style={[
                 styles.validationText,
@@ -143,27 +126,19 @@ const SignUpPassword = ({onNextStep}) => {
             </Text>
           </View>
           <TextInput
-            style={{
-              width: width * 0.92,
-              borderBottomWidth: 2,
-              borderColor: '#07AC7D',
-              marginHorizontal: 16,
-              paddingBottom: 8,
-              marginBottom: 40,
-              fontSize: 16,
-              fontWeight: 'bold',
-            }}
+            style={styles.passwordConfirmInput}
             secureTextEntry={true}
             value={confirmPassword}
             onChangeText={setConfirmPassword}
             placeholder="비밀번호 확인"
+            placeholderTextColor={'#A7A7A7'}
           />
         </View>
         <View>
           <TouchableOpacity
-            style={[styles.button, {backgroundColor: '#07AC7D'}]}
+            style={styles.button}
             onPress={handleNext}>
-            <Text style={{color: '#fff', fontSize: 16, fontWeight: 'bold'}}>
+            <Text style={styles.buttonText}>
               다음
             </Text>
           </TouchableOpacity>
@@ -174,10 +149,36 @@ const SignUpPassword = ({onNextStep}) => {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  secondContainer: {
+    justifyContent: 'space-between',
+    flex: 1,
+  },
   textContainer: {
     marginTop: 40,
     marginLeft: 16,
     marginBottom: 95,
+  },
+  passwordInputContainer: {
+    flexDirection: 'row',
+  },
+  passwordInput: {
+    width: width * 0.92,
+    borderBottomWidth: 2,
+    borderColor: '#07AC7D',
+    marginHorizontal: 16,
+    paddingBottom: 8,
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  passwordHideIcon: {
+    position: 'absolute',
+    width: 24,
+    height: 24,
+    right: width * 0.04,
   },
   text: {
     color: '#07AC7D',
@@ -193,17 +194,34 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     marginBottom: 36,
   },
+  validationTextContainer: {
+    flexDirection: 'row',
+    marginBottom: 40,
+    paddingHorizontal: 16,
+  },
   validationText: {
     marginRight: 16,
-    
   },
   valid: {
     color: '#07AC7D',
-    fontWeight:'bold'
+    fontWeight: 'bold',
   },
   invalid: {
     color: 'red',
   },
+  passwordConfirmInput: {
+    width: width * 0.92,
+    borderBottomWidth: 2,
+    borderColor: '#07AC7D',
+    marginHorizontal: 16,
+    paddingBottom: 8,
+    marginBottom: 40,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  buttonText: {
+    color: '#fff', fontSize: 16, fontWeight: 'bold'
+  }
 });
 
 export default SignUpPassword;

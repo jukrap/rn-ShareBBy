@@ -12,6 +12,7 @@ import SignUpPassword from "../components/SignUp/SignUpPassword";
 import SignUpAddress from "../components/SignUp/SignUpAddress";
 import SignUpNickname from '../components/SignUp/SignUpNickname'
 import SignUpAddressSelection from "../components/SignUp/SignUpAddressSelection";
+import Main from '../pages/Main/Main';
 
 const Stack = createNativeStackNavigator();
 
@@ -32,7 +33,7 @@ const LoginTab = () => {
       <Stack.Screen name="SignUpAddressSelection" component={SignUpAddressSelection}/>
       <Stack.Screen name="SearchId" component={SearchId}/>
       <Stack.Screen name="SearchPassword" component={SearchPassword}/>
-
+      <Stack.Screen name='Main' component={Main}  />
     </Stack.Navigator>
 
   )

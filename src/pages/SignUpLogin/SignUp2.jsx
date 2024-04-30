@@ -64,7 +64,7 @@ const SignUp = ({navigation}) => {
       await auth().signInWithCredential(credential);
       console.log('사용자가 성공적으로 인증되었습니다.');
       setIsPhoneVerified(true); // 전화번호 인증이 완료되었음을 표시합니다.
-      setVerificationCode(''); // 인증이 성공하면 verificationCode를 초기화합니다.
+      setVerificationCode(''); // 인증이 성공하면 vegrificationCode를 초기화합니다.
     } catch (error) {
       console.error('인증 오류:', error);
       Alert.alert('인증 실패', '인증에 실패했습니다.');
