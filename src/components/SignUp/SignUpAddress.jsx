@@ -25,12 +25,10 @@ const SignUpAddress = ({ navigation, checkboxState, email, nickname, password })
       await firestore().collection('users').doc(user.uid).set({
         checkboxState,
         email,
-        password,
         address,
         nickname
         // 기타 회원 정보 필드 추가 가능
       });
-
       Alert.alert('회원가입 성공');
       navigation.navigate('Login')
     } catch (error) {
