@@ -38,6 +38,16 @@
 				<string>kakao6031b1866d99c7f6d2f2dbd56b41ed27</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>naverlogin</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>naverlogin</string>
+			</array>
+		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>1</string>
@@ -45,6 +55,8 @@
 	<string>6031b1866d99c7f6d2f2dbd56b41ed27</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
+		<string>naversearchapp</string>
+		<string>naversearchthirdlogin</string>
 		<string>kakaokompassauth</string>
 		<string>kakaolink</string>
 	</array>
@@ -57,6 +69,12 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>지도 사용시 사용자 권한 부여</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>지도 사용시 사용자 권한 부여</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>지도 사용시 사용자 권한 부여</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>
@@ -69,12 +87,6 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>지도 사용시 사용자 권한 부여</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>지도 사용시 사용자 권한 부여</string>
-	<key>NSLocationAlwaysUsageDescription</key>
-	<string>지도 사용시 사용자 권한 부여</string>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 </dict>
