@@ -86,7 +86,7 @@ const Chat = () => {
     } catch (error) {
       console.error('Error fetching current user: ', error);
     }
-    console.log('currentUserUID:', currentUserUID);
+    // console.log('currentUserUID:', currentUserUID);
   };
 
   const fetchChatRooms = async () => {
@@ -111,7 +111,7 @@ const Chat = () => {
     } else {
       setSelectedUsers(selectedUsers.filter(id => id !== userId));
     }
-    console.log('selectedUsers:', selectedUsers);
+    // console.log('selectedUsers:', selectedUsers);
   };
 
   const createGroupChat = async () => {

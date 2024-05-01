@@ -19,8 +19,8 @@ import 'dayjs/locale/ko';
 
 const ChatRoom = ({route, navigation}) => {
   const {chatRoomId, chatRoomName} = route.params;
-  // console.log('chatRoomId:', chatRoomId);
   const [messages, setMessages] = useState([]);
+  const [getMessages, setGetMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isHamburgerModalVisible, setIsHamburgerModalVisible] = useState(false);
   const [isPlusModalVisible, setIsPlusModalVisible] = useState(false);
@@ -42,14 +42,12 @@ const ChatRoom = ({route, navigation}) => {
       .collection('chatRooms')
       .doc(chatRoomId)
       .collection('messages')
-      .where('actflag', '==', true)
       .orderBy('timestamp', 'desc')
       .onSnapshot(querySnapshot => {
         if (querySnapshot) {
           const newMessages = querySnapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data(),
-            createdAt: doc.data().timestamp.toDate(),
           }));
           setMessages(newMessages);
         }
@@ -61,7 +59,6 @@ const ChatRoom = ({route, navigation}) => {
   const sendMessage = async () => {
     try {
       const currentUser = auth().currentUser;
-      console.log('currentUser:', currentUser);
 
       let senderName = 'Unknown';
       if (currentUser) {
@@ -69,19 +66,18 @@ const ChatRoom = ({route, navigation}) => {
           .collection('users')
           .doc(currentUser.uid)
           .get();
-        console.log('userSnapshot:', userSnapshot);
         if (userSnapshot.exists) {
           senderName = userSnapshot.data().nickname;
-          console.log('senderName:', senderName);
+          senderProfileImg = userSnapshot.data().profileImage;
         }
       }
 
       const newMessage = {
         text: inputMessage,
         sender: senderName,
-        actflag: true,
         senderId: currentUser ? currentUser.uid : null,
         timestamp: firestore.FieldValue.serverTimestamp(),
+        senderProfileImg: senderProfileImg,
       };
 
       await firestore()
@@ -165,12 +161,13 @@ const ChatRoom = ({route, navigation}) => {
               gap: 8,
               marginHorizontal: 12,
               marginBottom: 12,
+              alignItems: 'center',
             }}>
             <Image
-              style={{width: 32, height: 32, borderRadius: 10}}
-              source={require('../../assets/images/defaultProfileImg.jpeg')}
+              style={{width: 30, height: 30, borderRadius: 10}}
+              source={{uri: senderProfileImg}}
             />
-            <Text style={{fontSize: 16, fontWeight: '700'}}>{item.sender}</Text>
+            <Text style={{fontWeight: '700'}}>{item.sender}</Text>
           </View>
         )}
         {isCurrentUser ? (
