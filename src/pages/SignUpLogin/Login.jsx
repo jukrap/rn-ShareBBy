@@ -150,6 +150,7 @@ const Login = ({navigation}) => {
       const {idToken} = await GoogleSignin.signIn();
       const googleCredential = auth.GoogleAuthProvider.credential(idToken);
       await auth().signInWithCredential(googleCredential);
+
       const user = auth().user;
 
       // 사용자 정보 가져오기
@@ -179,6 +180,7 @@ const Login = ({navigation}) => {
       Alert.alert('구글 로그인 실패');
     }
   };
+
 
   const kakaoLogins = async () => {
     try {
@@ -222,6 +224,7 @@ const Login = ({navigation}) => {
         '카카오 프로필 정보를 가져오는 데 오류가 발생했습니다.',
       );
     }
+
   };
 
   const registerKakaoUser = async profile => {
@@ -258,7 +261,7 @@ const Login = ({navigation}) => {
       // 로그인 정보 가져오기
       const userCollection = firestore().collection('users');
       console.log((await userCollection.doc(user.uid).get()).data());
-      navigation.navigate('Main', {userId: user.uid});
+      navigation.navigate('BottomTab', {userId: user.uid});
     } catch (e) {
       console.error('로그인 실패:', e);
       Alert.alert('로그인 실패');

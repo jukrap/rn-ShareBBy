@@ -6,8 +6,9 @@ import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 
 const { width, height } = Dimensions.get('window');
 
-const Recruit = ({ navigation, route, onClose }) => {
-    const addedAddress = route.params;
+const Recruit = ({ navigation, route }) => {
+    console.log(route.params);
+    // const addedAddress = route.params;
     const [initialLocation, setinitialLocation] = useState({
         latitude: 37.78825,
         longitude: -122.4324,
@@ -49,11 +50,11 @@ const Recruit = ({ navigation, route, onClose }) => {
         });
     }, []);
 
-    useEffect(() => {
-        if (addedAddress) {
-            setAddMarkerAddress(addedAddress);
-        }
-    }, [addedAddress]);
+    // useEffect(() => {
+    //     if (addedAddress) {
+    //         setAddMarkerAddress(addedAddress);
+    //     }
+    // }, [addedAddress]);
 
     const requestPermission = async () => {
         try {
@@ -107,6 +108,9 @@ const Recruit = ({ navigation, route, onClose }) => {
             { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
         );
     }
+    const getUserInfo = async () => {
+        
+    }
 
     const goToDetailScreen = () => {
         setIsModalVisible(false)
@@ -147,7 +151,7 @@ const Recruit = ({ navigation, route, onClose }) => {
                         }
                     }}
                 >
-                    {addMarkerAddress?.map((markerElements, i) => {
+                    {/* {addMarkerAddress?.map((markerElements, i) => {
                         console.log('markerElements : ', markerElements);
                         return (
                             <Marker
@@ -158,7 +162,7 @@ const Recruit = ({ navigation, route, onClose }) => {
                                 <Image source={locationIcon} style={{ width: 30, height: 30 }} />
                             </Marker>
                         )
-                    })}
+                    })} */}
                 </MapView>
             </View>
             <Modal
