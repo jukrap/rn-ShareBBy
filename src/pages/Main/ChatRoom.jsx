@@ -58,6 +58,10 @@ const ChatRoom = ({route, navigation}) => {
 
   const sendMessage = async () => {
     try {
+      if (!inputMessage.trim()) {
+        return;
+      }
+
       const currentUser = auth().currentUser;
 
       let senderName = 'Unknown';
