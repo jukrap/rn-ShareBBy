@@ -1,4 +1,4 @@
-package com.gangsterdev.app
+package com.gangsterdev.hobbyshare
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
