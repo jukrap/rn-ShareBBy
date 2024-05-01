@@ -17,6 +17,7 @@ const requestPermission = async () => {
 
 const Join = ({ navigation, route }) => {
     const addedAddress = route.params;
+    console.log(addedAddress);
     const mapView = useRef(null);
     const [initialLocation, setinitialLocation] = useState({
         latitude: 37.78825,
@@ -31,7 +32,6 @@ const Join = ({ navigation, route }) => {
     });
     const [location, setLocation] = useState();
     const [addMarkerAddress, setAddMarkerAddress] = useState([]);
-    const [isModalVisible, setIsModalVisible] = useState(false);
     const currTime = new Date();
 
     useEffect(() => {
@@ -154,11 +154,6 @@ const Join = ({ navigation, route }) => {
                 </View>
             </View>
         )
-    }
-
-    const goToDetailScreen = () => {
-        setIsModalVisible(false)
-        navigation.navigate('Detail', pickedLocation)
     }
 
     return (

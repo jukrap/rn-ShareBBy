@@ -7,8 +7,9 @@ import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 const { width, height } = Dimensions.get('window');
 
 const Recruit = ({ navigation, route }) => {
-    console.log(route.params);
-    // const addedAddress = route.params;
+    const { id, nickname} = route.params
+
+    // const [addMarkerAddress, setAddMarkerAddress] = useState([]);
     const [initialLocation, setinitialLocation] = useState({
         latitude: 37.78825,
         longitude: -122.4324,
@@ -19,9 +20,10 @@ const Recruit = ({ navigation, route }) => {
         pickAddress: '',
         pickLatitude: '',
         pickLongitude: '',
+        id : id,
+        nickname : nickname,
     });
     const [location, setLocation] = useState();
-    const [addMarkerAddress, setAddMarkerAddress] = useState([]);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const mapView = useRef(null);
 
@@ -72,11 +74,12 @@ const Recruit = ({ navigation, route }) => {
         if (json.results && json.results.length > 0) {
             const pickLocation = json.results[0].formatted_address;
             const { lat, lng } = json.results[0].geometry.location;
-            setPickedLocation({
+            setPickedLocation(prevState => ({
+                ...prevState,
                 pickAddress: pickLocation,
                 pickLatitude: lat,
                 pickLongitude: lng,
-            });
+            }))
             setIsModalVisible(true);
 
         } else {
@@ -87,10 +90,6 @@ const Recruit = ({ navigation, route }) => {
     const handleMapPress = (e) => {
         const { latitude, longitude } = e.coordinate;
         fetchAddress(latitude, longitude);
-    };
-
-    const handleMarkerPress = (markerElements) => {
-        navigation.navigate('Show', markerElements);
     };
 
     const moveCurrLocation = () => {
@@ -108,9 +107,6 @@ const Recruit = ({ navigation, route }) => {
             { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
         );
     }
-    const getUserInfo = async () => {
-        
-    }
 
     const goToDetailScreen = () => {
         setIsModalVisible(false)
@@ -121,13 +117,13 @@ const Recruit = ({ navigation, route }) => {
         <SafeAreaView style={{ flex: 1, backgroundColor:'#FFF' }}>
             <View style={{ flex: 1, backgroundColor:'#FFF' }}>
                 <View style={styles.searchView}>
-                    <View style={styles.searchOpacity}>
+                    {/* <View style={styles.searchOpacity}>
                         <Image source={searchIcon} style={{ width: 24, height: 24 }} />
                         <TextInput
                             placeholder='원하는 취미, 위치 검색'
                             placeholderTextColor='#898989'
                             style={{ flex: 1, fontSize: 12, fontFamily: 'Pretendard' }} />
-                    </View>
+                    </View> */}
                     <TouchableOpacity 
                         style={{ marginLeft: 'auto', paddingTop: 10 }}
                         onPress={moveCurrLocation}>
@@ -213,7 +209,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         marginTop: 20,
         position: 'absolute',
-        zIndex: 2
+        zIndex: 2,
+        bottom : 0,
+        paddingBottom : 10
     },
     searchOpacity: {
         height: 40,

@@ -8,7 +8,9 @@ import Tobbar from '../../components/Main/TobTab'
 const { width, height } = Dimensions.get('window');
 
 const Detail = ({ route, navigation }) => {
-    const { pickAddress, pickLatitude, pickLongitude } = route.params;
+    const userData = route.params
+    const { pickAddress, pickLatitude, pickLongitude, id, nickname } = userData;
+
     const [date, setDate] = useState(new Date())
     const [writeDate, setWrtieDate] = useState(new Date()) // 내가 쓴 모집글 시간을 저장
     const [isDateModal, setIsDateModal] = useState(false)
@@ -24,6 +26,8 @@ const Detail = ({ route, navigation }) => {
         peopleCount: '',
         showTitle: '',
         showContent: '',
+        nickName : nickname,
+        id : id,
     });
     const [currTextlength, setCurrTextlength] = useState(0);
     const [isTextClick, setIsTextClick] = useState({
@@ -274,6 +278,7 @@ const Detail = ({ route, navigation }) => {
                                 style={[styles.pressOptionBtn, { backgroundColor: '#07AC7D' }]}
                                 onPress={() => {
                                     navigation.navigate('Join', detailContent)
+                                    console.log(detailContent);
                                     setIsModalVisible(false)}}>
                                 <Text style={styles.pressOptionText}>예</Text>
                             </TouchableOpacity>
