@@ -2430,7 +2430,7 @@ PODS:
   - RNGoogleSignin (11.0.1):
     - GoogleSignIn (~> 7.0.0)
     - React-Core
-  - RNNaverLogin (4.0.0-beta.1):
+  - RNNaverLogin (4.0.0):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2488,6 +2488,7 @@ DEPENDENCIES:
   - GoogleUtilities
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
   - "kakao-login (from `../node_modules/@react-native-seoul/kakao-login`)"
+  - naveridlogin-sdk-ios
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCT-Folly/Fabric (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCTDeprecation (from `../node_modules/react-native/ReactApple/Libraries/RCTFoundation/RCTDeprecation`)
@@ -2827,11 +2828,11 @@ SPEC CHECKSUMS:
   RNFBStorage: 2ef3bcc956d6c771f94efda0c3714c04019dde86
   RNGestureHandler: 72574cf7d3910bdbdf8136c1caf70cd45ede9d9f
   RNGoogleSignin: 24d3b3261f78b0fae0aa013f8ab6f8d25e369b0c
-  RNNaverLogin: af12cf085682b1160609505f2554c78c5a364b9b
+  RNNaverLogin: 4cf478363dae75da6d055a543f0789d3b777b3cb
   RNScreens: cfe03c0356f5d19e1f04e45b7e2ff6edd92fe6e1
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
   Yoga: d97d4830fe26d7abad29a92f2b11012d2e1f58d1
 
-PODFILE CHECKSUM: b4bae90d5aa4b6543f82ee95ea7448bf2a617686
+PODFILE CHECKSUM: 3a71ee1b4db33a57ef6353792c69834e5c551a23
 
 COCOAPODS: 1.15.2
