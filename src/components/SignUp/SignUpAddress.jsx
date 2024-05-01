@@ -60,7 +60,6 @@ const SignUpAddress = ({
         nickname,
         profileImage: profileImageUrl, // Firebase Storage에서 가져온 URL 사용
       });
-
       Alert.alert('회원가입 성공');
       navigation.navigate('Login');
     } catch (error) {

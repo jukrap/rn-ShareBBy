@@ -4,6 +4,7 @@ import { SafeAreaView, View, Text, TouchableOpacity, StyleSheet, ScrollView, Dim
 const { width, height } = Dimensions.get('window');
 
 const Main = ({ navigation, route }) => {
+    console.log(route);
     const [optionClick, setOptionClick] = useState(null);
 
     const handleOptionClick = (id) => {
@@ -73,8 +74,7 @@ const Main = ({ navigation, route }) => {
                         snapToAlignment="start"
                         // onViewableItemsChanged={onViewableItemsChanged}
                         // viewabilityConfig={viewabilityConfig.current}
-                    />
-                    
+                    />            
                 </View>
                 <View style={styles.divisionView} />
                 <View style={{ marginBottom: 20, paddingHorizontal: 16, gap: 6 }}>
@@ -85,7 +85,7 @@ const Main = ({ navigation, route }) => {
                     <View style={{ justifyContent: 'space-between', flexDirection: 'row' }}>
                         <TouchableOpacity activeOpacity={0.8}
                             style={[styles.hobbyBox, {backgroundColor : '#703CA0'}]}
-                            onPress={() => navigation.navigate('Recruit')}>
+                            onPress={() => navigation.navigate('Recruit', route)}>
                             <Image source={goRecruit} style={{ width: 100, height: 100, marginTop: 'auto' }} />
                             <Text style={styles.hobbyText}>모집하기</Text>
                         </TouchableOpacity>
@@ -141,7 +141,6 @@ const Main = ({ navigation, route }) => {
                                 <Image source={dummyProfileIcon} style={{ width: 36, height: 36 }} />
                                 <Text>이나겸</Text>
                             </View>
-
                         </View>
                     </View>
                 </View>
@@ -150,6 +149,7 @@ const Main = ({ navigation, route }) => {
         </SafeAreaView>
     )
 }
+
 const dropDownIcon = require('../../assets/icons/dropDownIcon.png');
 const goJoin = require('../../assets/images/goJoin.png');
 const goRecruit = require('../../assets/images/goRecruit.png');

@@ -1,4 +1,10 @@
 {
-  "name": "HobbyShare",
-  "displayName": "HobbyShare"
+  "ios": {
+    "name": "HobbyShare",
+    "displayName": "HobbyShare"
+  },
+  "android": {
+    "name": "app",
+    "displayName": "HobbyShare"
+  }
 }
