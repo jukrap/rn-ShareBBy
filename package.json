@@ -21,7 +21,10 @@
     "@react-navigation/bottom-tabs": "^6.5.20",
     "@react-navigation/native": "^6.1.17",
     "@react-navigation/native-stack": "^6.9.26",
+<<<<<<< HEAD
+=======
     "date-fns": "^3.6.0",
+>>>>>>> f7c744f5e251660f68d87f4d7144a88840bd0aa4
     "dayjs": "^1.11.11",
     "metro-react-native-babel-preset": "^0.77.0",
     "react": "18.2.0",

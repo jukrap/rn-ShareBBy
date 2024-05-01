@@ -27,6 +27,11 @@ const Chat = () => {
   const [currentUserUID, setCurrentUserUID] = useState(null);
   const navigation = useNavigation();
 
+  const handleLogout = () => {
+    auth().signOut();
+    navigation.navigate('LoginTab');
+  };
+
   const handleGroupNameChange = text => {
     setGroupName(text);
   };
@@ -63,6 +68,7 @@ const Chat = () => {
       const usersSnapshot = await firestore().collection('users').get();
       const userList = usersSnapshot.docs.map(doc => doc.data());
       setUsers(userList);
+      // console.log('users:', users);
     } catch (error) {
       console.error('Error: ', error);
     }
@@ -75,11 +81,12 @@ const Chat = () => {
       if (user) {
         const userUID = user.uid;
         setCurrentUserUID(userUID);
-        setSelectedUsers(prevUsers => [...prevUsers, userUID]);
+        setSelectedUsers([userUID]);
       }
     } catch (error) {
       console.error('Error fetching current user: ', error);
     }
+    console.log('currentUserUID:', currentUserUID);
   };
 
   const fetchChatRooms = async () => {
@@ -104,6 +111,7 @@ const Chat = () => {
     } else {
       setSelectedUsers(selectedUsers.filter(id => id !== userId));
     }
+    console.log('selectedUsers:', selectedUsers);
   };
 
   const createGroupChat = async () => {
@@ -140,7 +148,7 @@ const Chat = () => {
   };
 
   const renderItem = ({item}) => {
-    const isSelected = selectedUsers.includes(item.uid);
+    const isSelected = selectedUsers.includes(item.id);
 
     return (
       <TouchableOpacity
@@ -153,7 +161,7 @@ const Chat = () => {
           alignItems: 'center',
           backgroundColor: isSelected ? 'lightgray' : 'white',
         }}
-        onPress={() => userPress(item.uid)}>
+        onPress={() => userPress(item.id)}>
         <Text>{item.nickname}</Text>
       </TouchableOpacity>
     );
@@ -194,6 +202,9 @@ const Chat = () => {
             }}>
             <Text style={{fontSize: 18, fontWeight: '700'}}>방 만들기</Text>
           </View>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleLogout}>
+          <Text>Log Out</Text>
         </TouchableOpacity>
       </View>
 
@@ -238,9 +249,10 @@ const Chat = () => {
         style={styles.modal}>
         <View style={styles.modalContent}>
           <FlatList
-            data={users.filter(user => user.uid !== currentUserUID)}
+            data={users.filter(user => user.id !== currentUserUID)}
             renderItem={renderItem}
-            keyExtractor={item => item.uid}
+            // keyExtractor={item => item.id}
+            key={item => item.id.toString()}
           />
           <TouchableOpacity onPress={toggleMakeNameModal}>
             <Text style={{fontSize: 18, fontWeight: '700'}}>초대하기</Text>

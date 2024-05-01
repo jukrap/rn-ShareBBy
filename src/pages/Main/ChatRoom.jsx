@@ -61,6 +61,7 @@ const ChatRoom = ({route, navigation}) => {
   const sendMessage = async () => {
     try {
       const currentUser = auth().currentUser;
+      console.log('currentUser:', currentUser);
 
       let senderName = 'Unknown';
       if (currentUser) {
@@ -68,8 +69,10 @@ const ChatRoom = ({route, navigation}) => {
           .collection('users')
           .doc(currentUser.uid)
           .get();
+        console.log('userSnapshot:', userSnapshot);
         if (userSnapshot.exists) {
-          senderName = userSnapshot.data().name;
+          senderName = userSnapshot.data().nickname;
+          console.log('senderName:', senderName);
         }
       }
 
@@ -121,7 +124,6 @@ const ChatRoom = ({route, navigation}) => {
   const renderItem = ({item, index}) => {
     dayjs.locale('ko');
     const isCurrentUser = item.senderId === auth().currentUser?.uid;
-
     const isFirstMessage = index === messages.length - 1;
     const prevItem = messages[index + 1];
     const isDifferentDay =
@@ -142,8 +144,8 @@ const ChatRoom = ({route, navigation}) => {
 
     const showProfileInfo =
       ((showDateSeparator && item.senderId !== auth().currentUser?.uid) ||
-        item.senderId !== prevItem?.senderId) &&
-      item.senderId !== auth().currentUser?.uid;
+        (item.senderId !== prevItem?.senderId && !isCurrentUser)) &&
+      item.senderId !== auth().currentUser?.id;
 
     return (
       <View>

@@ -12,10 +12,7 @@ import {
 import {signIn} from '../../lib/auth';
 import firestore from '@react-native-firebase/firestore';
 
-import {
-  GoogleSignin,
-
-} from '@react-native-google-signin/google-signin';
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import auth from '@react-native-firebase/auth';
 import * as KakaoLogin from '@react-native-seoul/kakao-login';
 import {WEB_CLIENT_ID} from '@env';
@@ -23,10 +20,9 @@ import {NaverLogin} from '@react-native-seoul/naver-login';
 
 const naverIcon = require('../../assets/icons/naver.png');
 const kakaoIcon = require('../../assets/icons/kakao.png');
-const googleIcon = require('../../assets/icons/google.png')
+const googleIcon = require('../../assets/icons/google.png');
 
 const LoginTitle = require('../../assets/images/LoginTitle.png');
-
 
 const Login = ({navigation}) => {
   const [email, setEmail] = useState();
@@ -75,29 +71,29 @@ const Login = ({navigation}) => {
 
   const onGoogleButtonPress = async () => {
     try {
-      const { idToken } = await GoogleSignin.signIn();
+      const {idToken} = await GoogleSignin.signIn();
       const googleCredential = auth.GoogleAuthProvider.credential(idToken);
       await auth().signInWithCredential(googleCredential);
       const currentUser = auth().currentUser;
-  
+
       // 사용자 정보 가져오기
       const email = currentUser.email;
       const displayName = currentUser.displayName;
       const photoURL = currentUser.photoURL;
-  
+
       console.log('구글 사용자 정보:', {
         email: email,
         displayName: displayName,
         photoURL: photoURL,
       });
-  
+
       // Firestore에 사용자 정보 저장
       await firestore().collection('users').doc(currentUser.uid).set({
         email: email,
         displayName: displayName,
         photoURL: photoURL,
       });
-  
+
       // Main 화면으로 이동
       navigation.navigate('Main');
     } catch (error) {
@@ -105,15 +101,12 @@ const Login = ({navigation}) => {
       Alert.alert('구글 로그인 실패');
     }
   };
-  
 
   const kakaoLogins = () => {
     KakaoLogin.login()
       .then(result => {
         console.log('Login Success', JSON.stringify(result));
         getProfile();
-
-
       })
       .catch(error => {
         if (error.code === 'E_CANCELLED_OPERATION') {
@@ -132,14 +125,12 @@ const Login = ({navigation}) => {
         const nickName = result.nickname;
         console.log('이메일:', email);
         console.log('닉네임:', nickName);
-        navigation.navigate('Main', { userId: email, nickname: nickName });
+        navigation.navigate('Main', {userId: email, nickname: nickName});
       })
       .catch(error => {
         console.log(`GetProfile Fail(code:${error.code})`, error.message);
       });
   };
-  
-  
 
   // 로그인
 
@@ -148,13 +139,13 @@ const Login = ({navigation}) => {
   // console.log((await userCollection.doc(user.uid).get()).data());
   // await userCollection.doc(user.uid).update({phoneNumber})
   // console.log((await userCollection.doc(user.uid).get()).data());
-  
+
   const onSignIn = async () => {
     try {
       const {user} = await signIn({email, password});
       // 로그인 정보 가져오기
       const userCollection = firestore().collection('users');
-      // console.log((await userCollection.doc(user.uid).get()).data());
+      console.log((await userCollection.doc(user.uid).get()).data());
       navigation.navigate('BottomTab', {userId: user.uid});
     } catch (e) {
       console.error('로그인 실패:', e);
@@ -168,9 +159,7 @@ const Login = ({navigation}) => {
         <Image source={LoginTitle} />
         <View style={styles.titleTextContainer}>
           <View>
-            <Text style={styles.firstTitleText}>
-              당신의 취미를
-            </Text>
+            <Text style={styles.firstTitleText}>당신의 취미를</Text>
           </View>
           <View>
             <Text style={styles.secondTitleText}>함께할 준비가 되셨나요?</Text>
@@ -320,8 +309,8 @@ const styles = StyleSheet.create({
   },
   signInButton: {
     borderRadius: 10,
-   
-    backgroundColor:'#D7FFF3',
+
+    backgroundColor: '#D7FFF3',
     flex: 0.12,
     justifyContent: 'center',
     alignItems: 'center',
