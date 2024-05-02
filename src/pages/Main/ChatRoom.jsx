@@ -27,6 +27,9 @@ const ChatRoom = ({route, navigation}) => {
   const [isPlusModalVisible, setIsPlusModalVisible] = useState(false);
   const [chatRoomNameChangeModalVisible, setChatRoomNameChangeModalVisible] =
     useState(false);
+  const [isKeyboardAvoidingPosition, setIsKeyboardAvoidingPosition] =
+    useState(false);
+
   const [chatMembers, setChatMembers] = useState([]);
   const [newChatRoomName, setNewChatRoomName] = useState('');
 
@@ -63,6 +66,7 @@ const ChatRoom = ({route, navigation}) => {
 
   const togglePlusModal = () => {
     setIsPlusModalVisible(!isPlusModalVisible);
+    setIsKeyboardAvoidingPosition(isPlusModalVisible);
   };
 
   const toggleChatRoomNameChangeModal = () => {
@@ -105,7 +109,7 @@ const ChatRoom = ({route, navigation}) => {
             memberDetails.push(userData);
           }
         }
-        // console.log('Chat room members:', memberDetails);
+        console.log('Chat room members:', memberDetails);
         setChatMembers(memberDetails);
         // console.log('chatMembers:', chatMembers);
       } else {
@@ -492,12 +496,65 @@ const ChatRoom = ({route, navigation}) => {
         animationIn="slideInUp"
         animationOut="slideOutDown"
         backdropOpacity={0.5}
-        style={styles.modal}>
-        <View style={styles.modalContent}>
-          <TouchableOpacity>
-            <Text style={{fontSize: 18, fontWeight: '700'}}>사진 업로드</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={togglePlusModal}>
+        onBackdropPress={togglePlusModal}
+        style={{
+          justifyContent: 'flex-end',
+          alignItems: 'center',
+          margin: 0,
+        }}>
+        <View
+          style={{
+            flex: 0.2,
+            width: '100%',
+            borderTopLeftRadius: 24,
+            borderTopRightRadius: 24,
+            backgroundColor: '#fff',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: 16,
+          }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              width: '100%',
+              justifyContent: 'space-between',
+              paddingHorizontal: 24,
+              flex: 3,
+            }}>
+            <TouchableOpacity
+              style={{alignItems: 'center', justifyContent: 'center', gap: 8}}>
+              <Image
+                style={{width: 32, height: 32}}
+                source={require('../../assets/icons/image.png')}
+              />
+              <Text>사진</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{alignItems: 'center', justifyContent: 'center', gap: 8}}>
+              <Image
+                style={{width: 32, height: 32}}
+                source={require('../../assets/icons/image.png')}
+              />
+              <Text>카메라</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{alignItems: 'center', justifyContent: 'center', gap: 8}}>
+              <Image
+                style={{width: 36, height: 36}}
+                source={require('../../assets/icons/calender.png')}
+              />
+              <Text>일정</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{alignItems: 'center', justifyContent: 'center', gap: 8}}>
+              <Image
+                style={{width: 32, height: 32}}
+                source={require('../../assets/icons/locationIcon.png')}
+              />
+              <Text>지도</Text>
+            </TouchableOpacity>
+          </View>
+          <TouchableOpacity style={{flex: 1}} onPress={togglePlusModal}>
             <Text>취소</Text>
           </TouchableOpacity>
         </View>
