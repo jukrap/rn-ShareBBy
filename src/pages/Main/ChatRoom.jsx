@@ -27,11 +27,8 @@ const ChatRoom = ({route, navigation}) => {
   const [isPlusModalVisible, setIsPlusModalVisible] = useState(false);
   const [chatRoomNameChangeModalVisible, setChatRoomNameChangeModalVisible] =
     useState(false);
-  const [isKeyboardAvoidingPosition, setIsKeyboardAvoidingPosition] =
-    useState(false);
 
   const [chatMembers, setChatMembers] = useState([]);
-  const [newChatRoomName, setNewChatRoomName] = useState('');
 
   const photoList = [
     {
@@ -66,7 +63,6 @@ const ChatRoom = ({route, navigation}) => {
 
   const togglePlusModal = () => {
     setIsPlusModalVisible(!isPlusModalVisible);
-    setIsKeyboardAvoidingPosition(isPlusModalVisible);
   };
 
   const toggleChatRoomNameChangeModal = () => {
@@ -109,7 +105,6 @@ const ChatRoom = ({route, navigation}) => {
             memberDetails.push(userData);
           }
         }
-        console.log('Chat room members:', memberDetails);
         setChatMembers(memberDetails);
         // console.log('chatMembers:', chatMembers);
       } else {
@@ -123,6 +118,48 @@ const ChatRoom = ({route, navigation}) => {
   useEffect(() => {
     getChatRoomMembers();
   }, [chatRoomId]);
+
+  // const sendMessage = async () => {
+  //   try {
+  //     if (!inputMessage.trim()) {
+  //       return;
+  //     }
+
+  //     const currentUser = auth().currentUser;
+
+  //     let senderName = 'Unknown';
+  //     if (currentUser) {
+  //       const userSnapshot = await firestore()
+  //         .collection('users')
+  //         .doc(currentUser.uid)
+  //         .get();
+  //       if (userSnapshot.exists) {
+  //         senderName = userSnapshot.data().nickname;
+  //         senderProfileImg = userSnapshot.data().profileImage;
+  //       }
+  //     }
+
+  //     const newMessage = {
+  //       text: inputMessage,
+  //       sender: senderName,
+  //       senderId: currentUser ? currentUser.uid : null,
+  //       timestamp: firestore.FieldValue.serverTimestamp(),
+  //       senderProfileImg: senderProfileImg,
+  //     };
+
+  //     await firestore()
+  //       .collection('chatRooms')
+  //       .doc(chatRoomId)
+  //       .collection('messages')
+  //       .add(newMessage);
+
+  //     setMessages(prevMessages => [newMessage, ...prevMessages]);
+
+  //     setInputMessage('');
+  //   } catch (error) {
+  //     console.error('Error sending message: ', error);
+  //   }
+  // };
 
   const sendMessage = async () => {
     try {
@@ -157,8 +194,6 @@ const ChatRoom = ({route, navigation}) => {
         .doc(chatRoomId)
         .collection('messages')
         .add(newMessage);
-
-      setMessages(prevMessages => [newMessage, ...prevMessages]);
 
       setInputMessage('');
     } catch (error) {
@@ -201,7 +236,6 @@ const ChatRoom = ({route, navigation}) => {
       console.error('Error deleting chat:', error);
     }
   };
-
   const renderItem = ({item, index}) => {
     dayjs.locale('ko');
     const isCurrentUser = item.senderId === auth().currentUser?.uid;
@@ -209,17 +243,24 @@ const ChatRoom = ({route, navigation}) => {
     const prevItem = messages[index + 1];
     const isDifferentDay =
       prevItem &&
-      !dayjs(item.createdAt).isSame(dayjs(prevItem.createdAt), 'day');
+      item.timestamp &&
+      prevItem.timestamp &&
+      !dayjs(item.timestamp?.toDate() || new Date()).isSame(
+        dayjs(prevItem.timestamp?.toDate() || new Date()),
+        'day',
+      );
 
     const showDateSeparator = isFirstMessage || isDifferentDay;
 
     const showTime =
       index === 0 ||
-      item.senderId !== messages[index - 1].senderId ||
+      item.senderId !== messages[index - 1]?.senderId ||
       isDifferentDay ||
       (index > 0 &&
-        !dayjs(item.createdAt).isSame(
-          dayjs(messages[index - 1].createdAt),
+        item.timestamp &&
+        messages[index - 1]?.timestamp &&
+        !dayjs(item.timestamp.toDate()).isSame(
+          dayjs(messages[index - 1].timestamp.toDate()),
           'minute',
         ));
 
@@ -234,7 +275,7 @@ const ChatRoom = ({route, navigation}) => {
           {showDateSeparator && (
             <View>
               <Text style={{paddingVertical: 22, color: '#aaa', fontSize: 12}}>
-                {dayjs(item.createdAt).format('YYYY년 MM월 DD일')}{' '}
+                {dayjs(item.timestamp?.toDate()).format('YYYY년 MM월 DD일')}
               </Text>
             </View>
           )}
@@ -260,10 +301,13 @@ const ChatRoom = ({route, navigation}) => {
             {showTime && (
               <View style={{marginBottom: 8}}>
                 <Text style={{color: '#aaa', fontSize: 10}}>
-                  {dayjs(item.createdAt).format('A hh:mm')}
+                  {item.timestamp &&
+                    item.timestamp.toDate &&
+                    dayjs(item.timestamp.toDate()).format('A hh:mm')}
                 </Text>
               </View>
             )}
+
             <View style={styles.sentByUserMessage}>
               <Text>{item.text}</Text>
             </View>
@@ -276,7 +320,9 @@ const ChatRoom = ({route, navigation}) => {
             {showTime && (
               <View style={{marginBottom: 8}}>
                 <Text style={{color: '#aaa', fontSize: 10}}>
-                  {dayjs(item.createdAt).format('A hh:mm')}
+                  {item.timestamp &&
+                    item.timestamp.toDate &&
+                    dayjs(item.timestamp.toDate()).format('A hh:mm')}
                 </Text>
               </View>
             )}
