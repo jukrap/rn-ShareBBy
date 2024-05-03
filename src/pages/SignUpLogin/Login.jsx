@@ -28,11 +28,6 @@ const LoginTitle = require('../../assets/images/LoginTitle.png');
 const Login = ({navigation}) => {
   const [email, setEmail] = useState();
   const [password, setPass] = useState();
-  const [userData, setUserData] = useState(null);
-  const [nickName, setNickName] = useState();
-  const [phoneNumber, setPhoneNumber] = useState();
-
-  const {width, height} = Dimensions.get('window');
 
   useEffect(() => {
     const initializeNaverLogin = async () => {
@@ -115,8 +110,8 @@ const Login = ({navigation}) => {
           // 원하는 데이터를 여기에 추가할 수 있습니다.
         });
 
-        // Main 화면으로 이동
-        navigation.navigate('Main', {
+        // BottomTab 화면으로 이동
+        navigation.navigate('BottomTab', {
           userId: profileData.response.email,
           nickname: profileData.response.nickname,
         });
@@ -130,56 +125,68 @@ const Login = ({navigation}) => {
     } catch (error) {
       console.error('네이버 프로필 정보를 가져오는 데 오류 발생:', error);
       Alert.alert(
-        '네이버 프로필 정보 가져오기 오류',
-        '네이버 프로필 정보를 가져오는 데 오류가 발생했습니다.',
+        '이미 사용중인 이메일입니다.',
       );
     }
   };
 
   useEffect(() => {
     const googleSigninConfigure = async () => {
-      await GoogleSignin.configure({
-        webClientId: WEB_CLIENT_ID,
-      });
+      try {
+        await GoogleSignin.configure({
+          webClientId: WEB_CLIENT_ID,
+        });
+      } catch (error) {
+        console.error('구글 로그인 설정 오류:', error);
+      }
     };
     googleSigninConfigure();
   }, []);
-
+  
   const onGoogleButtonPress = async () => {
     try {
       const {idToken} = await GoogleSignin.signIn();
       const googleCredential = auth.GoogleAuthProvider.credential(idToken);
       await auth().signInWithCredential(googleCredential);
+  
+      const user = auth().currentUser; // 사용자 객체를 currentUser로 변경
+  
+      if (user) {
+        // 사용자 정보 가져오기
+        const email = user.email || ''; // 이메일이 없는 경우 빈 문자열 사용
+        const displayName = user.displayName || ''; // 표시 이름이 없는 경우 빈 문자열 사용
+        // const photoURL = user.photoURL || ''; // 프로필 사진 URL이 없는 경우 빈 문자열 사용
+        const profileImageUrl = await storage()
+        .ref('dummyprofile.png') // Storage 경로 지정
+        .getDownloadURL();
 
-      const user = auth().user;
-
-      // 사용자 정보 가져오기
-      const email = user.email;
-      const displayName = user.displayName;
-      const photoURL = user.photoURL;
-
-      console.log('구글 사용자 정보:', {
-        id: user.uid, // 유저 ID 사용
-        email: email,
-        nickName: displayName,
-        photoURL: photoURL,
-      });
-
-      // Firestore에 사용자 정보 저장
-      await firestore().collection('users').doc(user.uid).set({
-        id: user.uid,
-        email: email,
-        nickName: displayName,
-        photoURL: photoURL,
-      });
-
-      // Main 화면으로 이동
-      navigation.navigate('Main', {userId: email, nickname: displayName});
+        console.log('구글 사용자 정보:', {
+          id: user.uid, // 유저 ID 사용
+          email: email,
+          nickName: displayName,
+          profileImage: profileImageUrl, 
+        });
+  
+        // Firestore에 사용자 정보 저장
+        await firestore().collection('users').doc(user.uid).set({
+          id: user.uid,
+          email: email,
+          nickName: displayName,
+          profileImage: profileImageUrl,
+        });
+  
+        // BottomTab 화면으로 이동
+        navigation.navigate('BottomTab', {userId: email, nickname: displayName});
+      } else {
+        console.error('사용자 정보가 없습니다.');
+        Alert.alert('사용자 정보가 없습니다.');
+      }
     } catch (error) {
       console.error('구글 로그인 오류:', error);
       Alert.alert('구글 로그인 실패');
     }
   };
+  
 
 
   const kakaoLogins = async () => {
@@ -235,17 +242,21 @@ const Login = ({navigation}) => {
         'temporary_password',
       );
       console.log('Firebase Auth User:', user);
+      const profileImageUrl = await storage()
+      .ref('dummyprofile.png') // Storage 경로 지정
+      .getDownloadURL();
 
       // Firestore에 사용자 정보 저장
       await firestore().collection('users').doc(user.uid).set({
         id: user.uid,
         email: profile.email,
         nickname: profile.nickname,
+        profileImage: profileImageUrl,
         // 다른 사용자 정보도 필요한 경우에 추가할 수 있습니다.
       });
 
-      // Main 화면으로 이동
-      navigation.navigate('Main', {
+      // BottomTab 화면으로 이동
+      navigation.navigate('BottomTab', {
         userId: user.uid,
         nickname: profile.nickname,
       });

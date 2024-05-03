@@ -45,6 +45,7 @@
 		7D3410EB2BD79CD60046200D /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		7D3410ED2BD7A3850046200D /* HobbyShare-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "HobbyShare-Bridging-Header.h"; sourceTree = "<group>"; };
 		7D3410EE2BD7A3860046200D /* SwiftBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftBridge.swift; sourceTree = "<group>"; };
+		7DC706F12BE2949B00103A63 /* HobbyShare.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = HobbyShare.entitlements; path = HobbyShare/HobbyShare.entitlements; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = HobbyShare/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		D34E87A95A89D14159BF009C /* Pods_HobbyShare_HobbyShareTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HobbyShare_HobbyShareTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA3CF81A78DD13FE1203ACD2 /* Pods-HobbyShare.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HobbyShare.release.xcconfig"; path = "Target Support Files/Pods-HobbyShare/Pods-HobbyShare.release.xcconfig"; sourceTree = "<group>"; };
@@ -92,6 +93,7 @@
 		13B07FAE1A68108700A75B9A /* HobbyShare */ = {
 			isa = PBXGroup;
 			children = (
+				7DC706F12BE2949B00103A63 /* HobbyShare.entitlements */,
 				7D3410EB2BD79CD60046200D /* GoogleService-Info.plist */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
@@ -493,6 +495,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = HobbyShare/HobbyShare.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = HobbyShare/Info.plist;
@@ -521,6 +524,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = HobbyShare/HobbyShare.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				INFOPLIST_FILE = HobbyShare/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (

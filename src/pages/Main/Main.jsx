@@ -146,6 +146,7 @@ const Main = ({ navigation, route }) => {
                     </View>
                 </View>
                 <View style={styles.divisionView} />
+               
             </ScrollView>
         </SafeAreaView>
     )
