@@ -24,6 +24,8 @@ target 'HobbyShare' do
   pod 'FirebaseAuth'
   pod 'FirebaseFirestore'
   pod 'Firebase/Storage'
+  pod 'naveridlogin-sdk-ios'
+
 
   use_frameworks! :linkage => :static
   use_react_native!(

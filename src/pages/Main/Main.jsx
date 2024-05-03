@@ -6,6 +6,7 @@ const { width, height } = Dimensions.get('window');
 const Main = ({ navigation, route }) => {
     console.log(route);
     const [optionClick, setOptionClick] = useState(null);
+    // const { userId, nickname } = route.params;
 
     const handleOptionClick = (id) => {
         setOptionClick(id);
