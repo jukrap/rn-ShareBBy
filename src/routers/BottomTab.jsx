@@ -12,6 +12,7 @@ import Chat from '../pages/Main/Chat';
 import ChatRoom from '../pages/Main/ChatRoom';
 import Board from '../pages/Main/Board';
 import Profile from '../pages/Main/Profile';
+import EditProfile from '../pages/Main/EditProfile';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -33,6 +34,15 @@ const AboutChat = () => {
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name="Chat" component={Chat} />
       <Stack.Screen name="ChatRoom" component={ChatRoom} />
+    </Stack.Navigator>
+  );
+};
+
+const AboutProfile = () => {
+  return (
+    <Stack.Navigator screenOptions={{headerShown: false}}>
+      <Stack.Screen name="Profile" component={Profile} />
+      <Stack.Screen name="EditProfile" component={EditProfile} />
     </Stack.Navigator>
   );
 };
@@ -63,7 +73,7 @@ const BottomTab = ({navigation}) => {
       <Tab.Screen name="홈" component={AboutMap} />
       <Tab.Screen name="게시판" component={Board} />
       <Tab.Screen name="채팅" component={AboutChat} />
-      <Tab.Screen name="프로필" component={Profile} />
+      <Tab.Screen name="프로필" component={AboutProfile} />
     </Tab.Navigator>
   );
 };

@@ -87,6 +87,12 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>HobbyShare would like access to your photo gallery</string>
+	<key>NSCameraUsageDescription</key>
+	<string>HobbyShare would like to use your camera</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>HobbyShare would like to save photos to your photo gallery</string>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 </dict>
