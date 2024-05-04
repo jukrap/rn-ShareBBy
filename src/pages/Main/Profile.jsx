@@ -102,14 +102,7 @@ const Profile = ({navigation, route}) => {
                 }
                 style={styles.name}>
                 <Text style={styles.nameStyle}>{users.nickname}</Text>
-                <Image
-                  source={rightArrow}
-                  style={{
-                    width: 20,
-                    height: 20,
-                    // marginTop: 8,
-                  }}
-                />
+                <Image source={rightArrow} style={styles.arrow} />
               </TouchableOpacity>
               <Text style={styles.emailStyle}>{users.email}</Text>
             </View>
@@ -117,22 +110,22 @@ const Profile = ({navigation, route}) => {
           <View style={styles.infoStyle}>
             <Text
               // onPress={() => navigation.navigate('Home')}
-              style={styles.editStyle}>
+              style={styles.listStyle}>
               내가 쓴 글
             </Text>
             <Text
               // onPress={() => navigation.navigate('Home')}
-              style={styles.editStyle}>
+              style={styles.listStyle}>
               찜한 글
             </Text>
             <Text
               // onPress={() => navigation.navigate('Home')}
-              style={styles.editStyle}>
+              style={styles.listStyle}>
               참여한 취미 목록
             </Text>
             <Text
               // onPress={() => navigation.navigate('Home')}
-              style={styles.editStyle}>
+              style={styles.listStyle}>
               취미 수정
             </Text>
           </View>
@@ -149,11 +142,7 @@ const Profile = ({navigation, route}) => {
             </Text>
             <TouchableOpacity
               // onPress={() => navigation.navigate('Home')}
-              style={{
-                flex: 1,
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-              }}>
+              style={styles.noticeWrapper}>
               <Text style={styles.noticeStyle}>공지사항</Text>
               <Image
                 style={{
@@ -166,11 +155,7 @@ const Profile = ({navigation, route}) => {
             </TouchableOpacity>
             <TouchableOpacity
               // onPress={() => getPhotos()}
-              style={{
-                flex: 1,
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-              }}>
+              style={styles.noticeWrapper}>
               <Text style={styles.noticeStyle}>약관 및 개인정보 처리 방침</Text>
               <Image
                 style={{
@@ -183,11 +168,7 @@ const Profile = ({navigation, route}) => {
             </TouchableOpacity>
             <TouchableOpacity
               // onPress={() => navigation.navigate('Home')}
-              style={{
-                flex: 1,
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-              }}>
+              style={styles.noticeWrapper}>
               <Text
                 // onPress={() => navigation.navigate('Home')}
                 style={styles.noticeStyle}>
@@ -204,11 +185,7 @@ const Profile = ({navigation, route}) => {
             </TouchableOpacity>
             <TouchableOpacity
               //   onPress={() => navigation.navigate('Home')}
-              style={{
-                flex: 1,
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-              }}>
+              style={styles.noticeWrapper}>
               <Text style={styles.noticeStyle}>앱 정보</Text>
               <Image
                 style={{
@@ -221,11 +198,7 @@ const Profile = ({navigation, route}) => {
             </TouchableOpacity>
             <TouchableOpacity
               //   onPress={() => navigation.navigate('Home')}
-              style={{
-                flex: 1,
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-              }}>
+              style={styles.noticeWrapper}>
               <Text style={styles.noticeStyle}>로그아웃</Text>
               <Image
                 style={{
@@ -280,6 +253,10 @@ const styles = StyleSheet.create({
     color: '#212529',
     paddingBottom: 10,
   },
+  arrow: {
+    width: 20,
+    height: 20,
+  },
   emailStyle: {
     fontSize: 15,
     fontWeight: 'bold',
@@ -300,7 +277,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 50,
     borderTopRightRadius: 50,
   },
-  editStyle: {
+  listStyle: {
     fontSize: 16,
     color: '#212529',
     flexDirection: 'row',
@@ -326,6 +303,11 @@ const styles = StyleSheet.create({
     marginLeft: 15,
     marginTop: 10,
     marginBottom: 15,
+  },
+  noticeWrapper: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   additionalInfo: {
     marginLeft: 30,
