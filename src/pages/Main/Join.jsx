@@ -3,6 +3,10 @@ import { SafeAreaView, Platform, View, Text, Image, Dimensions, TouchableOpacity
 import Geolocation from "react-native-geolocation-service";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 
+
+import { getHobbies } from "../../lib/hobby";
+
+
 const { width, height } = Dimensions.get('window');
 
 const requestPermission = async () => {
@@ -15,25 +19,18 @@ const requestPermission = async () => {
     }
 }
 
-const Join = ({ navigation, route }) => {
-    const addedAddress = route.params;
-    console.log(addedAddress);
+const Join = ({ navigation }) => {
     const mapView = useRef(null);
-    const [initialLocation, setinitialLocation] = useState({
-        latitude: 37.78825,
-        longitude: -122.4324,
-        latitudeDelta: 0.1,
-        longitudeDelta: 0.1,
-    });
+
     const [pickedLocation, setPickedLocation] = useState({
         pickAddress: '',
         pickLatitude: '',
         pickLongitude: '',
     });
     const [location, setLocation] = useState();
-    const [addMarkerAddress, setAddMarkerAddress] = useState([]);
-    const currTime = new Date();
-
+    const [hobbiesData, setHobbiesData] = useState([]);
+    const currTime = new Date().getTime();
+    
     useEffect(() => {
         requestPermission().then(result => {
             if (result === "granted") {
@@ -57,13 +54,10 @@ const Join = ({ navigation, route }) => {
                 );
             }
         });
+        getHobbiesData();
+        // console.log(currTime);
     }, []);
 
-    useEffect(() => {
-        if (addedAddress) {
-            setAddMarkerAddress([addedAddress]);
-        }
-    }, [addedAddress]);
 
     const fetchAddress = async (latitude, longitude) => {
         const res = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyCKEnmMSbRzEbeqOwoO_zKm7qLhNhhhDKs&language=ko`)
@@ -81,6 +75,12 @@ const Join = ({ navigation, route }) => {
         } else {
             console.error('no results');
         }
+    }
+
+    const getHobbiesData = async () => {
+        const res = await getHobbies();
+        setHobbiesData(res)
+        // console.log('🔥🔥🔥 아좌좟~ 🔥🔥🔥 ====> ', res); 
     }
 
     const handleMapPress = (e) => {
@@ -112,11 +112,18 @@ const Join = ({ navigation, route }) => {
         );
     }
 
+
     const renderItem = ({ item }) => {
+        const deadTime = new Date(currTime - item._data.deadline);
+        // console.log(deadTime)
+        const DAY = deadTime.getDate();
+        const HOUR = deadTime.getHours();
+        const MIN = deadTime.getMinutes();
+
         return (
             <View style={styles.listView}>
                 <View style={{ justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row', paddingTop: 8 }}>
-                    <Text style={styles.listTitle}>{item.title}</Text>
+                    <Text style={styles.listTitle}>{item._data.title}</Text>
                     {
                         percentFun(item.currP, item.totalP) < 50 ?
                             (
@@ -130,11 +137,14 @@ const Join = ({ navigation, route }) => {
                     }
                 </View>
                 <View style={{ justifyContent: 'space-between', alignItems: 'stretch', flexDirection: 'row' }}>
-                    <Text style={styles.listLocation}>{item.location}</Text>
-                    <Text style={[styles.listRcruit, { color: '#4E8FE4' }]}>{item.currP} \ {item.totalP} 명</Text>
+                    <Text style={styles.listLocation}>{item._data.address}</Text>
+                    <Text style={[styles.listRcruit, { color: '#4E8FE4' }]}>{item.currP} \ {item._data.peopleCount} 명</Text>
                 </View>
-                <View style={{ justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row', paddingTop: 16 }}>
-                    <Text style={{}}>모집 종료 3일 9시간 51분 전</Text>
+                <View>
+                    <Text>{item._data.tag}</Text>
+                </View>
+                <View style={{ justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row' }}>
+                    <Text style={{}}>{DAY}일 {HOUR}시간 {MIN}전</Text>
                     {
                         percentFun(item.currP, item.totalP) == 100 ? (
                             <TouchableOpacity
@@ -150,7 +160,6 @@ const Join = ({ navigation, route }) => {
                             </TouchableOpacity>
                         )
                     }
-
                 </View>
             </View>
         )
@@ -175,9 +184,9 @@ const Join = ({ navigation, route }) => {
                 </View>
                 <View style={{ position: 'absolute', zIndex: 2, bottom: 30 }}>
                     <FlatList
-                        data={dummyList}
+                        data={hobbiesData}
                         renderItem={renderItem}
-                        keyExtractor={item => item.id.toString()}
+                        keyExtractor={item => item.id}
                         horizontal={true}
                         showsHorizontalScrollIndicator={false}
                         style={{ paddingLeft: 8 }}
@@ -192,7 +201,7 @@ const Join = ({ navigation, route }) => {
                     style={{ flex: 1 }}
                     ref={mapView}
                     provider={PROVIDER_GOOGLE}
-                    initialRegion={initialLocation}
+                    initialRegion={moveCurrLocation}
                     region={location}
                     showsUserLocation={true}
                     showsBuildings={false}
@@ -205,16 +214,16 @@ const Join = ({ navigation, route }) => {
                         }
                     }}
                 >
-                    {addMarkerAddress?.map((markerElements, i) => {
-                        console.log('markerElements : ', markerElements);
+                    {hobbiesData?.map((markerElements, i) => {
+                        // console.log('markerElements : ', markerElements);
                         return (
                             <Marker
                                 key={i}
                                 pinColor="#00c7ae"
-                                coordinate={{ latitude: Number(markerElements.latitude), longitude: Number(markerElements.longitude) }}
+                                coordinate={{ latitude: Number(markerElements._data.latitude), longitude: Number(markerElements._data.longitude) }}
                                 onPress={() => handleMarkerPress(markerElements)}>
                                 <Image source={locationIcon} style={{ width: 30, height: 30 }} />
-                            </Marker>
+                            </Marker> 
                         )
                     })}
                 </MapView>
@@ -350,7 +359,7 @@ const styles = StyleSheet.create({
         height: width / 2.4,
         paddingHorizontal: 16,
         paddingVertical: 12,
-        gap: 10,
+        gap: 6,
         marginHorizontal: 10,
         borderRadius: 8,
         borderWidth: 1,

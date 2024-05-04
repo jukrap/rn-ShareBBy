@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { SafeAreaView, View, Text, Image, TouchableOpacity, Dimensions, StyleSheet, ScrollView } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 
@@ -6,6 +6,13 @@ const { width, height } = Dimensions.get('window');
 
 const Show = ({ route, navigation }) => {
     const { address, detailAddress, deadLine, latitude, longitude, peopleCount, showContent, showTag, showTitle } = route.params;
+    
+    
+    // useEffect(() => {
+
+    // }, []);
+    
+    
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: '#FEFFFE' }}>
             <MapView
@@ -19,7 +26,7 @@ const Show = ({ route, navigation }) => {
                 }}
             >
                 <TouchableOpacity 
-                    onPress={() => navigation.goBack()}
+                    onPress={() => navigation.navigate('Detail')}
                     style={style.backSpaceView}>
                     <Image source={backIcon} style={{ width: 30, height: 30 }} />
                 </TouchableOpacity>
