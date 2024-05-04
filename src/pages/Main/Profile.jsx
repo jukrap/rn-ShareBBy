@@ -1,4 +1,3 @@
-//  여기다 백업
 import React, {useEffect, useRef, useState} from 'react';
 import {
   Image,
@@ -22,27 +21,12 @@ import storage from '@react-native-firebase/storage';
 
 const {width, height} = Dimensions.get('window');
 const rightArrow = require('../../assets/icons/right-arrow.png');
-// const getPhotos = async () => {
-//   ImagePicker.openPicker({
-//     width: 300,
-//     height: 400,
-//     multiple: false,
-//   }).then(images => {
-//     console.log(images);
-//     Upload(images.sourceURL);
-//   });
-// };
 
 const Profile = ({navigation, route}) => {
   const [users, setUsers] = useState(null);
   const [userUid, setUserUid] = useState(null);
   const usersCollection = firestore().collection('users');
   useEffect(() => {
-    // const fetchUser = async () => {
-    //   await fetchUserUid();
-    //   await fetchUserData();
-    // };
-    // fetchUser();
     const fetchUserUid = async () => {
       try {
         const user = auth().currentUser;

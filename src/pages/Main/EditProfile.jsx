@@ -65,72 +65,27 @@ const EditProfile = ({navigation, route}) => {
     }
   };
   return (
-    <ScrollView style={{flex: 1}}>
+    <ScrollView style={styles.safeAreaViewStyle}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Image style={{width: 50, height: 50}} source={leftArrow} />
+          <Image style={styles.arrow} source={leftArrow} />
         </TouchableOpacity>
-        <Text style={{fontSize: 20, fontWeight: 'bold', marginTop: 13}}>
-          프로필 수정
-        </Text>
+        <Text style={styles.headtext}>프로필 수정</Text>
       </View>
 
-      <TouchableOpacity
-        style={{
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-        onPress={() => getPhotos()}>
-        <Image
-          style={{
-            width: 120,
-            height: 120,
-            borderRadius: 50,
-          }}
-          source={{uri: route.params.profileImage}}
-        />
+      <TouchableOpacity style={styles.ImageWrapper} onPress={() => getPhotos()}>
+        <Image style={styles.image} source={{uri: route.params.profileImage}} />
       </TouchableOpacity>
-      <View style={{margin: 25}}>
-        <Text
-          style={{
-            fontSize: 20,
-            fontWeight: 'bold',
-            marginBottom: 10,
-          }}>
-          내 정보
-        </Text>
-        <Text
-          style={{
-            fontSize: 16,
-            fontWeight: 'bold',
-            marginTop: 10,
-            color: '#3f3f3f',
-          }}>
-          이름
-        </Text>
+      <View style={styles.editProfileWrapper}>
+        <Text style={styles.myProfile}>내 정보</Text>
+        <Text style={styles.name}>이름</Text>
         <TextInput
           onChangeText={setNickname}
-          style={{
-            height: 40,
-            marginTop: 12,
-            marginBottom: 12,
-            borderWidth: 1,
-            borderRadius: 10,
-            borderColor: '#07AC7D',
-            padding: 10,
-          }}
+          style={styles.editName}
           value={nickname}
         />
 
-        <Text
-          style={{
-            fontSize: 16,
-            fontWeight: 'bold',
-            marginTop: 10,
-            color: '#3f3f3f',
-          }}>
-          주소
-        </Text>
+        <Text style={styles.address}>주소</Text>
         <TouchableHighlight
           style={{
             height: 40,
@@ -172,9 +127,53 @@ const EditProfile = ({navigation, route}) => {
   );
 };
 const styles = StyleSheet.create({
+  safeAreaViewStyle: {
+    flex: 1,
+    backgroundColor: '#fefefe',
+  },
   header: {
     marginTop: 60,
     flexDirection: 'row',
+  },
+  arrow: {width: 50, height: 50},
+  headtext: {fontSize: 20, fontWeight: 'bold', marginTop: 13},
+  ImageWrapper: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  image: {
+    width: 120,
+    height: 120,
+    borderRadius: 50,
+  },
+  editProfileWrapper: {
+    margin: 25,
+  },
+  myProfile: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  name: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginTop: 10,
+    color: '#3f3f3f',
+  },
+  editName: {
+    height: 40,
+    marginTop: 12,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderRadius: 10,
+    borderColor: '#07AC7D',
+    padding: 10,
+  },
+  address: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginTop: 10,
+    color: '#3f3f3f',
   },
 });
 export default EditProfile;
