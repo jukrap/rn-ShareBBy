@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">HobbyShare</string>
+    <string name="kakao_app_key">6031b1866d99c7f6d2f2dbd56b41ed27</string>
 </resources>

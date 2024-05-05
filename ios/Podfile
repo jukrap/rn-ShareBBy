@@ -8,8 +8,6 @@ require Pod::Executable.execute_command('node', ['-p',
 platform :ios, min_ios_version_supported
 prepare_react_native_project!
 
-rn_maps_path = '../node_modules/react-native-maps'
-
 linkage = ENV['USE_FRAMEWORKS']
 if linkage != nil
   Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
@@ -18,12 +16,13 @@ end
 
 target 'HobbyShare' do
   $RNFirebaseAsStaticFramework = true
-  pod 'react-native-google-maps', :path => rn_maps_path
   config = use_native_modules!
   pod 'GoogleUtilities', :modular_headers => true
   pod 'FirebaseAuth'
   pod 'FirebaseFirestore'
   pod 'Firebase/Storage'
+  pod 'naveridlogin-sdk-ios'
+
 
   use_frameworks! :linkage => :static
   use_react_native!(
