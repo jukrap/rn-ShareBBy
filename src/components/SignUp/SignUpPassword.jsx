@@ -35,7 +35,7 @@ const SignUpPassword = ({onNextStep}) => {
       Alert.alert('유효성 검사', '비밀번호가 조건을 충족하지 않습니다.');
       return;
     }
-    onNextStep({password}); 
+    onNextStep({password});
   };
 
   // 비밀번호 유효성 검사 함수
@@ -97,6 +97,7 @@ const SignUpPassword = ({onNextStep}) => {
               placeholder="비밀번호 입력"
               placeholderTextColor={'#A7A7A7'}
               autoFocus={true}
+              autoCapitalize="none"
             />
             <TouchableOpacity onPress={passwordShow}>
               <Image
@@ -135,6 +136,7 @@ const SignUpPassword = ({onNextStep}) => {
             onChangeText={setConfirmPassword}
             placeholder="비밀번호 확인"
             placeholderTextColor={'#A7A7A7'}
+            autoCapitalize="none"
           />
         </View>
         <View>

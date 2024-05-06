@@ -9,7 +9,7 @@ import {
   Alert,
   KeyboardAvoidingView,
 } from 'react-native';
-import firestore from '@react-native-firebase/firestore'; 
+import firestore from '@react-native-firebase/firestore';
 
 const SignUpNickname = ({onNextStep}) => {
   const {width, height} = Dimensions.get('window');
@@ -78,6 +78,7 @@ const SignUpNickname = ({onNextStep}) => {
               placeholder="닉네임 입력"
               placeholderTextColor={'#A7A7A7'}
               autoFocus={true}
+              autoCapitalize="none"
               value={nickname}
               onChangeText={text => {
                 if (text.length <= 15) {

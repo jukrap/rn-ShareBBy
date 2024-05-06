@@ -27,7 +27,7 @@ const LoginTitle = require('../../assets/images/LoginTitle.png');
 
 const Login = ({navigation}) => {
   const [email, setEmail] = useState();
-  const [password, setPass] = useState();
+  const [password, setPassword] = useState();
 
   useEffect(() => {
     const initializeNaverLogin = async () => {
@@ -158,7 +158,7 @@ const Login = ({navigation}) => {
         console.log('구글 사용자 정보:', {
           id: user.uid,
           email: email,
-          nickName: displayName,
+          nickname: displayName,
           profileImage: profileImageUrl,
         });
 
@@ -166,7 +166,7 @@ const Login = ({navigation}) => {
         await firestore().collection('users').doc(user.uid).set({
           id: user.uid,
           email: email,
-          nickName: displayName,
+          nickname: displayName,
           profileImage: profileImageUrl,
         });
 
@@ -293,16 +293,20 @@ const Login = ({navigation}) => {
               placeholder="아이디를 입력해주세요"
               onChangeText={setEmail}
               placeholderTextColor={'#A7A7A7'}
+              autoCompleteType="email"
+              autoCapitalize='none'
+              keyboardType="email-address"
             />
           </View>
 
           <View style={styles.passwordTextInput}>
             <TextInput
               style={{paddingLeft: 12}}
-              value={email}
+              value={password}
               placeholder="비밀번호를 입력해주세요"
-              onChangeText={setEmail}
+              onChangeText={setPassword}
               placeholderTextColor={'#A7A7A7'}
+              autoCapitalize='none'
             />
           </View>
 

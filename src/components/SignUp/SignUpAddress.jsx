@@ -12,7 +12,8 @@ import {
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import Postcode from '@actbase/react-daum-postcode';
-import storage from '@react-native-firebase/storage'; // Firebase Storage 추가
+import storage from '@react-native-firebase/storage';
+const {width} = Dimensions.get('window');
 
 const SignUpAddress = ({
   navigation,
@@ -21,7 +22,6 @@ const SignUpAddress = ({
   nickname,
   password,
 }) => {
-  const {width} = Dimensions.get('window');
   const [address, setAddress] = useState('');
   const [showPostcode, setShowPostcode] = useState(false);
 
@@ -32,7 +32,6 @@ const SignUpAddress = ({
 
   const onSignUp = async () => {
     try {
-      // Firebase를 사용하여 회원가입 처리
       console.log('회원가입 데이터:', {
         checkboxState,
         email,
@@ -41,12 +40,10 @@ const SignUpAddress = ({
         profileImageUrl,
       });
 
-      // Firebase Storage에서 프로필 이미지 다운로드 URL 가져오기
       const profileImageUrl = await storage()
-        .ref('dummyprofile.png') // Storage 경로 지정
+        .ref('dummyprofile.png')
         .getDownloadURL();
 
-      // 회원 생성 및 Firestore에 저장
       const userCredential = await auth().createUserWithEmailAndPassword(
         email,
         password,
@@ -58,7 +55,7 @@ const SignUpAddress = ({
         email,
         address,
         nickname,
-        profileImage: profileImageUrl, // Firebase Storage에서 가져온 URL 사용
+        profileImage: profileImageUrl,
       });
       Alert.alert('회원가입 성공');
       navigation.navigate('Login');
@@ -71,7 +68,7 @@ const SignUpAddress = ({
   // 다음 주소 API 모달에서 주소 선택 시 처리
   const handleCompleteDaumPostcode = data => {
     setAddress(data.address); // 선택된 주소로 state 업데이트
-    setShowPostcode(false); // 모달 닫기
+    setShowPostcode(false);
   };
 
   return (
@@ -89,19 +86,11 @@ const SignUpAddress = ({
 
           <View style={{flexDirection: 'row'}}>
             <TextInput
-              style={{
-                width: width * 0.92,
-                borderBottomWidth: 2,
-                borderColor: '#07AC7D',
-                marginHorizontal: 16,
-                paddingBottom: 8,
-                marginBottom: 40,
-                fontSize: 16,
-                fontWeight: 'bold',
-              }}
+              style={styles.addressTextInput}
               placeholder="지번, 도로명, 건물명으로 검색"
               placeholderTextColor={'#A7A7A7'}
               autoFocus={true}
+              autoCapitalize="none"
               value={address}
               onChangeText={handleChangeAddress}
               onPress={() => setShowPostcode(true)}
@@ -144,6 +133,16 @@ const styles = StyleSheet.create({
     color: '#07AC7D',
     fontWeight: 'bold',
     fontSize: 24,
+  },
+  addressTextInput: {
+    width: width * 0.92,
+    borderBottomWidth: 2,
+    borderColor: '#07AC7D',
+    marginHorizontal: 16,
+    paddingBottom: 8,
+    marginBottom: 40,
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   button: {
     borderRadius: 10,

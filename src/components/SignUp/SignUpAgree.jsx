@@ -15,17 +15,16 @@ const SignUpAgree = ({onNextStep}) => {
   const [isNextEnabled, setIsNextEnabled] = useState(false);
   const [checkboxState, setCheckboxState] = useState({});
 
-  
   const handleCheckBoxChange = isChecked => {
     const isRequiredChecked =
       isChecked.isChecked2 && isChecked.isChecked3 && isChecked.isChecked4;
     setIsNextEnabled(isRequiredChecked);
-    setCheckboxState(isChecked); 
+    setCheckboxState(isChecked);
   };
 
   const handleNextStep = () => {
-    console.log('checkboxState:', checkboxState); 
-    onNextStep({checkboxState}); 
+    console.log('checkboxState:', checkboxState);
+    onNextStep({checkboxState});
   };
 
   return (
@@ -48,9 +47,9 @@ const SignUpAgree = ({onNextStep}) => {
           <TouchableOpacity
             style={[
               styles.button,
-              {backgroundColor: isNextEnabled ? '#07AC7D' : '#A7A7A7'}, 
+              {backgroundColor: isNextEnabled ? '#07AC7D' : '#A7A7A7'},
             ]}
-            onPress={handleNextStep} 
+            onPress={handleNextStep}
             disabled={!isNextEnabled}>
             <Text style={styles.buttonText}>다음으로</Text>
           </TouchableOpacity>

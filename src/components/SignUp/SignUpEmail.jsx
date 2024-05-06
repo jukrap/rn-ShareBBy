@@ -68,6 +68,9 @@ const SignUpEmail = ({onNextStep}) => {
             onChangeText={setEmail}
             value={email}
             autoFocus={true}
+            autoCompleteType="email"
+            autoCapitalize="none"
+            keyboardType="email-address"
           />
         </View>
         <View>
