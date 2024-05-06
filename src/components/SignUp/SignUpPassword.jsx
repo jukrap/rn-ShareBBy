@@ -3,12 +3,12 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   TouchableOpacity,
   Image,
   Dimensions,
   TextInput,
   Alert,
+  KeyboardAvoidingView,
 } from 'react-native';
 
 const passwordHideIcon = require('../../assets/icons/passwordHide.png');
@@ -35,7 +35,7 @@ const SignUpPassword = ({onNextStep}) => {
       Alert.alert('유효성 검사', '비밀번호가 조건을 충족하지 않습니다.');
       return;
     }
-    onNextStep({password}); // 비밀번호 데이터만 전달
+    onNextStep({password});
   };
 
   // 비밀번호 유효성 검사 함수
@@ -77,7 +77,10 @@ const SignUpPassword = ({onNextStep}) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={150}
+      style={styles.container}>
       <View style={styles.secondContainer}>
         <View>
           <View>
@@ -93,6 +96,8 @@ const SignUpPassword = ({onNextStep}) => {
               onChangeText={handlePasswordChange}
               placeholder="비밀번호 입력"
               placeholderTextColor={'#A7A7A7'}
+              autoFocus={true}
+              autoCapitalize="none"
             />
             <TouchableOpacity onPress={passwordShow}>
               <Image
@@ -101,8 +106,7 @@ const SignUpPassword = ({onNextStep}) => {
               />
             </TouchableOpacity>
           </View>
-          <View
-            style={styles.validationTextContainer}>
+          <View style={styles.validationTextContainer}>
             <Text
               style={[
                 styles.validationText,
@@ -132,19 +136,16 @@ const SignUpPassword = ({onNextStep}) => {
             onChangeText={setConfirmPassword}
             placeholder="비밀번호 확인"
             placeholderTextColor={'#A7A7A7'}
+            autoCapitalize="none"
           />
         </View>
         <View>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={handleNext}>
-            <Text style={styles.buttonText}>
-              다음
-            </Text>
+          <TouchableOpacity style={styles.button} onPress={handleNext}>
+            <Text style={styles.buttonText}>다음</Text>
           </TouchableOpacity>
         </View>
       </View>
-    </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -159,7 +160,7 @@ const styles = StyleSheet.create({
   textContainer: {
     marginTop: 40,
     marginLeft: 16,
-    marginBottom: 95,
+    marginBottom: 40,
   },
   passwordInputContainer: {
     flexDirection: 'row',
@@ -193,6 +194,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     paddingVertical: 16,
     marginBottom: 36,
+    height: 55,
   },
   validationTextContainer: {
     flexDirection: 'row',
@@ -215,13 +217,15 @@ const styles = StyleSheet.create({
     borderColor: '#07AC7D',
     marginHorizontal: 16,
     paddingBottom: 8,
-    marginBottom: 40,
+    marginBottom: 290,
     fontSize: 16,
     fontWeight: 'bold',
   },
   buttonText: {
-    color: '#fff', fontSize: 16, fontWeight: 'bold'
-  }
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
 });
 
 export default SignUpPassword;
