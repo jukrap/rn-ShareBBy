@@ -79,6 +79,7 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>NSLocationTemporaryUsageDescriptionDictionary</key>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>지도 사용시 사용자 권한 부여</string>
 	<key>NSLocationAlwaysUsageDescription</key>

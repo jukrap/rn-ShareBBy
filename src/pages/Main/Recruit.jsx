@@ -1,10 +1,15 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { SafeAreaView, View, Text, TouchableOpacity, StyleSheet, TextInput, ScrollView, Dimensions, Image, FlatList } from "react-native";
 import { NaverMapView, NaverMapMarkerOverlay } from "@mj-studio/react-native-naver-map";
 import Modal from "react-native-modal";
 import Geolocation from "react-native-geolocation-service";
 
+import { getHobbies } from "../../lib/hobby";
+
 const { width, height } = Dimensions.get('window');
+
+const LATITUDE_DELTA = 0.05;
+const LONGITUDE_DELTA = LATITUDE_DELTA * (width / height);
 
 const Recruit = ({ navigation, route }) => {
     const { id, nickname} = route.params
@@ -24,6 +29,8 @@ const Recruit = ({ navigation, route }) => {
         nickname : nickname,
     });
     const [location, setLocation] = useState();
+    const [hobbiesData, setHobbiesData] = useState([]);
+
     const [addMarkerAddress, setAddMarkerAddress] = useState([]);
     const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -38,20 +45,8 @@ const Recruit = ({ navigation, route }) => {
     }
 
     const moveCurrLocation = () => {
-        Geolocation.getCurrentPosition(
-            (position) => {
-                const { latitude, longitude } = position.coords;
-                mapView.current.animateToRegion({
-                    latitude,
-                    longitude,
-                    latitudeDelta: 0.005,
-                    longitudeDelta: 0.005,
-                });
-            },
-            (error) => console.log(error),
-            { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
-        );
-    }
+        mapView?.current?.setLocationTrackingMode("Follow")
+    };
 
     const fetchAddress = async (latitude, longitude) => {
         const res = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyCKEnmMSbRzEbeqOwoO_zKm7qLhNhhhDKs&language=ko`)
@@ -72,6 +67,11 @@ const Recruit = ({ navigation, route }) => {
         }
     }
 
+    const getHobbiesData = async () => {
+        const res = await getHobbies();
+        setHobbiesData(res)
+    }
+
     const goToDetailScreen = () => {
         setIsModalVisible(false)
         navigation.navigate('Detail', pickedLocation)
@@ -81,6 +81,35 @@ const Recruit = ({ navigation, route }) => {
         const { latitude, longitude } = e;
         fetchAddress(latitude, longitude);
     };
+
+    const getMyLocation = async () => {
+        requestPermission().then(result => {
+            if (result === "granted") {
+                Geolocation.getCurrentPosition(
+                    pos => {
+                        setLocation({
+                            latitude: pos.coords.latitude,
+                            longitude: pos.coords.longitude,
+                            latitudeDelta: LATITUDE_DELTA,
+                            longitudeDelta: LONGITUDE_DELTA,
+                        })
+                    },
+                    error => {
+                        console.log(error);
+                    },
+                    {
+                        enableHighAccuracy: false,
+                        timeout: 2000,
+                    },
+                );
+            }
+        }
+    )};
+        
+    useEffect(() => {
+        getMyLocation();
+        getHobbiesData();
+    }, []);
 
     useEffect(() => {
         requestPermission().then(result => {
@@ -98,14 +127,24 @@ const Recruit = ({ navigation, route }) => {
                         console.log(error);
                     },
                     {
-                        enableHighAccuracy: true,
+                        enableHighAccuracy: false,
                         timeout: 2000,
-                        maximumAge: 3600,
                     },
                 );
             }
         });
-}, []);
+    }, []);
+
+    const renderMarker = useCallback((marker) => {
+        return (
+            <NaverMapMarkerOverlay
+                key={marker._data.id} 
+                latitude={marker._data.latitude}
+                longitude={marker._data.longitude}
+                onPress={() => handleMarkerPress(marker)}
+                />
+        )
+    },[]);
 
     
 
@@ -118,8 +157,14 @@ const Recruit = ({ navigation, route }) => {
                         placeholderTextColor='#898989'
                         style={{ flex: 1, fontSize: 12, fontFamily: 'Pretendard' }} />
                 </View>
+                <TouchableOpacity
+                    style={{ marginLeft: 'auto', paddingTop: 10 }}
+                    onPress={moveCurrLocation}>
+                    <Image source={currGpsIcon} style={{ width: 40, height: 40 }} />
+                </TouchableOpacity>
             </View>   
             <NaverMapView
+                ref={mapView}
                 style={{ flex: 1 }}
                 layerGroups={{
                     BUILDING: true,
@@ -138,27 +183,8 @@ const Recruit = ({ navigation, route }) => {
                             handleMapPress(props)
                             }
                         }
-                // isIndoorEnabled={indoor}
-                // symbolScale={symbolScale}
-                // lightness={lightness}
-                // isNightModeEnabled={nightMode}
-                // isShowCompass={compass}
-                // isShowScaleBar={scaleBar}
-                // isShowZoomControls={zoomControls}
-                // isExtentBoundedInKorea
-                // logoAlign={'TopRight'}
-                // onInitialized={() => console.log('initialized!')}
-                // onOptionChanged={() => console.log('Option Changed!')}
-                // onCameraChanged={(args) => console.log(`Camera Changed: ${formatJson(args)}`)}
             >
-                {/* <NaverMapMarkerOverlay
-                    latitude={37.498040483}
-                    longitude={127.02758183}
-                    onTap={() => console.log(1)}
-                    // anchor={{ x: 0.5, y: 1 }}
-                    width={25}
-                    height={35}
-                /> */}
+                {hobbiesData.map((v) => renderMarker(v))}
             </NaverMapView>
             <Modal
                 isVisible={isModalVisible}
@@ -311,7 +337,6 @@ const styles = StyleSheet.create({
 })
 
 const searchIcon = require('../../assets/icons/searchIcon.png');
-const locationIcon = require('../../assets/icons/locationIcon.png');
 const currGpsIcon = require('../../assets/icons/currGpsIcon.png');
 
 export default Recruit;

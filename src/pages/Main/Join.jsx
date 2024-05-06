@@ -1,12 +1,15 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { SafeAreaView, View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput, Dimensions, Image, FlatList } from "react-native";
-import { NaverMapView, NaverMapMarkerOverlay } from "@mj-studio/react-native-naver-map";
+import { NaverMapView, NaverMapMarkerOverlay, TrackingMode } from "@mj-studio/react-native-naver-map";
 import Geolocation from "react-native-geolocation-service";
-import dayjs from "dayjs";
+import dayjs from 'dayjs';
 
 import { getHobbies } from "../../lib/hobby";
 
 const { width, height } = Dimensions.get('window');
+
+const LATITUDE_DELTA = 0.05;
+const LONGITUDE_DELTA = LATITUDE_DELTA * (width / height);
 
 const Join = ({ navigation, route }) => {
     const mapView = useRef(null);
@@ -19,7 +22,7 @@ const Join = ({ navigation, route }) => {
     });
     const [location, setLocation] = useState();
     const [hobbiesData, setHobbiesData] = useState([]);
-    const currTime = new Date().getTime();
+    const [joinPeople, setJoinPeople] = useState(0);
         
     useEffect(() => {
         getMyLocation();
@@ -56,11 +59,6 @@ const Join = ({ navigation, route }) => {
         // console.log('🔥🔥🔥 아좌좟~ 🔥🔥🔥 ====> ', res); 
     }
 
-    const handleMapPress = (e) => {
-        const { latitude, longitude } = e.coordinate;
-        fetchAddress(latitude, longitude);
-    };
-
     const handleMarkerPress = (markerElements) => {
         navigation.navigate('Show', markerElements);
     };
@@ -70,27 +68,24 @@ const Join = ({ navigation, route }) => {
     }
 
     const moveCurrLocation = () => {
-        Geolocation.getCurrentPosition(
-            (position) => {
-                const { latitude, longitude } = position.coords;
-                mapView.current.animateToRegion({
-                    latitude,
-                    longitude,
-                    latitudeDelta: 0.005,
-                    longitudeDelta: 0.005,
-                });
-            },
-            (error) => console.log(error),
-            { enableHighAccuracy: false, timeout: 2000 }
-        );
-    }
+        mapView?.current?.setLocationTrackingMode("Follow")
+    };
+
+    const renderMarker = useCallback((marker) => {
+        return (
+            <NaverMapMarkerOverlay
+                key={marker._data.id} 
+                latitude={marker._data.latitude}
+                longitude={marker._data.longitude}
+                onPress={() => handleMarkerPress(marker)}
+                />
+        )
+    }, []);
 
     const renderItem = ({ item }) => {
-        const duration = dayjs.duration(diff);
-        
-        const diffDays = duration.days();
-        const diffHours = duration.hours();
-        const diffMinutes = duration.minutes();
+        const diffDays = dayjs(item._data.deadline).diff(now, 'days')
+        const diffHours = dayjs(item._data.deadline).diff(now, 'hours')
+        const diffMins = dayjs(item._data.deadline).diff(now, 'minutes')
 
         return (
             <View style={styles.listView}>
@@ -110,13 +105,13 @@ const Join = ({ navigation, route }) => {
                 </View>
                 <View style={{ justifyContent: 'space-between', alignItems: 'stretch', flexDirection: 'row' }}>
                     <Text style={styles.listLocation}>{item._data.address}</Text>
-                    <Text style={[styles.listRcruit, { color: '#4E8FE4' }]}>{item.currP} \ {item._data.peopleCount} 명</Text>
+                    <Text style={[styles.listRcruit, { color: '#4E8FE4' }]}>{joinPeople} \ {item._data.peopleCount} 명</Text>
                 </View>
                 <View>
                     <Text>{item._data.tag}</Text>
                 </View>
                 <View style={{ justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row' }}>
-                    <Text style={{}}>{diffDays}일 {diffHours}시간 {diffMinutes}전</Text>
+                    <Text><Text style={{fontWeight : 700}}>{diffDays}</Text> 일 <Text style={{fontWeight : 700}}>{diffHours%24}</Text> 시간 <Text style={{fontWeight : 700}}>{diffMins%60}</Text> 분 전</Text>
                     {
                         percentFun(item.currP, item.totalP) == 100 ? (
                             <TouchableOpacity
@@ -137,19 +132,6 @@ const Join = ({ navigation, route }) => {
         )
     }
 
-    const renderMarker = useCallback((marker) => {
-        return (
-            <NaverMapMarkerOverlay
-                key={marker._data.id} 
-                latitude={marker._data.latitude}
-                longitude={marker._data.longitude}
-                onPress={() => handleMarkerPress(marker)}
-                />
-            
-        )
-    }, []);
-
-
     return (
         <SafeAreaView style={{flex : 1}}>
             <View style={styles.searchView}>
@@ -166,9 +148,10 @@ const Join = ({ navigation, route }) => {
                          <Image source={currGpsIcon} style={{ width: 40, height: 40 }} />
                      </TouchableOpacity>
                 </View>
-                <View style={{ position: 'absolute', zIndex: 2, bottom: 30 }}>
+                <View style={{ bottom: 30, position: 'absolute', zIndex: 2,   }}>
                     <FlatList
-                        data={hobbiesData}
+                    
+                        data={hobbiesData.reverse()}
                         renderItem={renderItem}
                         keyExtractor={item => item.id}
                         horizontal={true}
@@ -193,20 +176,8 @@ const Join = ({ navigation, route }) => {
                     TRANSIT: false,
                 }}
                 initialRegion={initialRegion}
-                logoAlign={'TopRight'}
                 locale={'ko'}
                 isShowLocationButton={false}
-                // isIndoorEnabled={indoor}
-                // symbolScale={symbolScale}
-                // lightness={lightness}
-                // isNightModeEnabled={nightMode}
-                // isShowCompass={compass}
-                // isShowIndoorLevelPicker={indoorLevelPicker}
-                // isShowScaleBar={scaleBar}
-                // isShowZoomControls={zoomControls}
-                // isExtentBoundedInKorea
-                // onCameraChanged={(args) => console.log(`Camera Changed: ${formatJson(args)}`)}
-                // onTapMap={(args) => console.log(`Map Tapped: ${formatJson(args)}`)}
             >
                 {hobbiesData.map((v) => renderMarker(v))}
             </NaverMapView>
@@ -308,7 +279,7 @@ const styles = StyleSheet.create({
         color: '#000',
         fontFamily: 'Pretendard',
         fontSize: 16,
-        fontWeight: 600,
+        fontWeight: '600',
     },
     listRcruit: {
         fontFamily: 'Pretendard',
