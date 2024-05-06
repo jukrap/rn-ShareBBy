@@ -20,22 +20,17 @@ import 'dayjs/locale/ko';
 
 import ChatRoomNameChangeModal from '../../components/Chat/ChatRoomNameChangeModal';
 
-const {width, height} = Dimensions.get('window');
+const {width} = Dimensions.get('window');
 
 const ChatRoom = ({route, navigation}) => {
   const {chatRoomId, chatRoomName} = route.params;
   const [messages, setMessages] = useState([]);
-  const [getMessages, setGetMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
-
-  const [currentUserName, setCurrentUserName] = useState('');
-
   const [isHamburgerModalVisible, setIsHamburgerModalVisible] = useState(false);
   const [isPlusModalVisible, setIsPlusModalVisible] = useState(false);
   const [chatOutModalVisible, setChatOutModalVisible] = useState(false);
   const [chatRoomNameChangeModalVisible, setChatRoomNameChangeModalVisible] =
     useState(false);
-
   const [chatMembers, setChatMembers] = useState([]);
 
   const photoList = [
@@ -65,14 +60,13 @@ const ChatRoom = ({route, navigation}) => {
     navigation.goBack();
   };
 
+  //modal
   const toggleHamburgerModal = () => {
     setIsHamburgerModalVisible(!isHamburgerModalVisible);
   };
-
   const togglePlusModal = () => {
     setIsPlusModalVisible(!isPlusModalVisible);
   };
-
   const toggleChatRoomNameChangeModal = () => {
     setChatRoomNameChangeModalVisible(!chatRoomNameChangeModalVisible);
   };
@@ -122,21 +116,8 @@ const ChatRoom = ({route, navigation}) => {
     }
   };
 
-  const fetchCurrentUser = async () => {
-    try {
-      const currentUser = auth().currentUser;
-      if (currentUser) {
-        const currentUserName = currentUser.nickname;
-        setCurrentUserName(currentUserName);
-      }
-    } catch (error) {
-      console.error('Error fetching current user: ', error);
-    }
-  };
-
   useEffect(() => {
     getChatRoomMembers();
-    fetchCurrentUser();
   }, [chatRoomId]);
 
   const sendMessage = async () => {
@@ -147,7 +128,6 @@ const ChatRoom = ({route, navigation}) => {
 
       const currentUser = auth().currentUser;
 
-
       let senderName = 'Unknown';
       if (currentUser) {
         const userSnapshot = await firestore()
@@ -157,7 +137,6 @@ const ChatRoom = ({route, navigation}) => {
         if (userSnapshot.exists) {
           senderName = userSnapshot.data().nickname;
           senderProfileImg = userSnapshot.data().profileImage;
-
         }
       }
 
@@ -197,20 +176,40 @@ const ChatRoom = ({route, navigation}) => {
   const deleteChat = async () => {
     try {
       const currentUser = auth().currentUser;
-
       const currentUserUID = currentUser ? currentUser.uid : null;
+
+      let currentUserNickname = 'Unknown';
+      if (currentUser) {
+        const userSnapshot = await firestore()
+          .collection('users')
+          .doc(currentUser.uid)
+          .get();
+        if (userSnapshot.exists) {
+          currentUserNickname = userSnapshot.data().nickname;
+        }
+      }
 
       const chatRoomRef = firestore().collection('chatRooms').doc(chatRoomId);
       const chatRoomSnapshot = await chatRoomRef.get();
       const currentMembers = chatRoomSnapshot.data().members;
-
       const updatedMembers = currentMembers.filter(
         memberUID => memberUID !== currentUserUID,
       );
 
       await chatRoomRef.update({members: updatedMembers});
 
-      console.log('채팅방 삭제 완료');
+      const newMessage = {
+        text: `${currentUserNickname}님이 나갔습니다.`,
+        sender: '시스템',
+        timestamp: firestore.FieldValue.serverTimestamp(),
+      };
+
+      await firestore()
+        .collection('chatRooms')
+        .doc(chatRoomId)
+        .collection('messages')
+        .add(newMessage);
+
       navigation.goBack();
     } catch (error) {
       console.error('Error deleting chat:', error);
@@ -218,8 +217,8 @@ const ChatRoom = ({route, navigation}) => {
   };
 
   const renderItem = ({item, index}) => {
-    // console.log('item:', item);
     dayjs.locale('ko');
+    const isSystemMessage = item.sender === '시스템';
     const isCurrentUser = item.senderId === auth().currentUser?.uid;
     const isFirstMessage = index === messages.length - 1;
     const prevItem = messages[index + 1];
@@ -293,6 +292,13 @@ const ChatRoom = ({route, navigation}) => {
             <View style={styles.sentByUserMessage}>
               <Text>{item.text}</Text>
             </View>
+          </View>
+        ) : isSystemMessage ? (
+          <View style={{justifyContent: 'center', alignItems: 'center'}}>
+            <Text style={{paddingVertical: 22, color: '#aaa', fontSize: 12}}>
+              {item.text}
+            </Text>
+            {showTime && <View style={{marginBottom: 8}}></View>}
           </View>
         ) : (
           <View style={styles.sentByOtherWrapper}>
@@ -542,7 +548,7 @@ const ChatRoom = ({route, navigation}) => {
                   justifyContent: 'center',
                   alignItems: 'center',
                 }}>
-                <Text style={styles.pressText}>선택하신 주소가 맞나요?</Text>
+                <Text style={styles.pressText}>정말 나가겠습니까?</Text>
               </View>
               <View style={styles.pressOptionView}>
                 <TouchableOpacity
