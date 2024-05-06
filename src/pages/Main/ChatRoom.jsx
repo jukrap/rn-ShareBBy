@@ -25,6 +25,7 @@ const {width, height} = Dimensions.get('window');
 const ChatRoom = ({route, navigation}) => {
   const {chatRoomId, chatRoomName} = route.params;
   const [messages, setMessages] = useState([]);
+  const [getMessages, setGetMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
 
   const [currentUserName, setCurrentUserName] = useState('');
@@ -146,6 +147,7 @@ const ChatRoom = ({route, navigation}) => {
 
       const currentUser = auth().currentUser;
 
+
       let senderName = 'Unknown';
       if (currentUser) {
         const userSnapshot = await firestore()
@@ -155,6 +157,7 @@ const ChatRoom = ({route, navigation}) => {
         if (userSnapshot.exists) {
           senderName = userSnapshot.data().nickname;
           senderProfileImg = userSnapshot.data().profileImage;
+
         }
       }
 
@@ -215,6 +218,7 @@ const ChatRoom = ({route, navigation}) => {
   };
 
   const renderItem = ({item, index}) => {
+    // console.log('item:', item);
     dayjs.locale('ko');
     const isCurrentUser = item.senderId === auth().currentUser?.uid;
     const isFirstMessage = index === messages.length - 1;

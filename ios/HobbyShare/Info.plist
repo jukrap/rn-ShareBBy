@@ -48,6 +48,14 @@
 				<string>naverlogin</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string></string>
+			<key>CFBundleURLSchemes</key>
+			<array/>
+		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>1</string>
@@ -87,6 +95,12 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>HobbyShare would like access to your photo gallery</string>
+	<key>NSCameraUsageDescription</key>
+	<string>HobbyShare would like to use your camera</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>HobbyShare would like to save photos to your photo gallery</string>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 </dict>
