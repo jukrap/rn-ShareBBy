@@ -3,14 +3,13 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   TouchableOpacity,
   TextInput,
   Alert,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import firestore from '@react-native-firebase/firestore'; // firestore import 추가
+import firestore from '@react-native-firebase/firestore';
 
 const SignUpEmail = ({onNextStep}) => {
   const [email, setEmail] = useState('');
