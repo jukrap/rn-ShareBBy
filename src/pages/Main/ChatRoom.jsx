@@ -20,8 +20,6 @@ import 'dayjs/locale/ko';
 
 import ChatRoomNameChangeModal from '../../components/Chat/ChatRoomNameChangeModal';
 
-const {width} = Dimensions.get('window');
-
 const ChatRoom = ({route, navigation}) => {
   const {chatRoomId, chatRoomName} = route.params;
   const [messages, setMessages] = useState([]);
@@ -33,6 +31,7 @@ const ChatRoom = ({route, navigation}) => {
     useState(false);
   const [chatMembers, setChatMembers] = useState([]);
 
+  //사진 올리기 기능 아직 구현 안 돼서 임시로 dummy data
   const photoList = [
     {
       id: 1,
@@ -143,7 +142,7 @@ const ChatRoom = ({route, navigation}) => {
       const newMessage = {
         text: inputMessage,
         sender: senderName,
-        senderId: currentUser ? currentUser.uid : null,
+        senderId: currentUser.uid,
         timestamp: firestore.FieldValue.serverTimestamp(),
         senderProfileImg: senderProfileImg,
       };
@@ -252,29 +251,22 @@ const ChatRoom = ({route, navigation}) => {
 
     return (
       <View>
-        <View style={{justifyContent: 'center', alignItems: 'center'}}>
+        <View style={styles.showDateSeparatorContainer}>
           {showDateSeparator && (
             <View>
-              <Text style={{paddingVertical: 22, color: '#aaa', fontSize: 12}}>
+              <Text style={styles.showDateSeparatorTime}>
                 {dayjs(item.timestamp?.toDate()).format('YYYY년 MM월 DD일')}
               </Text>
             </View>
           )}
         </View>
         {showProfileInfo && (
-          <View
-            style={{
-              flexDirection: 'row',
-              gap: 8,
-              marginHorizontal: 12,
-              marginBottom: 12,
-              alignItems: 'center',
-            }}>
+          <View style={styles.showProfileInfoContainer}>
             <Image
-              style={{width: 30, height: 30, borderRadius: 10}}
+              style={styles.showProfileInfoImage}
               source={{uri: item.senderProfileImg}}
             />
-            <Text style={{fontWeight: '700'}}>{item.sender}</Text>
+            <Text style={styles.showProfileInfoNickname}>{item.sender}</Text>
           </View>
         )}
         {isCurrentUser ? (
@@ -354,7 +346,7 @@ const ChatRoom = ({route, navigation}) => {
           />
         </TouchableOpacity>
         <TextInput
-          style={styles.input}
+          style={styles.textInput}
           placeholder="메시지를 입력하세요"
           maxLength={500}
           value={inputMessage}
@@ -541,7 +533,7 @@ const ChatRoom = ({route, navigation}) => {
             onBackdropPress={() =>
               setChatOutModalVisible(!chatOutModalVisible)
             }>
-            <View style={styles.pressLocaView}>
+            <View style={styles.chatOutConfirm}>
               <View
                 style={{
                   padding: 16,
@@ -661,6 +653,30 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingVertical: 16,
   },
+  showDateSeparatorContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  showDateSeparatorTime: {
+    paddingVertical: 22,
+    color: '#aaa',
+    fontSize: 12,
+  },
+  showProfileInfoContainer: {
+    flexDirection: 'row',
+    gap: 8,
+    marginHorizontal: 12,
+    marginBottom: 12,
+    alignItems: 'center',
+  },
+  showProfileInfoImage: {
+    width: 30,
+    height: 30,
+    borderRadius: 10,
+  },
+  showProfileInfoNickname: {
+    fontWeight: '700',
+  },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -669,7 +685,7 @@ const styles = StyleSheet.create({
     padding: 10,
     gap: 8,
   },
-  input: {
+  textInput: {
     flex: 1,
     borderWidth: 1,
     borderColor: '#ccc',
@@ -719,7 +735,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 16,
   },
-  pressLocaView: {
+  chatOutConfirm: {
     marginHorizontal: 30,
     borderRadius: 10,
     backgroundColor: '#fff',
@@ -743,62 +759,6 @@ const styles = StyleSheet.create({
   pressOptionText: {
     fontSize: 16,
     color: '#FFF',
-  },
-  nomalText: {
-    color: '#000',
-    fontFamily: 'Pretendard',
-    fontSize: 12,
-  },
-  howText: {
-    color: '#fff',
-    fontFamily: 'Pretendard',
-    fontSize: 10,
-  },
-  icon: {
-    width: 24,
-    height: 24,
-  },
-  listView: {
-    width: width / 1.3,
-    height: width / 2.4,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    gap: 10,
-    marginHorizontal: 10,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#07AC7D',
-    backgroundColor: '#fff',
-    shadowColor: '#A7A7A7',
-    shadowOffset: {
-      width: 4,
-      height: 1,
-    },
-    shadowOpacity: 0.8,
-    shadowRadius: 4,
-  },
-  listTitle: {
-    color: '#000',
-    fontFamily: 'Pretendard',
-    fontSize: 16,
-    fontWeight: 600,
-  },
-  listRcruit: {
-    fontFamily: 'Pretendard',
-    fontSize: 12,
-    fontWeight: 700,
-  },
-  listLocation: {
-    color: '#07AC7D',
-    width: 200,
-    fontFamily: 'Pretendard',
-    fontWeight: 400,
-  },
-  showBtn: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
-    backgroundColor: '#07AC7D',
   },
 });
 
