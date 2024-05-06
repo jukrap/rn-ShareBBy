@@ -94,12 +94,12 @@ const EditProfile = ({navigation, route}) => {
         </View>
 
         <TouchableOpacity
-          onPress={() => {
-            UpdateNickname();
+          onPress={async () => {
+            await UpdateNickname();
             if (editImage.IsEdit) {
-              UploadImage(editImage.ImageUrl);
+              await UploadImage(editImage.ImageUrl);
             }
-            goHome();
+            await goHome();
           }}
           style={styles.submitBox}>
           <Text style={styles.sumbitText}>완료</Text>
