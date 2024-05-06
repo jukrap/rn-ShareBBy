@@ -56,13 +56,13 @@ const BottomTab = ({navigation}) => {
           let iconName;
 
           if (route.name === '홈') {
-            iconName = focused ? homePageIcon : homePageIcon;
+            iconName = focused ? homeOnIcon : homeOffIcon;
           } else if (route.name === '게시판') {
-            iconName = focused ? boardPageIcon : boardPageIcon;
+            iconName = focused ? boardOnIcon : boardOffIcon;
           } else if (route.name === '채팅') {
-            iconName = focused ? chatPageIcon : chatPageIcon;
+            iconName = focused ? chatOnIcon : chatOffIcon;
           } else if (route.name === '프로필') {
-            iconName = focused ? profilePageIcon : profilePageIcon;
+            iconName = focused ? profileOnIcon : profileOffIcon;
           }
           // 아이콘 반환
           return <Image source={iconName} style={style.icon} />;
@@ -78,10 +78,14 @@ const BottomTab = ({navigation}) => {
   );
 };
 
-const homePageIcon = require('../assets/icons/homePageIcon.png');
-const boardPageIcon = require('../assets/icons/boardPageIcon.png');
-const chatPageIcon = require('../assets/icons/chatPageIcon.png');
-const profilePageIcon = require('../assets/icons/profilePageIcon.png');
+const homeOnIcon = require('../assets/icons/homeOnIcon.png');
+const homeOffIcon = require('../assets/icons/homeOffIcon.png');
+const boardOnIcon = require('../assets/icons/boardOnIcon.png');
+const boardOffIcon = require('../assets/icons/boardOffIcon.png');
+const chatOnIcon = require('../assets/icons/chatOnIcon.png');
+const chatOffIcon = require('../assets/icons/chatOffIcon.png');
+const profileOnIcon = require('../assets/icons/profileOnIcon.png');
+const profileOffIcon = require('../assets/icons/profileOffIcon.png');
 
 export const style = StyleSheet.create({
   icon: {
