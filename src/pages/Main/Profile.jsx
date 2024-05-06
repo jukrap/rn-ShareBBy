@@ -175,14 +175,6 @@ const Profile = ({navigation, route}) => {
               //   onPress={() => navigation.navigate('Home')}
               style={styles.noticeWrapper}>
               <Text style={styles.noticeStyle}>로그아웃</Text>
-              <Image
-                style={{
-                  width: 20,
-                  height: 20,
-                  marginTop: 8,
-                }}
-                source={rightArrow}
-              />
             </TouchableOpacity>
           </View>
         </ScrollView>
