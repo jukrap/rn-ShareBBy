@@ -2,27 +2,22 @@ import React, {useState} from 'react';
 import {
   View,
   Text,
-  Button,
   StyleSheet,
-  SafeAreaView,
-  Image,
   TouchableOpacity,
   Dimensions,
   TextInput,
-  Alert, // Alert import 추가
+  Alert,
+  KeyboardAvoidingView,
 } from 'react-native';
-import firestore from '@react-native-firebase/firestore'; // firestore import 추가
+import firestore from '@react-native-firebase/firestore'; 
 
 const SignUpNickname = ({onNextStep}) => {
-  // onNextStep props 추가
   const {width, height} = Dimensions.get('window');
   const [nickname, setNickname] = useState('');
 
   const handleNext = async () => {
-    // async 키워드 추가
     try {
-      // 파이어베이스에서 닉네임 중복 확인
-      const userQuery = await firestore() // firestore() 호출 추가
+      const userQuery = await firestore()
         .collection('users')
         .where('nickname', '==', nickname)
         .get();
@@ -32,10 +27,8 @@ const SignUpNickname = ({onNextStep}) => {
         return;
       }
       if (!userQuery.empty) {
-        // 중복된 닉네임이 있으면 알림 표시
         Alert.alert('중복된 닉네임', '이미 사용 중인 닉네임입니다.');
       } else {
-        // 중복된 닉네임이 없으면 다음 단계로 진행
         onNextStep({nickname});
       }
     } catch (error) {
@@ -48,7 +41,10 @@ const SignUpNickname = ({onNextStep}) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : null}
+      keyboardVerticalOffset={150}
+      style={styles.container}>
       <View style={{justifyContent: 'space-between', flex: 1}}>
         <View>
           <View>
@@ -81,10 +77,10 @@ const SignUpNickname = ({onNextStep}) => {
               }}
               placeholder="닉네임 입력"
               placeholderTextColor={'#A7A7A7'}
+              autoFocus={true}
               value={nickname}
               onChangeText={text => {
                 if (text.length <= 15) {
-                  // 최대 길이 제한
                   setNickname(text);
                 }
               }}
@@ -102,13 +98,13 @@ const SignUpNickname = ({onNextStep}) => {
           </TouchableOpacity>
         </View>
       </View>
-    </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
   },
   textContainer: {
     marginTop: 40,
@@ -137,6 +133,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     paddingVertical: 16,
     marginBottom: 36,
+    height: 55,
   },
 });
 

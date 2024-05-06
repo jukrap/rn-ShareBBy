@@ -3,11 +3,11 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   TouchableOpacity,
   Dimensions,
   TextInput,
   Alert,
+  KeyboardAvoidingView,
 } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
@@ -75,7 +75,10 @@ const SignUpAddress = ({
   };
 
   return (
-    <SafeAreaView style={styles.Container}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : null}
+      keyboardVerticalOffset={150}
+      style={styles.container}>
       <View style={{justifyContent: 'space-between', flex: 1}}>
         <View>
           <View>
@@ -98,6 +101,7 @@ const SignUpAddress = ({
               }}
               placeholder="지번, 도로명, 건물명으로 검색"
               placeholderTextColor={'#A7A7A7'}
+              autoFocus={true}
               value={address}
               onChangeText={handleChangeAddress}
               onPress={() => setShowPostcode(true)}
@@ -123,12 +127,12 @@ const SignUpAddress = ({
           onSelected={data => handleCompleteDaumPostcode(data)}
         />
       )}
-    </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
-  Container: {
+  container: {
     flex: 1,
   },
   textContainer: {

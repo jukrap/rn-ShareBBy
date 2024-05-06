@@ -1,11 +1,9 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
-  Button,
   StyleSheet,
   SafeAreaView,
-  Image,
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
@@ -17,17 +15,17 @@ const SignUpAgree = ({onNextStep}) => {
   const [isNextEnabled, setIsNextEnabled] = useState(false);
   const [checkboxState, setCheckboxState] = useState({});
 
-  // CheckBox 컴포넌트에서 필수 항목 체크 여부를 확인하여 버튼의 활성/비활성 상태를 결정
+  
   const handleCheckBoxChange = isChecked => {
     const isRequiredChecked =
       isChecked.isChecked2 && isChecked.isChecked3 && isChecked.isChecked4;
     setIsNextEnabled(isRequiredChecked);
-    setCheckboxState(isChecked); // 체크박스 상태 저장
+    setCheckboxState(isChecked); 
   };
 
   const handleNextStep = () => {
-    console.log('checkboxState:', checkboxState); // 체크박스 상태를 콘솔에 출력
-    onNextStep({checkboxState}); // 체크박스 상태를 다음 단계로 전달
+    console.log('checkboxState:', checkboxState); 
+    onNextStep({checkboxState}); 
   };
 
   return (
@@ -50,13 +48,11 @@ const SignUpAgree = ({onNextStep}) => {
           <TouchableOpacity
             style={[
               styles.button,
-              {backgroundColor: isNextEnabled ? '#07AC7D' : '#A7A7A7'}, // isNextEnabled 값에 따라 배경색 변경
+              {backgroundColor: isNextEnabled ? '#07AC7D' : '#A7A7A7'}, 
             ]}
-            onPress={handleNextStep} // 체크박스 상태를 다음 단계로 전달
+            onPress={handleNextStep} 
             disabled={!isNextEnabled}>
-            <Text style={styles.buttonText}>
-              다음으로
-            </Text>
+            <Text style={styles.buttonText}>다음으로</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -66,10 +62,11 @@ const SignUpAgree = ({onNextStep}) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
   },
   secondContainer: {
-    justifyContent: 'space-between', flex: 1
+    justifyContent: 'space-between',
+    flex: 1,
   },
   textContainer: {
     marginTop: 40,
@@ -87,7 +84,8 @@ const styles = StyleSheet.create({
     fontSize: 24,
   },
   checkboxContainer: {
-    flexDirection: 'row', alignItems: 'center'
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   button: {
     borderRadius: 10,
@@ -97,11 +95,13 @@ const styles = StyleSheet.create({
     marginTop: 16,
     paddingVertical: 16,
     marginBottom: 36,
-    height: 50,
+    height: 55,
   },
   buttonText: {
-    color: '#fff', fontSize: 16, fontWeight: 'bold'
-  }
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
 });
 
 export default SignUpAgree;
