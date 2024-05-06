@@ -7,7 +7,7 @@ import {
   Image,
   TouchableOpacity,
   StyleSheet,
-  Dimensions,
+  KeyboardAvoidingView,
 } from 'react-native';
 import {signIn} from '../../lib/auth';
 import firestore from '@react-native-firebase/firestore';
@@ -17,7 +17,7 @@ import auth from '@react-native-firebase/auth';
 import * as KakaoLogin from '@react-native-seoul/kakao-login';
 import {WEB_CLIENT_ID} from '@env';
 import NaverLogin from '@react-native-seoul/naver-login';
-import storage from '@react-native-firebase/storage'; // Firebase Storage 추가
+import storage from '@react-native-firebase/storage';
 
 const naverIcon = require('../../assets/icons/naver.png');
 const kakaoIcon = require('../../assets/icons/kakao.png');
@@ -26,8 +26,9 @@ const googleIcon = require('../../assets/icons/google.png');
 const LoginTitle = require('../../assets/images/LoginTitle.png');
 
 const Login = ({navigation}) => {
-  const [email, setEmail] = useState("qwer1234@gmail.com");
-  const [password, setPass] = useState("Qwer1234!");
+
+  const [email, setEmail] = useState();
+  const [password, setPassword] = useState();
 
   useEffect(() => {
     const initializeNaverLogin = async () => {
@@ -106,11 +107,9 @@ const Login = ({navigation}) => {
           id: user.uid,
           email: profileData.response.email,
           nickname: profileData.response.nickname,
-          profileImage: profileImageUrl, // Firebase Storage에서 가져온 URL 사용
-          // 원하는 데이터를 여기에 추가할 수 있습니다.
+          profileImage: profileImageUrl,
         });
 
-        // BottomTab 화면으로 이동
         navigation.navigate('BottomTab', {
           userId: profileData.response.email,
           nickname: profileData.response.nickname,
@@ -124,9 +123,7 @@ const Login = ({navigation}) => {
       }
     } catch (error) {
       console.error('네이버 프로필 정보를 가져오는 데 오류 발생:', error);
-      Alert.alert(
-        '이미 사용중인 이메일입니다.',
-      );
+      Alert.alert('이미 사용중인 이메일입니다.');
     }
   };
 
@@ -142,41 +139,42 @@ const Login = ({navigation}) => {
     };
     googleSigninConfigure();
   }, []);
-  
+
   const onGoogleButtonPress = async () => {
     try {
       const {idToken} = await GoogleSignin.signIn();
       const googleCredential = auth.GoogleAuthProvider.credential(idToken);
       await auth().signInWithCredential(googleCredential);
-  
+
       const user = auth().currentUser; // 사용자 객체를 currentUser로 변경
-  
+
       if (user) {
         // 사용자 정보 가져오기
-        const email = user.email || ''; // 이메일이 없는 경우 빈 문자열 사용
-        const displayName = user.displayName || ''; // 표시 이름이 없는 경우 빈 문자열 사용
-        // const photoURL = user.photoURL || ''; // 프로필 사진 URL이 없는 경우 빈 문자열 사용
+        const email = user.email || ''; //
+        const displayName = user.displayName || '';
         const profileImageUrl = await storage()
-        .ref('dummyprofile.png') // Storage 경로 지정
-        .getDownloadURL();
+          .ref('dummyprofile.png') // Storage 경로 지정
+          .getDownloadURL();
 
         console.log('구글 사용자 정보:', {
-          id: user.uid, // 유저 ID 사용
+          id: user.uid,
           email: email,
-          nickName: displayName,
-          profileImage: profileImageUrl, 
+          nickname: displayName,
+          profileImage: profileImageUrl,
         });
-  
+
         // Firestore에 사용자 정보 저장
         await firestore().collection('users').doc(user.uid).set({
           id: user.uid,
           email: email,
-          nickName: displayName,
+          nickname: displayName,
           profileImage: profileImageUrl,
         });
-  
-        // BottomTab 화면으로 이동
-        navigation.navigate('BottomTab', {userId: email, nickname: displayName});
+
+        navigation.navigate('BottomTab', {
+          userId: email,
+          nickname: displayName,
+        });
       } else {
         console.error('사용자 정보가 없습니다.');
         Alert.alert('사용자 정보가 없습니다.');
@@ -186,8 +184,6 @@ const Login = ({navigation}) => {
       Alert.alert('구글 로그인 실패');
     }
   };
-  
-
 
   const kakaoLogins = async () => {
     try {
@@ -231,7 +227,6 @@ const Login = ({navigation}) => {
         '카카오 프로필 정보를 가져오는 데 오류가 발생했습니다.',
       );
     }
-
   };
 
   const registerKakaoUser = async profile => {
@@ -243,8 +238,8 @@ const Login = ({navigation}) => {
       );
       console.log('Firebase Auth User:', user);
       const profileImageUrl = await storage()
-      .ref('dummyprofile.png') // Storage 경로 지정
-      .getDownloadURL();
+        .ref('dummyprofile.png')
+        .getDownloadURL();
 
       // Firestore에 사용자 정보 저장
       await firestore().collection('users').doc(user.uid).set({
@@ -252,10 +247,8 @@ const Login = ({navigation}) => {
         email: profile.email,
         nickname: profile.nickname,
         profileImage: profileImageUrl,
-        // 다른 사용자 정보도 필요한 경우에 추가할 수 있습니다.
       });
 
-      // BottomTab 화면으로 이동
       navigation.navigate('BottomTab', {
         userId: user.uid,
         nickname: profile.nickname,
@@ -269,7 +262,6 @@ const Login = ({navigation}) => {
   const onSignIn = async () => {
     try {
       const {user} = await signIn({email, password});
-      // 로그인 정보 가져오기
       const userCollection = firestore().collection('users');
       console.log((await userCollection.doc(user.uid).get()).data());
       navigation.navigate('BottomTab', {userId: user.uid});
@@ -280,81 +272,87 @@ const Login = ({navigation}) => {
   };
 
   return (
-    <View style={styles.firstContainer}>
-      <View>
-        <Image source={LoginTitle} />
-        <View style={styles.titleTextContainer}>
-          <View>
-            <Text style={styles.firstTitleText}>당신의 취미를</Text>
+    <KeyboardAvoidingView style={{flex: 1}}>
+      <View style={styles.firstContainer}>
+        <View>
+          <Image source={LoginTitle} />
+          <View style={styles.titleTextContainer}>
+            <View>
+              <Text style={styles.firstTitleText}>당신의 취미를</Text>
+            </View>
+            <View>
+              <Text style={styles.secondTitleText}>
+                함께할 준비가 되셨나요?
+              </Text>
+            </View>
           </View>
-          <View>
-            <Text style={styles.secondTitleText}>함께할 준비가 되셨나요?</Text>
+
+          <View style={styles.loginTextInput}>
+            <TextInput
+              style={{paddingLeft: 12}}
+              value={email}
+              placeholder="아이디를 입력해주세요"
+              onChangeText={setEmail}
+              placeholderTextColor={'#A7A7A7'}
+              autoCompleteType="email"
+              autoCapitalize='none'
+              keyboardType="email-address"
+            />
           </View>
-        </View>
 
-        <View style={styles.loginTextInput}>
-          <TextInput
-            style={{paddingLeft: 12}}
-            value={email}
-            placeholder="아이디를 입력해주세요"
-            onChangeText={setEmail}
-            placeholderTextColor={'#A7A7A7'}
-            autoCorrect={false}
-            autoCapitalize='none'
-          />
-        </View>
-        <View style={styles.passwordTextInput}>
-          <TextInput
-            style={{paddingLeft: 12}}
-            value={password}
-            secureTextEntry={true}
-            placeholder="비밀번호를 입력해주세요"
-            onChangeText={setPass}
-            placeholderTextColor={'#A7A7A7'}
-          />
-        </View>
+          <View style={styles.passwordTextInput}>
+            <TextInput
+              style={{paddingLeft: 12}}
+              value={password}
+              placeholder="비밀번호를 입력해주세요"
+              onChangeText={setPassword}
+              placeholderTextColor={'#A7A7A7'}
+              autoCapitalize='none'
+            />
+          </View>
 
-        <TouchableOpacity onPress={onSignIn} style={styles.loginButton}>
-          <Text style={styles.loginButtonText}>로그인</Text>
-        </TouchableOpacity>
-
-        <View style={styles.searchContainer}>
-          <TouchableOpacity onPress={() => navigation.navigate('SearchId')}>
-            <Text style={styles.searchId}>아이디 찾기</Text>
+          <TouchableOpacity onPress={onSignIn} style={styles.loginButton}>
+            <Text style={styles.loginButtonText}>로그인</Text>
           </TouchableOpacity>
-          <View>
-            <View style={styles.searchBar} />
+
+          <View style={styles.searchContainer}>
+            <TouchableOpacity onPress={() => navigation.navigate('SearchId')}>
+              <Text style={styles.searchId}>아이디 찾기</Text>
+            </TouchableOpacity>
+            <View>
+              <View style={styles.searchBar} />
+            </View>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('SearchPassword')}>
+              <Text style={styles.searchPassword}>비밀번호 찾기</Text>
+            </TouchableOpacity>
           </View>
+
           <TouchableOpacity
-            onPress={() => navigation.navigate('SearchPassword')}>
-            <Text style={styles.searchPassword}>비밀번호 찾기</Text>
+            onPress={() => navigation.navigate('SignUp')}
+            style={styles.signInButton}>
+            <Text style={styles.signInText}>Are You Ready 가입하기</Text>
           </TouchableOpacity>
-        </View>
 
-        <TouchableOpacity
-          onPress={() => navigation.navigate('SignUp')}
-          style={styles.signInButton}>
-          <Text style={styles.signInText}>Are You Ready 가입하기</Text>
-        </TouchableOpacity>
-
-        <View style={styles.orContainer}>
-          <View style={styles.orLeftBar} />
-          <Text style={styles.orText}>또는</Text>
-          <View style={styles.orRightBar} />
-        </View>
-        <View style={styles.loginIconCantainer}>
-          <TouchableOpacity onPress={handleNaverLogin}>
-            <Image source={naverIcon} />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={kakaoLogins}>
-            <Image source={kakaoIcon} />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={onGoogleButtonPress}>
-            <Image source={googleIcon} />
-          </TouchableOpacity>
+          <View style={styles.orContainer}>
+            <View style={styles.orLeftBar} />
+            <Text style={styles.orText}>또는</Text>
+            <View style={styles.orRightBar} />
+          </View>
+          <View style={styles.loginIconCantainer}>
+            <TouchableOpacity onPress={handleNaverLogin}>
+              <Image source={naverIcon} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={kakaoLogins}>
+              <Image source={kakaoIcon} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={onGoogleButtonPress}>
+              <Image source={googleIcon} />
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -383,7 +381,7 @@ const styles = StyleSheet.create({
   loginTextInput: {
     backgroundColor: '#d9d9d9',
     borderRadius: 10,
-    flex: 0.12,
+    flex: Platform.OS === 'android' ? 0.15 : 0.12,
     justifyContent: 'center',
     marginTop: 44,
     marginBottom: 13,
@@ -391,12 +389,13 @@ const styles = StyleSheet.create({
   passwordTextInput: {
     backgroundColor: '#d9d9d9',
     borderRadius: 10,
-    flex: 0.12,
+    flex: Platform.OS === 'android' ? 0.15 : 0.12,
     justifyContent: 'center',
   },
   loginButton: {
     borderRadius: 10,
-    flex: 0.12,
+    flex: Platform.OS === 'android' ? 0.15 : 0.12,
+
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 13,
@@ -430,9 +429,8 @@ const styles = StyleSheet.create({
   },
   signInButton: {
     borderRadius: 10,
-
     backgroundColor: '#D7FFF3',
-    flex: 0.12,
+    flex: Platform.OS === 'android' ? 0.15 : 0.12,
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 13,
