@@ -26,6 +26,7 @@ const googleIcon = require('../../assets/icons/google.png');
 const LoginTitle = require('../../assets/images/LoginTitle.png');
 
 const Login = ({navigation}) => {
+
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
 

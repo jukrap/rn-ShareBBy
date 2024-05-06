@@ -16,6 +16,11 @@ module.exports = {
         verbose: false,
       },
     ],
-    ['@babel/plugin-transform-private-methods', {loose: true}], // 추가된 부분
+  ],
+  overrides: [
+    {
+      test: fileName => !fileName.includes('node_modules'),
+      plugins: [[require('@babel/plugin-proposal-class-properties'), { loose: true }]],
+    },
   ],
 };
