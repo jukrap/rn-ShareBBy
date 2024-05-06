@@ -15,21 +15,26 @@ import storage from '@react-native-firebase/storage';
 const leftArrow = require('../../assets/icons/back.png');
 const EditProfile = ({navigation, route}) => {
   const [nickname, setNickname] = useState(route.params.nickname);
+  const [editImage, setEditImage] = useState({
+    IsEdit: false,
+    ImageUrl: '',
+  });
   const usersCollection = firestore().collection('users');
 
   const getPhotos = async () => {
-    console.log('image edit');
     ImagePicker.openPicker({
       width: 300,
       height: 400,
       multiple: false,
     }).then(images => {
-      console.log(images);
-      UploadImage(images.sourceURL);
+      // console.log('사진 업로드', images.sourceURL);
+      setEditImage({
+        IsEdit: true,
+        ImageUrl: images.sourceURL,
+      });
     });
   };
   const UploadImage = async uri => {
-    //tHb81DaAtCb5c3V3sJ9PodWT5ye2
     const reference = storage().ref(
       `gs://sharebby-4d82f.appspot.com/${route.params.uuid}.png`,
     );
@@ -45,24 +50,22 @@ const EditProfile = ({navigation, route}) => {
     } catch (error) {
       console.log(error.message);
     }
-    await navigation.reset({
-      index: 0,
-      routes: [{name: 'BottomTab', params: {screen: 'Profile'}}],
-    });
   };
   const UpdateNickname = async () => {
     try {
       const userDocRef = await usersCollection.doc(route.params.uuid);
 
       await userDocRef.update({nickname: nickname});
-      await navigation.reset({
-        index: 0,
-        routes: [{name: 'BottomTab', params: {screen: 'Profile'}}],
-      });
     } catch (error) {
-      console.log('에러');
       console.log(error.message);
     }
+  };
+
+  const goHome = async () => {
+    await navigation.reset({
+      index: 0,
+      routes: [{name: 'BottomTab', params: {screen: 'Profile'}}],
+    });
   };
   return (
     <ScrollView style={styles.safeAreaViewStyle}>
@@ -81,46 +84,25 @@ const EditProfile = ({navigation, route}) => {
         <Text style={styles.name}>이름</Text>
         <TextInput
           onChangeText={setNickname}
-          style={styles.editName}
+          style={styles.nameBox}
           value={nickname}
         />
 
         <Text style={styles.address}>주소</Text>
-        <TouchableHighlight
-          style={{
-            height: 40,
-            marginTop: 12,
-            marginBottom: 12,
-            borderWidth: 1,
-            backgroundColor: '#DBDBDB',
-            borderRadius: 10,
-            borderColor: '#07AC7D',
-            padding: 10,
-          }}>
+        <View style={styles.addressBox}>
           <Text>{route.params.address}</Text>
-        </TouchableHighlight>
+        </View>
 
         <TouchableOpacity
           onPress={() => {
             UpdateNickname();
+            if (editImage.IsEdit) {
+              UploadImage(editImage.ImageUrl);
+            }
+            goHome();
           }}
-          style={{
-            backgroundColor: '#07AC7D',
-            alignItems: 'center',
-            justifyContent: 'center',
-            height: 40,
-            marginTop: 12,
-            marginBottom: 12,
-            borderRadius: 10,
-          }}>
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: 'bold',
-              color: '#fff',
-            }}>
-            완료
-          </Text>
+          style={styles.submitBox}>
+          <Text style={styles.sumbitText}>완료</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -160,7 +142,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     color: '#3f3f3f',
   },
-  editName: {
+  nameBox: {
     height: 40,
     marginTop: 12,
     marginBottom: 12,
@@ -174,6 +156,30 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 10,
     color: '#3f3f3f',
+  },
+  addressBox: {
+    height: 40,
+    marginTop: 12,
+    marginBottom: 12,
+    borderWidth: 1,
+    backgroundColor: '#DBDBDB',
+    borderRadius: 10,
+    borderColor: '#07AC7D',
+    padding: 10,
+  },
+  submitBox: {
+    backgroundColor: '#07AC7D',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 40,
+    marginTop: 12,
+    marginBottom: 12,
+    borderRadius: 10,
+  },
+  sumbitText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff',
   },
 });
 export default EditProfile;

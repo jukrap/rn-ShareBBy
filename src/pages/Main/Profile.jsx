@@ -50,7 +50,7 @@ const Profile = ({navigation, route}) => {
           const querySnapshot = (
             await usersCollection.doc(userUid).get()
           ).data();
-          console.log(querySnapshot);
+          // console.log(querySnapshot);
           setUsers(querySnapshot); // 사용자 데이터 상태 설정
         } catch (error) {
           console.log(error.message);
@@ -114,16 +114,7 @@ const Profile = ({navigation, route}) => {
             </Text>
           </View>
           <View style={styles.additionalInfo}>
-            <Text
-              style={{
-                color: '#3F3F3F',
-                fontWeight: 'bold',
-                fontSize: 14,
-                margin: 15,
-                marginTop: 25,
-              }}>
-              기타
-            </Text>
+            <Text style={styles.info}>기타</Text>
             <TouchableOpacity
               // onPress={() => navigation.navigate('Home')}
               style={styles.noticeWrapper}>
@@ -296,6 +287,13 @@ const styles = StyleSheet.create({
   additionalInfo: {
     marginLeft: 30,
     marginRight: 30,
+  },
+  info: {
+    color: '#3F3F3F',
+    fontWeight: 'bold',
+    fontSize: 14,
+    margin: 15,
+    marginTop: 25,
   },
 });
 export default Profile;
