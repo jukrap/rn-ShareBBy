@@ -1,5 +1,7 @@
 import React, { useRef, useState } from "react";
 import { SafeAreaView, Text, View, TextInput, TouchableOpacity, Dimensions, StyleSheet, Image, FlatList, ScrollView } from "react-native";
+import dayjs from 'dayjs';
+import 'dayjs/locale/ko';
 import DatePicker from 'react-native-date-picker'
 import Modal from "react-native-modal";
 
@@ -12,18 +14,19 @@ const { width, height } = Dimensions.get('window');
 const Detail = ({ route, navigation }) => {
     const userData = route.params
     const { pickAddress, pickLatitude, pickLongitude, id, nickname } = userData;
+
     const writeTime = new Date().getTime() // 내가 쓴 모집글 시간을 저장
     const [date, setDate] = useState(new Date())
     const [isDateModal, setIsDateModal] = useState(false)
     const [isPeopleModal, setIsPeopleModal] = useState(false)
-    const [saveDate, setSaveDate] = useState(0);
+    // const [saveDate, setSaveDate] = useState(0);
     const [detailContent, setDetailConetent] = useState({
         address: pickAddress,
         latitude: pickLatitude,
         longitude: pickLongitude,
         detailAddress: '',
         showTag: '',
-        deadLine: saveDate,
+        deadLine: date,
         peopleCount: '',
         showTitle: '',
         showContent: '',
@@ -84,8 +87,8 @@ const Detail = ({ route, navigation }) => {
             writeTime,
         }
         await recruitHobby(body)
-        navigation.navigate('Join');
-
+        navigation.navigate('Main');
+        console.log('==============> 🚀 success post body : ', body);
         setIsModalVisible(false)
     }
 
@@ -175,16 +178,10 @@ const Detail = ({ route, navigation }) => {
                                 date={date}
                                 onConfirm={(date) => {
                                     setIsDateModal(false)
+                                    const postDate = dayjs(date).locale('ko').format()
                                     setDate(date)
-                                    handleInputContent('deadLine', `${date.getMonth() + 1} 월 ${date.getDate()} 일 ${date.getHours()} 시 ${date.getMinutes()} 분 까지`)
+                                    handleInputContent('deadLine', postDate)
                                     handleBlur('deadLine')
-                                    const testDate = new Date(date)
-                                    console.log('saveDate minTime.ver: ', testDate.getTime());
-                                    console.log('writeTime minTime.ver: ', writeTime);
-                                    console.log('min', (testDate.getTime() - writeTime) / 1000 / 60) // 1440 (min)
-                                    console.log('hour',  (testDate.getTime() - writeTime) / 1000 / 60 / 60) // 24 (hour)
-                                    console.log('day',  (testDate.getTime() - writeTime) / 1000 / 60 / 60 / 24) // 1 (date)
-                                    // console.log('currTime-saveDate minTime.ver: ', testDate.getTime() - writeTime);
                                 }}
                                 onCancel={() => {
                                     setIsDateModal(false)
