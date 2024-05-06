@@ -9,6 +9,7 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
   Image,
+  Dimensions,
 } from 'react-native';
 import Modal from 'react-native-modal';
 
@@ -19,12 +20,18 @@ import 'dayjs/locale/ko';
 
 import ChatRoomNameChangeModal from '../../components/Chat/ChatRoomNameChangeModal';
 
+const {width, height} = Dimensions.get('window');
+
 const ChatRoom = ({route, navigation}) => {
   const {chatRoomId, chatRoomName} = route.params;
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
+
+  const [currentUserName, setCurrentUserName] = useState('');
+
   const [isHamburgerModalVisible, setIsHamburgerModalVisible] = useState(false);
   const [isPlusModalVisible, setIsPlusModalVisible] = useState(false);
+  const [chatOutModalVisible, setChatOutModalVisible] = useState(false);
   const [chatRoomNameChangeModalVisible, setChatRoomNameChangeModalVisible] =
     useState(false);
 
@@ -106,60 +113,30 @@ const ChatRoom = ({route, navigation}) => {
           }
         }
         setChatMembers(memberDetails);
-        // console.log('chatMembers:', chatMembers);
       } else {
-        // console.log('Chat room does not exist.');
+        console.log('Chat room does not exist.');
       }
     } catch (error) {
       console.error('Error fetching chat room members:', error);
     }
   };
 
+  const fetchCurrentUser = async () => {
+    try {
+      const currentUser = auth().currentUser;
+      if (currentUser) {
+        const currentUserName = currentUser.nickname;
+        setCurrentUserName(currentUserName);
+      }
+    } catch (error) {
+      console.error('Error fetching current user: ', error);
+    }
+  };
+
   useEffect(() => {
     getChatRoomMembers();
+    fetchCurrentUser();
   }, [chatRoomId]);
-
-  // const sendMessage = async () => {
-  //   try {
-  //     if (!inputMessage.trim()) {
-  //       return;
-  //     }
-
-  //     const currentUser = auth().currentUser;
-
-  //     let senderName = 'Unknown';
-  //     if (currentUser) {
-  //       const userSnapshot = await firestore()
-  //         .collection('users')
-  //         .doc(currentUser.uid)
-  //         .get();
-  //       if (userSnapshot.exists) {
-  //         senderName = userSnapshot.data().nickname;
-  //         senderProfileImg = userSnapshot.data().profileImage;
-  //       }
-  //     }
-
-  //     const newMessage = {
-  //       text: inputMessage,
-  //       sender: senderName,
-  //       senderId: currentUser ? currentUser.uid : null,
-  //       timestamp: firestore.FieldValue.serverTimestamp(),
-  //       senderProfileImg: senderProfileImg,
-  //     };
-
-  //     await firestore()
-  //       .collection('chatRooms')
-  //       .doc(chatRoomId)
-  //       .collection('messages')
-  //       .add(newMessage);
-
-  //     setMessages(prevMessages => [newMessage, ...prevMessages]);
-
-  //     setInputMessage('');
-  //   } catch (error) {
-  //     console.error('Error sending message: ', error);
-  //   }
-  // };
 
   const sendMessage = async () => {
     try {
@@ -236,6 +213,7 @@ const ChatRoom = ({route, navigation}) => {
       console.error('Error deleting chat:', error);
     }
   };
+
   const renderItem = ({item, index}) => {
     dayjs.locale('ko');
     const isCurrentUser = item.senderId === auth().currentUser?.uid;
@@ -368,6 +346,7 @@ const ChatRoom = ({route, navigation}) => {
         <TextInput
           style={styles.input}
           placeholder="메시지를 입력하세요"
+          maxLength={500}
           value={inputMessage}
           onChangeText={text => setInputMessage(text)}
           spellCheck={false}
@@ -472,6 +451,7 @@ const ChatRoom = ({route, navigation}) => {
                   </View>
                 )}
                 keyExtractor={(item, index) => index.toString()}
+                showsVerticalScrollIndicator={false}
               />
             </View>
 
@@ -523,8 +503,10 @@ const ChatRoom = ({route, navigation}) => {
                 justifyContent: 'flex-end',
                 alignItems: 'center',
                 paddingBottom: 16,
+                gap: 8,
               }}>
-              <TouchableOpacity onPress={deleteChat}>
+              <TouchableOpacity
+                onPress={() => setChatOutModalVisible(!chatOutModalVisible)}>
                 <Text style={{fontSize: 18, fontWeight: '700'}}>
                   채팅방 나가기
                 </Text>
@@ -534,6 +516,46 @@ const ChatRoom = ({route, navigation}) => {
               </TouchableOpacity>
             </View>
           </View>
+          <Modal
+            isVisible={chatOutModalVisible}
+            animationIn={'bounceIn'}
+            animationOut={'bounceOut'}
+            animationInTiming={300}
+            animationOutTiming={300}
+            transparent={true}
+            backdropColor="#fff"
+            backdropOpacity={0.5}
+            onBackButtonPress={() =>
+              setChatOutModalVisible(!chatOutModalVisible)
+            }
+            onBackdropPress={() =>
+              setChatOutModalVisible(!chatOutModalVisible)
+            }>
+            <View style={styles.pressLocaView}>
+              <View
+                style={{
+                  padding: 16,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <Text style={styles.pressText}>선택하신 주소가 맞나요?</Text>
+              </View>
+              <View style={styles.pressOptionView}>
+                <TouchableOpacity
+                  activeOpacity={0.6}
+                  style={[styles.pressOptionBtn, {backgroundColor: '#07AC7D'}]}
+                  onPress={deleteChat}>
+                  <Text style={styles.pressOptionText}>예</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  activeOpacity={0.6}
+                  style={[styles.pressOptionBtn, {backgroundColor: '#DBDBDB'}]}
+                  onPress={() => setChatOutModalVisible(false)}>
+                  <Text style={styles.pressOptionText}>아니요</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
         </SafeAreaView>
       </Modal>
 
@@ -686,6 +708,87 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     gap: 16,
+  },
+  pressLocaView: {
+    marginHorizontal: 30,
+    borderRadius: 10,
+    backgroundColor: '#fff',
+    overflow: 'hidden',
+  },
+  pressText: {
+    marginBottom: 6,
+    fontSize: 16,
+  },
+  pressOptionView: {
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  pressOptionBtn: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
+  },
+  pressOptionText: {
+    fontSize: 16,
+    color: '#FFF',
+  },
+  nomalText: {
+    color: '#000',
+    fontFamily: 'Pretendard',
+    fontSize: 12,
+  },
+  howText: {
+    color: '#fff',
+    fontFamily: 'Pretendard',
+    fontSize: 10,
+  },
+  icon: {
+    width: 24,
+    height: 24,
+  },
+  listView: {
+    width: width / 1.3,
+    height: width / 2.4,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    gap: 10,
+    marginHorizontal: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#07AC7D',
+    backgroundColor: '#fff',
+    shadowColor: '#A7A7A7',
+    shadowOffset: {
+      width: 4,
+      height: 1,
+    },
+    shadowOpacity: 0.8,
+    shadowRadius: 4,
+  },
+  listTitle: {
+    color: '#000',
+    fontFamily: 'Pretendard',
+    fontSize: 16,
+    fontWeight: 600,
+  },
+  listRcruit: {
+    fontFamily: 'Pretendard',
+    fontSize: 12,
+    fontWeight: 700,
+  },
+  listLocation: {
+    color: '#07AC7D',
+    width: 200,
+    fontFamily: 'Pretendard',
+    fontWeight: 400,
+  },
+  showBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    backgroundColor: '#07AC7D',
   },
 });
 
