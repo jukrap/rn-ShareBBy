@@ -101,14 +101,17 @@ const PostCard = ({item, onDelete, onPress}) => {
           </>
         )}
       </Text>
-      {item.post_file ? (
+      {item.post_files && item.post_files.length > 0 ? (
         <View style={styles.postImageWrapper}>
-          <ProgressiveImage
-            defaultImageSource={dummyProfileIcon}
-            source={{uri: item.post_file}}
-            style={styles.postImage}
-            resizeMode="cover"
-          />
+          {item.post_files.map((imageUrl, index) => (
+            <ProgressiveImage
+              key={index}
+              defaultImageSource={dummyProfileIcon}
+              source={{uri: imageUrl}}
+              style={styles.postImage}
+              resizeMode="cover"
+            />
+          ))}
         </View>
       ) : (
         <View style={styles.divider} />
@@ -227,14 +230,17 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   postImageWrapper: {
-    width: '100%',
-    height: 250,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
     marginBottom: 16,
   },
   postImage: {
-    width: '100%',
-    height: 250,
+    width: '48%',
+    height: 150,
+    marginBottom: 8,
   },
+  
   divider: {},
   interactionContainer: {
     flexDirection: 'row',
