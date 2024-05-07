@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 
 import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore'; // firestore import 추가
 
 const backIcon = require('../../assets/icons/back.png');
 
@@ -23,6 +24,16 @@ const SearchPassword = ({navigation}) => {
       return;
     }
     try {
+      // 이메일이 존재하는지 확인
+      const userSnapshot = await firestore()
+        .collection('users')
+        .where('email', '==', email)
+        .get();
+      if (userSnapshot.empty) {
+        Alert.alert('이메일 없음', '해당 이메일 주소가 존재하지 않습니다.');
+        return;
+      }
+      // 이메일이 존재하면 비밀번호 재설정 이메일 전송
       await auth().sendPasswordResetEmail(email);
       Alert.alert('이메일 전송 성공', '비밀번호 재설정 이메일을 전송했습니다.');
     } catch (error) {
@@ -59,6 +70,7 @@ const SearchPassword = ({navigation}) => {
             placeholder="이메일을 입력해주세요."
             placeholderTextColor={'#A7A7A7'}
             onChangeText={setEmail}
+            autoCapitalize="none"
             value={email}
           />
         </View>

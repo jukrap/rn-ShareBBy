@@ -12,6 +12,7 @@
   "dependencies": {
     "@actbase/react-daum-postcode": "^1.0.4",
     "@mj-studio/react-native-naver-map": "^1.5.0",
+    "@react-native-async-storage/async-storage": "^1.23.1",
     "@react-native-firebase/app": "^19.2.2",
     "@react-native-firebase/auth": "^19.2.2",
     "@react-native-firebase/dynamic-links": "^19.2.2",
@@ -44,7 +45,8 @@
     "react-native-screens": "^3.30.1",
     "react-native-select-dropdown": "^4.0.1",
     "react-native-skeleton-placeholder": "^5.2.4",
-    "react-native-webview": "^13.8.6"
+    "react-native-webview": "^13.8.6",
+    "zustand": "^4.5.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
