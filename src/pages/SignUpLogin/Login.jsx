@@ -26,8 +26,8 @@ const LoginTitle = require('../../assets/images/LoginTitle.png');
 
 const Login = ({navigation}) => {
 
-  const [email, setEmail] = useState();
-  const [password, setPassword] = useState();
+  const [email, setEmail] = useState("qwer1234@gmail.co");
+  const [password, setPassword] = useState("Qwer1234!");
   const [isEmailValid, setIsEmailValid] = useState(false);
 
   const onSignIn = async () => {

@@ -2,18 +2,24 @@ import React, { useEffect, useRef, useState } from "react";
 import { SafeAreaView, View, Text, TouchableOpacity, StyleSheet, ScrollView, Dimensions, Image, FlatList } from "react-native";
 import { NaverMapView, NaverMapMarkerOverlay } from "@mj-studio/react-native-naver-map";
 
+const { width, height } = Dimensions.get('window');
+
 const Show = ({ navigation, route }) => {
-    const jejuRegion = {
-        latitude: 33.20530773,
-        longitude: 126.14656715029,
-        latitudeDelta: 0.38,
-        longitudeDelta: 0.8,
-      };
+    console.log('show ===============> ', route.params._data);
+
+    const { address, content, deadline, latitude, longitude, nickname, peopleCount, tag, title, writeTime } = route.params._data;
+    
+    const [initialRegion, setInitialRegion] = useState({
+        latitude: latitude,
+        longitude: longitude,
+        latitudeDelta: 0,
+        longitudeDelta: 0,
+    });
 
     return (
         <SafeAreaView style={{flex : 1}}>
             <NaverMapView
-                style={{ flex: 1 }}
+                style={{width : width, height : width }}
                 layerGroups={{
                     BUILDING: true,
                     BICYCLE: false,
@@ -22,7 +28,7 @@ const Show = ({ navigation, route }) => {
                     TRAFFIC: false,
                     TRANSIT: false,
                 }}
-                initialRegion={jejuRegion}
+                initialRegion={initialRegion}
                 // isIndoorEnabled={indoor}
                 // symbolScale={symbolScale}
                 // lightness={lightness}
@@ -35,26 +41,12 @@ const Show = ({ navigation, route }) => {
                 // isExtentBoundedInKorea
                 logoAlign={'TopRight'}
                 locale={'ko'}
-                onInitialized={() => console.log('initialized!')}
-                onOptionChanged={() => console.log('Option Changed!')}
-                // onCameraChanged={(args) => console.log(`Camera Changed: ${formatJson(args)}`)}
-                // onTapMap={(args) => console.log(`Map Tapped: ${formatJson(args)}`)}
             >
                 <NaverMapMarkerOverlay
-                    latitude={33.3565607356}
-                    longitude={126.48599018}
-                    onTap={() => console.log(1)}
-                    // anchor={{ x: 0.5, y: 1 }}
-                    caption={{
-                    key: '1',
-                    text: 'hello',
-                    }}
-                    subCaption={{
-                    key: '1234',
-                    text: '123',
-                    }}
-                    width={20}
-                    height={20}
+                    latitude={latitude}
+                    longitude={longitude}
+                    width={35}
+                    height={45}
                 />
             </NaverMapView>
         </SafeAreaView>
