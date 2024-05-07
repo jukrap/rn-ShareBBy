@@ -14,11 +14,16 @@ import {
 import Modal from 'react-native-modal';
 
 import firestore from '@react-native-firebase/firestore';
+import storage from '@react-native-firebase/storage';
 import auth from '@react-native-firebase/auth';
+import ImagePicker from 'react-native-image-crop-picker';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ko';
 
-import ChatRoomNameChangeModal from '../../components/Chat/ChatRoomNameChangeModal';
+import ChatRoomNameChangeModal from '../../components/Chat/Modal/ChatRoomNameChangeModal';
+import PlusModal from '../../components/Chat/Modal/PlusModal';
+import PhotoList from '../../components/Chat/PhotoList';
+import ChatMemberList from '../../components/Chat/ChatMemberList';
 
 const ChatRoom = ({route, navigation}) => {
   const {chatRoomId, chatRoomName} = route.params;
@@ -30,6 +35,7 @@ const ChatRoom = ({route, navigation}) => {
   const [chatRoomNameChangeModalVisible, setChatRoomNameChangeModalVisible] =
     useState(false);
   const [chatMembers, setChatMembers] = useState([]);
+  const [pickImage, setPickImage] = useState('');
 
   //사진 올리기 기능 아직 구현 안 돼서 임시로 dummy data
   const photoList = [
@@ -54,6 +60,41 @@ const ChatRoom = ({route, navigation}) => {
         'https://firebasestorage.googleapis.com/v0/b/sharebby-4d82f.appspot.com/o/dummyprofile.png?alt=media&token=a34d85db-3310-4052-84f0-f0bdfc9e88c8',
     },
   ];
+
+  const uploadImage = async (localImagePath, chatRoomId) => {
+    try {
+      const fileName = localImagePath.substring(
+        localImagePath.lastIndexOf('/') + 1,
+      );
+      const reference = storage().ref(
+        `chatRoomImages/${chatRoomId}/${fileName}`,
+      );
+
+      await reference.putFile(localImagePath);
+
+      const url = await reference.getDownloadURL();
+      return url;
+    } catch (error) {
+      console.error('Error uploading image to Firebase Storage:', error);
+      throw error;
+    }
+  };
+
+  const getPhotos = async () => {
+    try {
+      const image = await ImagePicker.openPicker({
+        width: 300,
+        height: 400,
+        multiple: false,
+      });
+      const imageUrl = await uploadImage(image.sourceURL, chatRoomId);
+      setPickImage(imageUrl);
+      sendMessage();
+      togglePlusModal();
+    } catch (error) {
+      console.error('Error selecting or uploading image:', error);
+    }
+  };
 
   const handleGoBack = () => {
     navigation.goBack();
@@ -121,7 +162,7 @@ const ChatRoom = ({route, navigation}) => {
 
   const sendMessage = async () => {
     try {
-      if (!inputMessage.trim()) {
+      if (!inputMessage.trim() && !pickImage) {
         return;
       }
 
@@ -145,6 +186,7 @@ const ChatRoom = ({route, navigation}) => {
         senderId: currentUser.uid,
         timestamp: firestore.FieldValue.serverTimestamp(),
         senderProfileImg: senderProfileImg,
+        image: pickImage,
       };
 
       await firestore()
@@ -154,6 +196,7 @@ const ChatRoom = ({route, navigation}) => {
         .add(newMessage);
 
       setInputMessage('');
+      setPickImage('');
     } catch (error) {
       console.error('Error sending message: ', error);
     }
@@ -281,9 +324,16 @@ const ChatRoom = ({route, navigation}) => {
               </View>
             )}
 
-            <View style={styles.sentByUserMessage}>
-              <Text>{item.text}</Text>
-            </View>
+            {item.image ? (
+              <Image
+                source={{uri: item.image}}
+                style={{width: 150, height: 150, borderRadius: 8}}
+              />
+            ) : (
+              <View style={styles.sentByUserMessage}>
+                <Text>{item.text}</Text>
+              </View>
+            )}
           </View>
         ) : isSystemMessage ? (
           <View style={{justifyContent: 'center', alignItems: 'center'}}>
@@ -294,9 +344,16 @@ const ChatRoom = ({route, navigation}) => {
           </View>
         ) : (
           <View style={styles.sentByOtherWrapper}>
-            <View style={styles.sentByOtherMessage}>
-              <Text>{item.text}</Text>
-            </View>
+            {item.image ? (
+              <Image
+                source={{uri: item.image}}
+                style={{width: 150, height: 150, borderRadius: 8}}
+              />
+            ) : (
+              <View style={styles.sentByOtherMessage}>
+                <Text>{item.text}</Text>
+              </View>
+            )}
             {showTime && (
               <View style={{marginBottom: 8}}>
                 <Text style={{color: '#aaa', fontSize: 10}}>
@@ -407,19 +464,7 @@ const ChatRoom = ({route, navigation}) => {
                   flex: 2,
                   alignItems: 'center',
                 }}>
-                <FlatList
-                  horizontal
-                  data={photoList.slice(0, 4)}
-                  renderItem={({item}) => (
-                    <View style={{marginHorizontal: 4}}>
-                      <Image
-                        style={{width: 64, height: 64, borderRadius: 8}}
-                        source={{uri: item.imageUrl}}
-                      />
-                    </View>
-                  )}
-                  keyExtractor={(item, index) => index.toString()}
-                />
+                <PhotoList chatRoomId={chatRoomId} />
               </View>
             </View>
 
@@ -435,26 +480,7 @@ const ChatRoom = ({route, navigation}) => {
               <View style={{marginBottom: 8}}>
                 <Text style={{fontSize: 16, fontWeight: '700'}}>참여 멤버</Text>
               </View>
-              <FlatList
-                data={chatMembers}
-                renderItem={({item}) => (
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      gap: 8,
-                      marginBottom: 16,
-                    }}>
-                    <Image
-                      source={{uri: item.profileImage}}
-                      style={{width: 30, height: 30, borderRadius: 8}}
-                    />
-                    <Text>{item.nickname}</Text>
-                  </View>
-                )}
-                keyExtractor={(item, index) => index.toString()}
-                showsVerticalScrollIndicator={false}
-              />
+              <ChatMemberList chatMembers={chatMembers} />
             </View>
 
             <View
@@ -561,74 +587,11 @@ const ChatRoom = ({route, navigation}) => {
         </SafeAreaView>
       </Modal>
 
-      <Modal
+      <PlusModal
         isVisible={isPlusModalVisible}
-        animationIn="slideInUp"
-        animationOut="slideOutDown"
-        backdropOpacity={0.5}
-        onBackdropPress={togglePlusModal}
-        style={{
-          justifyContent: 'flex-end',
-          alignItems: 'center',
-          margin: 0,
-        }}>
-        <View
-          style={{
-            flex: 0.2,
-            width: '100%',
-            borderTopLeftRadius: 24,
-            borderTopRightRadius: 24,
-            backgroundColor: '#fff',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: 16,
-          }}>
-          <View
-            style={{
-              flexDirection: 'row',
-              width: '100%',
-              justifyContent: 'space-between',
-              paddingHorizontal: 24,
-              flex: 3,
-            }}>
-            <TouchableOpacity
-              style={{alignItems: 'center', justifyContent: 'center', gap: 8}}>
-              <Image
-                style={{width: 32, height: 32}}
-                source={require('../../assets/icons/image.png')}
-              />
-              <Text>사진</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={{alignItems: 'center', justifyContent: 'center', gap: 8}}>
-              <Image
-                style={{width: 32, height: 32}}
-                source={require('../../assets/icons/image.png')}
-              />
-              <Text>카메라</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={{alignItems: 'center', justifyContent: 'center', gap: 8}}>
-              <Image
-                style={{width: 36, height: 36}}
-                source={require('../../assets/icons/calender.png')}
-              />
-              <Text>일정</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={{alignItems: 'center', justifyContent: 'center', gap: 8}}>
-              <Image
-                style={{width: 32, height: 32}}
-                source={require('../../assets/icons/locationIcon.png')}
-              />
-              <Text>지도</Text>
-            </TouchableOpacity>
-          </View>
-          <TouchableOpacity style={{flex: 1}} onPress={togglePlusModal}>
-            <Text>취소</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
+        toggleModal={togglePlusModal}
+        getPhotos={getPhotos}
+      />
     </SafeAreaView>
   );
 };
