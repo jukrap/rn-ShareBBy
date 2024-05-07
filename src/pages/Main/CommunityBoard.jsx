@@ -116,6 +116,30 @@ const CommunityBoard = ({ navigation }) => {
 			});
 	};
 
+	const handleEdit = (post_id) => {
+		Alert.alert(
+			"게시글 수정",
+			"해당 게시글을 수정하겠습니까?",
+			[
+				{
+					text: "아니오",
+					onPress: () => console.log("아니오를 클릭"),
+					style: "cancel",
+				},
+				{
+					text: "네",
+					onPress: () => EditPost(post_id),
+				},
+			],
+			{ cancelable: false }
+		);
+	};
+
+	const EditPost = (post_id) => {
+		console.log("현재 게시글 ID: ", post_id);
+		navigation.navigate('CommunityEditPost', { postId: post_id });
+	};
+
 	const ListHeader = () => {
 		return null;
 	};
@@ -178,6 +202,7 @@ const CommunityBoard = ({ navigation }) => {
 								<PostCard
 									item={item}
 									onDelete={handleDelete}
+									onEdit={handleEdit} 
 									onPress={() => navigation.navigate("HomeProfile", { userId: item.userId })}
 								/>
 							)}
