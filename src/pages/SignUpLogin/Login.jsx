@@ -92,7 +92,7 @@ const Login = ({navigation}) => {
               onChangeText={setPassword}
               placeholderTextColor={'#A7A7A7'}
               autoCapitalize="none"
-              secureTextEntry='true'
+              secureTextEntry={true}
             />
           </View>
 
