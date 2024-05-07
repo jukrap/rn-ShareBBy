@@ -14,7 +14,7 @@ import {ko} from 'date-fns/locale';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 
-const PostCard = ({item, onDelete, onPress, onEdit}) => {
+const PostCard = ({item, onDelete, onComment, onEdit, onProfilePress}) => {
   const [postUserData, setPostUserData] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -49,7 +49,11 @@ const PostCard = ({item, onDelete, onPress, onEdit}) => {
         .doc(item.userId)
         .get();
       if (documentSnapshot.exists) {
-        setPostUserData(documentSnapshot.data());
+        const userData = documentSnapshot.data();
+        setPostUserData({
+          profileImage: userData.profileImage,
+          nickname: userData.nickname,
+        });
       }
     } catch (error) {
       console.log('사용자 데이터를 가져오는 중에 오류가 발생했습니다:', error);
@@ -133,19 +137,15 @@ const PostCard = ({item, onDelete, onPress, onEdit}) => {
   return (
     <View style={styles.card}>
       <View style={styles.userInfoContainer}>
-        <View style={styles.userInfoWrapper}>
+        <TouchableOpacity
+          style={styles.userInfoWrapper}
+          onPress={() => onProfilePress(item.userId)}>
           <Image
             style={styles.userProfileImage}
-            source={{
-              uri:
-                postUserData?.userImg ||
-                'https://lh5.googleusercontent.com/-b0PKyNuQv5s/AAAAAAAAAAI/AAAAAAAAAAA/AMZuuclxAM4M1SCBGAO7Rp-QP6zgBEUkOQ/s96-c/photo.jpg',
-            }}
+            source={{uri: postUserData?.profileImage}}
           />
           <View style={styles.userInfoTextContainer}>
-            <Text style={styles.userNameText}>
-              {postUserData?.fname || 'Test'} {postUserData?.lname || 'User'}
-            </Text>
+            <Text style={styles.userNameText}>{postUserData?.nickname}</Text>
             <Text style={styles.postTimeText}>
               {formatDistanceToNow(item.post_created.toDate(), {
                 addSuffix: true,
@@ -153,7 +153,7 @@ const PostCard = ({item, onDelete, onPress, onEdit}) => {
               })}
             </Text>
           </View>
-        </View>
+        </TouchableOpacity>
         <View style={styles.moreIconContainer}>
           <TouchableOpacity onPress={toggleModal}>
             <Image
@@ -218,7 +218,7 @@ const PostCard = ({item, onDelete, onPress, onEdit}) => {
               {likeCount}
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.interactionButton} onPress={onPress}>
+          <TouchableOpacity style={styles.interactionButton} onPress={onComment}>
             <Image source={commentIcon} style={{width: 24, height: 24}} />
             <Text style={styles.interactionText}>{getCommentCount()}</Text>
           </TouchableOpacity>

@@ -165,7 +165,7 @@ const CommunityBoard = ({navigation}) => {
             },
             {
               text: '네',
-              onPress: () => EditPost(post_id),
+              onPress: () => editPost(post_id),
             },
           ],
           {cancelable: false},
@@ -176,9 +176,13 @@ const CommunityBoard = ({navigation}) => {
     }
   };
 
-  const EditPost = post_id => {
+  const editPost = post_id => {
     console.log('현재 게시글 ID: ', post_id);
     navigation.navigate('CommunityEditPost', {postId: post_id});
+  };
+
+  const handleProfilePress = userId => {
+    navigation.navigate('Profile', {userId});
   };
 
   const ListHeader = () => {
@@ -264,9 +268,10 @@ const CommunityBoard = ({navigation}) => {
                   item={item}
                   onDelete={handleDelete}
                   onEdit={handleEdit}
-                  onPress={() =>
+                  onComment={() =>
                     navigation.navigate('HomeProfile', {userId: item.userId})
                   }
+                  onProfilePress={handleProfilePress}
                 />
               )}
               keyExtractor={item => item.id}
