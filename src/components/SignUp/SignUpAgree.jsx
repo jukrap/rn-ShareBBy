@@ -90,6 +90,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: '#07AC7D',
     alignItems: 'center',
+    justifyContent:'center',
     marginHorizontal: 16,
     marginTop: 16,
     paddingVertical: 16,
@@ -100,6 +101,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+    
   },
 });
 

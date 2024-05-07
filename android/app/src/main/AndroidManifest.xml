@@ -39,5 +39,11 @@
                     android:scheme="kakao6031b1866d99c7f6d2f2dbd56b41ed27" />
             </intent-filter>
         </activity>
+        <meta-data
+          android:name="com.naver.maps.map.cycfhnicdh"
+         android:value="cycfhnicdh" /> 
     </application>
+     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+  <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+  <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 </manifest>
