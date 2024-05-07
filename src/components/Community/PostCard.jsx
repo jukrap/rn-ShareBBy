@@ -28,7 +28,7 @@ const PostCard = ({item, onDelete, onPress, onEdit}) => {
   }, []);
 
   const isLiked = item.post_like > 0;
-  const likeIcon = isLiked ? heartIcon : heartIcon; //오른쪽에 색 있는 하트 아이콘으로 추후 변경
+  const likeIcon = isLiked ? heartLineIcon : heartRedIcon;
 
   // 좋아요 개수 가져오기
   const getLikeCount = () => {
@@ -199,7 +199,8 @@ const PostCard = ({item, onDelete, onPress, onEdit}) => {
 
 const moreIcon = require('../../assets/icons/moreIcon.png');
 const commentIcon = require('../../assets/icons/commentIcon.png');
-const heartIcon = require('../../assets/icons/heartIcon.png');
+const heartLineIcon = require('../../assets/icons/heartLineIcon.png');
+const heartRedIcon = require('../../assets/icons/heartRedIcon.png');
 const shareIcon = require('../../assets/icons/shareIcon.png');
 const pencilIcon = require('../../assets/icons/pencilIcon.png');
 const deleteIcon = require('../../assets/icons/deleteIcon.png');
