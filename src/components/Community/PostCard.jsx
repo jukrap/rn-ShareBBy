@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Dimensions,
   StyleSheet,
+  Modal,
 } from 'react-native';
 import ProgressiveImage from './ProgressiveImage';
 import {formatDistanceToNow} from 'date-fns';
@@ -13,9 +14,10 @@ import {ko} from 'date-fns/locale';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 
-const PostCard = ({item, onDelete, onPress}) => {
+const PostCard = ({item, onDelete, onPress, onEdit}) => {
   const [postUserData, setPostUserData] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged(user => {
@@ -57,6 +59,10 @@ const PostCard = ({item, onDelete, onPress}) => {
     fetchPostUserData();
   }, []);
 
+  const toggleModal = () => {
+    setIsModalVisible(!isModalVisible);
+  };
+
   return (
     <View style={styles.card}>
       <View style={styles.userInfoContainer}>
@@ -82,7 +88,13 @@ const PostCard = ({item, onDelete, onPress}) => {
           </View>
         </View>
         <View style={styles.moreIconContainer}>
-          <Image style={styles.moreIcon} resizeMode="cover" source={moreIcon} />
+          <TouchableOpacity onPress={toggleModal}>
+            <Image
+              style={styles.moreIcon}
+              resizeMode="cover"
+              source={moreIcon}
+            />
+          </TouchableOpacity>
         </View>
       </View>
       <Text style={styles.postContentText} ellipsizeMode="tail">
@@ -113,16 +125,6 @@ const PostCard = ({item, onDelete, onPress}) => {
                 style={styles.postImage}
                 resizeMode="cover"
               />
-              /*
-                <ProgressiveImage
-                  key={index}
-                  defaultImageSource={defaultPostImg}
-                  source={{ uri: imageUrl }}
-                  style={styles.postImage}
-                  resizeMode="cover"
-                  onError={(error) => console.log("이미지 로딩 에러:", error)}
-                />
-              */
             );
           })}
         </View>
@@ -161,6 +163,36 @@ const PostCard = ({item, onDelete, onPress}) => {
           )}
         </View>
       </View>
+
+      <Modal visible={isModalVisible} animationType="slide" transparent={true}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={() => {
+                onEdit(item.id); // 게시글 수정 기능 호출
+                toggleModal();
+              }}>
+              <Image source={pencilIcon} style={{width: 24, height: 24}} />
+              <Text style={styles.modalButtonText}>게시글 수정</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={() => {
+                onDelete(item.id); // 게시글 삭제 기능 호출
+                toggleModal();
+              }}>
+              <Image source={deleteIcon} style={{width: 24, height: 24}} />
+              <Text style={styles.modalButtonText}>게시글 삭제</Text>
+            </TouchableOpacity>
+          </View>
+          <TouchableOpacity
+            style={styles.modalCloseButton}
+            onPress={toggleModal}>
+            <Text style={styles.modalCloseButtonText}>닫기</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -169,6 +201,8 @@ const moreIcon = require('../../assets/icons/moreIcon.png');
 const commentIcon = require('../../assets/icons/commentIcon.png');
 const heartIcon = require('../../assets/icons/heartIcon.png');
 const shareIcon = require('../../assets/icons/shareIcon.png');
+const pencilIcon = require('../../assets/icons/pencilIcon.png');
+const deleteIcon = require('../../assets/icons/deleteIcon.png');
 const defaultPostImg = require('../../assets/images/defaultPostImg.jpg');
 
 export default PostCard;
@@ -292,5 +326,37 @@ const styles = StyleSheet.create({
     color: '#898989',
     textDecorationLine: 'underline',
     paddingLeft: 20,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: '#FEFFFE',
+    padding: 16,
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
+  },
+  modalButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#FEFFFE',
+  },
+  modalButtonText: {
+    marginLeft: 8,
+    fontSize: 16,
+    color: '#898989',
+  },
+  modalCloseButton: {
+    backgroundColor: '#FEFFFE',
+    padding: 16,
+    alignItems: 'center',
+  },
+  modalCloseButtonText: {
+    fontSize: 16,
+    color: '#212529',
   },
 });
