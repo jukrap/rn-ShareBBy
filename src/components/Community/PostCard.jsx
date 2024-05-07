@@ -103,15 +103,28 @@ const PostCard = ({item, onDelete, onPress}) => {
       </Text>
       {item.post_files && item.post_files.length > 0 ? (
         <View style={styles.postImageWrapper}>
-          {item.post_files.map((imageUrl, index) => (
-            <ProgressiveImage
-              key={index}
-              defaultImageSource={dummyProfileIcon}
-              source={{uri: imageUrl}}
-              style={styles.postImage}
-              resizeMode="cover"
-            />
-          ))}
+          {item.post_files.map((imageUrl, index) => {
+            console.log(`인덱스 ${index}의 이미지:`, imageUrl);
+            return (
+              <Image
+                key={index}
+                defaultImageSource={defaultPostImg}
+                source={{uri: imageUrl}}
+                style={styles.postImage}
+                resizeMode="cover"
+              />
+              /*
+                <ProgressiveImage
+                  key={index}
+                  defaultImageSource={defaultPostImg}
+                  source={{ uri: imageUrl }}
+                  style={styles.postImage}
+                  resizeMode="cover"
+                  onError={(error) => console.log("이미지 로딩 에러:", error)}
+                />
+              */
+            );
+          })}
         </View>
       ) : (
         <View style={styles.divider} />
@@ -139,7 +152,7 @@ const PostCard = ({item, onDelete, onPress}) => {
           </TouchableOpacity>
         </View>
         <View style={styles.rightInteractionContainer}>
-          {currentUser && currentUser.uid === item.user_id && (
+          {currentUser && currentUser.uid === item.userId && (
             <TouchableOpacity
               style={styles.interactionButton}
               onPress={() => onDelete(item.id)}>
@@ -156,7 +169,9 @@ const moreIcon = require('../../assets/icons/moreIcon.png');
 const commentIcon = require('../../assets/icons/commentIcon.png');
 const heartIcon = require('../../assets/icons/heartIcon.png');
 const shareIcon = require('../../assets/icons/shareIcon.png');
-const dummyProfileIcon = require('../../assets/icons/dummyProfileIcon.png');
+const defaultPostImg = require('../../assets/images/defaultPostImg.jpg');
+
+export default PostCard;
 
 const styles = StyleSheet.create({
   card: {
@@ -240,7 +255,7 @@ const styles = StyleSheet.create({
     height: 150,
     marginBottom: 8,
   },
-  
+
   divider: {},
   interactionContainer: {
     flexDirection: 'row',
@@ -279,5 +294,3 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
   },
 });
-
-export default PostCard;

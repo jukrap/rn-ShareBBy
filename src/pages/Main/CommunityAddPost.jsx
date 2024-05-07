@@ -76,7 +76,7 @@ const CommunityAddPost = () => {
       await firestore()
         .collection('posts')
         .add({
-          user_id: currentUser.uid,
+          userId: currentUser.uid,
           post_content: postContent,
           post_files: imageUrls,
           post_created: firestore.Timestamp.fromDate(new Date()),

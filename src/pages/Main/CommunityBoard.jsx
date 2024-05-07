@@ -38,12 +38,12 @@ const CommunityBoard = ({ navigation }) => {
 				.get();
 
 			querySnapshot.forEach((doc) => {
-				const { user_id, post_content, post_file, post_created, post_like, post_actflag } = doc.data();
+				const { userId, post_content, post_files, post_created, post_like, post_actflag } = doc.data();
 				list.push({
 					id: doc.id,
-					user_id,
+					userId,
 					post_content,
-					post_file,
+					post_files,
 					post_created,
 					post_like,
 					post_actflag,
