@@ -19,6 +19,7 @@ import firestore from '@react-native-firebase/firestore';
 import {useFocusEffect} from '@react-navigation/native';
 
 import PostCard from '../../components/Community/PostCard';
+import auth from '@react-native-firebase/auth';
 
 const {width, height} = Dimensions.get('window');
 
@@ -26,6 +27,15 @@ const CommunityBoard = ({navigation}) => {
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [deleted, setDeleted] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = auth().onAuthStateChanged(user => {
+      setCurrentUser(user);
+    });
+
+    return unsubscribe;
+  }, []);
 
   const fetchPost = async () => {
     try {
@@ -87,22 +97,34 @@ const CommunityBoard = ({navigation}) => {
   */
 
   const handleDelete = post_id => {
-    Alert.alert(
-      '게시글 삭제',
-      '해당 게시글을 삭제하겠습니까?',
-      [
-        {
-          text: '아니오',
-          onPress: () => console.log('아니오를 클릭'),
-          style: 'cancel',
-        },
-        {
-          text: '네',
-          onPress: () => deletePost(post_id),
-        },
-      ],
-      {cancelable: false},
-    );
+    if (post) {
+      const selectedPost = post.find(item => item.id === post_id);
+
+      if (
+        selectedPost &&
+        currentUser &&
+        currentUser.uid === selectedPost.userId
+      ) {
+        Alert.alert(
+          '게시글 삭제',
+          '해당 게시글을 삭제하겠습니까?',
+          [
+            {
+              text: '아니오',
+              onPress: () => console.log('아니오를 클릭'),
+              style: 'cancel',
+            },
+            {
+              text: '네',
+              onPress: () => deletePost(post_id),
+            },
+          ],
+          {cancelable: false},
+        );
+      } else {
+        Alert.alert('권한 없음', '게시글 작성자만 삭제할 수 있습니다.');
+      }
+    }
   };
 
   const deletePost = post_id => {
@@ -124,22 +146,34 @@ const CommunityBoard = ({navigation}) => {
   };
 
   const handleEdit = post_id => {
-    Alert.alert(
-      '게시글 수정',
-      '해당 게시글을 수정하겠습니까?',
-      [
-        {
-          text: '아니오',
-          onPress: () => console.log('아니오를 클릭'),
-          style: 'cancel',
-        },
-        {
-          text: '네',
-          onPress: () => EditPost(post_id),
-        },
-      ],
-      {cancelable: false},
-    );
+    if (post) {
+      const selectedPost = post.find(item => item.id === post_id);
+
+      if (
+        selectedPost &&
+        currentUser &&
+        currentUser.uid === selectedPost.userId
+      ) {
+        Alert.alert(
+          '게시글 수정',
+          '해당 게시글을 수정하겠습니까?',
+          [
+            {
+              text: '아니오',
+              onPress: () => console.log('아니오를 클릭'),
+              style: 'cancel',
+            },
+            {
+              text: '네',
+              onPress: () => EditPost(post_id),
+            },
+          ],
+          {cancelable: false},
+        );
+      } else {
+        Alert.alert('권한 없음', '게시글 작성자만 수정할 수 있습니다.');
+      }
+    }
   };
 
   const EditPost = post_id => {
