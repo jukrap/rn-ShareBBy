@@ -1,15 +1,15 @@
-// SignUpEmail.jsx
 import React, {useState} from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   TouchableOpacity,
   TextInput,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
-import firestore from '@react-native-firebase/firestore'; // firestore import 추가
+import firestore from '@react-native-firebase/firestore';
 
 const SignUpEmail = ({onNextStep}) => {
   const [email, setEmail] = useState('');
@@ -48,7 +48,10 @@ const SignUpEmail = ({onNextStep}) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={150}
+      style={styles.container}>
       <View style={styles.secondContariner}>
         <View>
           <View style={styles.textContainer}>
@@ -63,6 +66,10 @@ const SignUpEmail = ({onNextStep}) => {
             placeholderTextColor={'#A7A7A7'}
             onChangeText={setEmail}
             value={email}
+            autoFocus={true}
+            autoCompleteType="email"
+            autoCapitalize="none"
+            keyboardType="email-address"
           />
         </View>
         <View>
@@ -71,16 +78,17 @@ const SignUpEmail = ({onNextStep}) => {
           </TouchableOpacity>
         </View>
       </View>
-    </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
   },
   secondContariner: {
-    justifyContent: 'space-between', flex: 1
+    justifyContent: 'space-between',
+    flex: 1,
   },
   textContainer: {
     marginTop: 40,
@@ -114,6 +122,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     paddingVertical: 16,
     marginBottom: 36,
+    height: 55,
   },
   buttonText: {
     color: '#fff',

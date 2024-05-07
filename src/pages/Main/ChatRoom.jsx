@@ -9,6 +9,7 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
   Image,
+  Dimensions,
 } from 'react-native';
 import Modal from 'react-native-modal';
 
@@ -22,15 +23,15 @@ import ChatRoomNameChangeModal from '../../components/Chat/ChatRoomNameChangeMod
 const ChatRoom = ({route, navigation}) => {
   const {chatRoomId, chatRoomName} = route.params;
   const [messages, setMessages] = useState([]);
-  const [getMessages, setGetMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isHamburgerModalVisible, setIsHamburgerModalVisible] = useState(false);
   const [isPlusModalVisible, setIsPlusModalVisible] = useState(false);
+  const [chatOutModalVisible, setChatOutModalVisible] = useState(false);
   const [chatRoomNameChangeModalVisible, setChatRoomNameChangeModalVisible] =
     useState(false);
-
   const [chatMembers, setChatMembers] = useState([]);
 
+  //사진 올리기 기능 아직 구현 안 돼서 임시로 dummy data
   const photoList = [
     {
       id: 1,
@@ -58,14 +59,13 @@ const ChatRoom = ({route, navigation}) => {
     navigation.goBack();
   };
 
+  //modal
   const toggleHamburgerModal = () => {
     setIsHamburgerModalVisible(!isHamburgerModalVisible);
   };
-
   const togglePlusModal = () => {
     setIsPlusModalVisible(!isPlusModalVisible);
   };
-
   const toggleChatRoomNameChangeModal = () => {
     setChatRoomNameChangeModalVisible(!chatRoomNameChangeModalVisible);
   };
@@ -107,9 +107,8 @@ const ChatRoom = ({route, navigation}) => {
           }
         }
         setChatMembers(memberDetails);
-        // console.log('chatMembers:', chatMembers);
       } else {
-        // console.log('Chat room does not exist.');
+        console.log('Chat room does not exist.');
       }
     } catch (error) {
       console.error('Error fetching chat room members:', error);
@@ -120,48 +119,6 @@ const ChatRoom = ({route, navigation}) => {
     getChatRoomMembers();
   }, [chatRoomId]);
 
-  // const sendMessage = async () => {
-  //   try {
-  //     if (!inputMessage.trim()) {
-  //       return;
-  //     }
-
-  //     const currentUser = auth().currentUser;
-
-  //     let senderName = 'Unknown';
-  //     if (currentUser) {
-  //       const userSnapshot = await firestore()
-  //         .collection('users')
-  //         .doc(currentUser.uid)
-  //         .get();
-  //       if (userSnapshot.exists) {
-  //         senderName = userSnapshot.data().nickname;
-  //         senderProfileImg = userSnapshot.data().profileImage;
-  //       }
-  //     }
-
-  //     const newMessage = {
-  //       text: inputMessage,
-  //       sender: senderName,
-  //       senderId: currentUser ? currentUser.uid : null,
-  //       timestamp: firestore.FieldValue.serverTimestamp(),
-  //       senderProfileImg: senderProfileImg,
-  //     };
-
-  //     await firestore()
-  //       .collection('chatRooms')
-  //       .doc(chatRoomId)
-  //       .collection('messages')
-  //       .add(newMessage);
-
-  //     setMessages(prevMessages => [newMessage, ...prevMessages]);
-
-  //     setInputMessage('');
-  //   } catch (error) {
-  //     console.error('Error sending message: ', error);
-  //   }
-  // };
-
   const sendMessage = async () => {
     try {
       if (!inputMessage.trim()) {
@@ -169,7 +126,6 @@ const ChatRoom = ({route, navigation}) => {
       }
 
       const currentUser = auth().currentUser;
-
 
       let senderName = 'Unknown';
       if (currentUser) {
@@ -180,14 +136,13 @@ const ChatRoom = ({route, navigation}) => {
         if (userSnapshot.exists) {
           senderName = userSnapshot.data().nickname;
           senderProfileImg = userSnapshot.data().profileImage;
-
         }
       }
 
       const newMessage = {
         text: inputMessage,
         sender: senderName,
-        senderId: currentUser ? currentUser.uid : null,
+        senderId: currentUser.uid,
         timestamp: firestore.FieldValue.serverTimestamp(),
         senderProfileImg: senderProfileImg,
       };
@@ -220,28 +175,49 @@ const ChatRoom = ({route, navigation}) => {
   const deleteChat = async () => {
     try {
       const currentUser = auth().currentUser;
-
       const currentUserUID = currentUser ? currentUser.uid : null;
+
+      let currentUserNickname = 'Unknown';
+      if (currentUser) {
+        const userSnapshot = await firestore()
+          .collection('users')
+          .doc(currentUser.uid)
+          .get();
+        if (userSnapshot.exists) {
+          currentUserNickname = userSnapshot.data().nickname;
+        }
+      }
 
       const chatRoomRef = firestore().collection('chatRooms').doc(chatRoomId);
       const chatRoomSnapshot = await chatRoomRef.get();
       const currentMembers = chatRoomSnapshot.data().members;
-
       const updatedMembers = currentMembers.filter(
         memberUID => memberUID !== currentUserUID,
       );
 
       await chatRoomRef.update({members: updatedMembers});
 
-      console.log('채팅방 삭제 완료');
+      const newMessage = {
+        text: `${currentUserNickname}님이 나갔습니다.`,
+        sender: '시스템',
+        timestamp: firestore.FieldValue.serverTimestamp(),
+      };
+
+      await firestore()
+        .collection('chatRooms')
+        .doc(chatRoomId)
+        .collection('messages')
+        .add(newMessage);
+
       navigation.goBack();
     } catch (error) {
       console.error('Error deleting chat:', error);
     }
   };
+
   const renderItem = ({item, index}) => {
-    // console.log('item:', item);
     dayjs.locale('ko');
+    const isSystemMessage = item.sender === '시스템';
     const isCurrentUser = item.senderId === auth().currentUser?.uid;
     const isFirstMessage = index === messages.length - 1;
     const prevItem = messages[index + 1];
@@ -275,29 +251,22 @@ const ChatRoom = ({route, navigation}) => {
 
     return (
       <View>
-        <View style={{justifyContent: 'center', alignItems: 'center'}}>
+        <View style={styles.showDateSeparatorContainer}>
           {showDateSeparator && (
             <View>
-              <Text style={{paddingVertical: 22, color: '#aaa', fontSize: 12}}>
+              <Text style={styles.showDateSeparatorTime}>
                 {dayjs(item.timestamp?.toDate()).format('YYYY년 MM월 DD일')}
               </Text>
             </View>
           )}
         </View>
         {showProfileInfo && (
-          <View
-            style={{
-              flexDirection: 'row',
-              gap: 8,
-              marginHorizontal: 12,
-              marginBottom: 12,
-              alignItems: 'center',
-            }}>
+          <View style={styles.showProfileInfoContainer}>
             <Image
-              style={{width: 30, height: 30, borderRadius: 10}}
+              style={styles.showProfileInfoImage}
               source={{uri: item.senderProfileImg}}
             />
-            <Text style={{fontWeight: '700'}}>{item.sender}</Text>
+            <Text style={styles.showProfileInfoNickname}>{item.sender}</Text>
           </View>
         )}
         {isCurrentUser ? (
@@ -315,6 +284,13 @@ const ChatRoom = ({route, navigation}) => {
             <View style={styles.sentByUserMessage}>
               <Text>{item.text}</Text>
             </View>
+          </View>
+        ) : isSystemMessage ? (
+          <View style={{justifyContent: 'center', alignItems: 'center'}}>
+            <Text style={{paddingVertical: 22, color: '#aaa', fontSize: 12}}>
+              {item.text}
+            </Text>
+            {showTime && <View style={{marginBottom: 8}}></View>}
           </View>
         ) : (
           <View style={styles.sentByOtherWrapper}>
@@ -370,8 +346,9 @@ const ChatRoom = ({route, navigation}) => {
           />
         </TouchableOpacity>
         <TextInput
-          style={styles.input}
+          style={styles.textInput}
           placeholder="메시지를 입력하세요"
+          maxLength={500}
           value={inputMessage}
           onChangeText={text => setInputMessage(text)}
           spellCheck={false}
@@ -476,6 +453,7 @@ const ChatRoom = ({route, navigation}) => {
                   </View>
                 )}
                 keyExtractor={(item, index) => index.toString()}
+                showsVerticalScrollIndicator={false}
               />
             </View>
 
@@ -527,8 +505,10 @@ const ChatRoom = ({route, navigation}) => {
                 justifyContent: 'flex-end',
                 alignItems: 'center',
                 paddingBottom: 16,
+                gap: 8,
               }}>
-              <TouchableOpacity onPress={deleteChat}>
+              <TouchableOpacity
+                onPress={() => setChatOutModalVisible(!chatOutModalVisible)}>
                 <Text style={{fontSize: 18, fontWeight: '700'}}>
                   채팅방 나가기
                 </Text>
@@ -538,6 +518,46 @@ const ChatRoom = ({route, navigation}) => {
               </TouchableOpacity>
             </View>
           </View>
+          <Modal
+            isVisible={chatOutModalVisible}
+            animationIn={'bounceIn'}
+            animationOut={'bounceOut'}
+            animationInTiming={300}
+            animationOutTiming={300}
+            transparent={true}
+            backdropColor="#fff"
+            backdropOpacity={0.5}
+            onBackButtonPress={() =>
+              setChatOutModalVisible(!chatOutModalVisible)
+            }
+            onBackdropPress={() =>
+              setChatOutModalVisible(!chatOutModalVisible)
+            }>
+            <View style={styles.chatOutConfirm}>
+              <View
+                style={{
+                  padding: 16,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <Text style={styles.pressText}>정말 나가겠습니까?</Text>
+              </View>
+              <View style={styles.pressOptionView}>
+                <TouchableOpacity
+                  activeOpacity={0.6}
+                  style={[styles.pressOptionBtn, {backgroundColor: '#07AC7D'}]}
+                  onPress={deleteChat}>
+                  <Text style={styles.pressOptionText}>예</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  activeOpacity={0.6}
+                  style={[styles.pressOptionBtn, {backgroundColor: '#DBDBDB'}]}
+                  onPress={() => setChatOutModalVisible(false)}>
+                  <Text style={styles.pressOptionText}>아니요</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
         </SafeAreaView>
       </Modal>
 
@@ -633,6 +653,30 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingVertical: 16,
   },
+  showDateSeparatorContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  showDateSeparatorTime: {
+    paddingVertical: 22,
+    color: '#aaa',
+    fontSize: 12,
+  },
+  showProfileInfoContainer: {
+    flexDirection: 'row',
+    gap: 8,
+    marginHorizontal: 12,
+    marginBottom: 12,
+    alignItems: 'center',
+  },
+  showProfileInfoImage: {
+    width: 30,
+    height: 30,
+    borderRadius: 10,
+  },
+  showProfileInfoNickname: {
+    fontWeight: '700',
+  },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -641,7 +685,7 @@ const styles = StyleSheet.create({
     padding: 10,
     gap: 8,
   },
-  input: {
+  textInput: {
     flex: 1,
     borderWidth: 1,
     borderColor: '#ccc',
@@ -690,6 +734,31 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     gap: 16,
+  },
+  chatOutConfirm: {
+    marginHorizontal: 30,
+    borderRadius: 10,
+    backgroundColor: '#fff',
+    overflow: 'hidden',
+  },
+  pressText: {
+    marginBottom: 6,
+    fontSize: 16,
+  },
+  pressOptionView: {
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  pressOptionBtn: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
+  },
+  pressOptionText: {
+    fontSize: 16,
+    color: '#FFF',
   },
 });
 

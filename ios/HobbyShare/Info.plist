@@ -20,6 +20,8 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>NMFClientId</key>
+  	<string>cycfhnicdh</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -52,9 +54,11 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string></string>
+			<string>https://hobbyshare.page.link</string>
 			<key>CFBundleURLSchemes</key>
-			<array/>
+			<array>
+				<string>com.gangsterdev.app.--PRODUCT-NAME-rfc1034identifier-</string>
+			</array>
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
@@ -77,12 +81,18 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>HobbyShare would like to use your camera</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>지도 사용시 사용자 권한 부여</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>지도 사용시 사용자 권한 부여</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>지도 사용시 사용자 권한 부여</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>HobbyShare would like to save photos to your photo gallery</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>HobbyShare would like access to your photo gallery</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>
@@ -95,12 +105,6 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>HobbyShare would like access to your photo gallery</string>
-	<key>NSCameraUsageDescription</key>
-	<string>HobbyShare would like to use your camera</string>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>HobbyShare would like to save photos to your photo gallery</string>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 </dict>

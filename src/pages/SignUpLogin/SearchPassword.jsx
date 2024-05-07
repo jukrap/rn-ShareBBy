@@ -1,15 +1,21 @@
-// SearchPassword.jsx
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, TextInput, Alert, Image, Modal} from 'react-native';
+import React, {useState} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  SafeAreaView,
+  TouchableOpacity,
+  TextInput,
+  Alert,
+  Image,
+} from 'react-native';
 
 import auth from '@react-native-firebase/auth';
 
 const backIcon = require('../../assets/icons/back.png');
 
-
-const SearchPassword = ({ navigation }) => {
+const SearchPassword = ({navigation}) => {
   const [email, setEmail] = useState('');
-  
 
   const handleResetPassword = async () => {
     if (!validateEmail(email)) {
@@ -28,23 +34,25 @@ const SearchPassword = ({ navigation }) => {
     }
   };
 
-  const validateEmail = (email) => {
+  const validateEmail = email => {
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return emailPattern.test(email);
   };
 
-
-
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-       <TouchableOpacity style={styles.backIcon} onPress={()=> navigation.goBack()}>
+    <SafeAreaView style={{flex: 1}}>
+      <TouchableOpacity
+        style={styles.backIcon}
+        onPress={() => navigation.goBack()}>
         <Image source={backIcon} />
       </TouchableOpacity>
-      <View style={{ justifyContent: 'space-between', flex: 1 }}>
+      <View style={{justifyContent: 'space-between', flex: 1}}>
         <View>
           <View style={styles.textContainer}>
             <Text style={styles.text}>비밀번호 찾기</Text>
-            <Text style={styles.secondText}>비밀번호를 찾기 위해 이메일 인증을 진행해 주세요.</Text>
+            <Text style={styles.secondText}>
+              비밀번호를 찾기 위해 이메일 인증을 진행해 주세요.
+            </Text>
           </View>
           <TextInput
             style={styles.input}
@@ -60,7 +68,6 @@ const SearchPassword = ({ navigation }) => {
           </TouchableOpacity>
         </View>
       </View>
-
     </SafeAreaView>
   );
 };
@@ -114,7 +121,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 10,
     padding: 20,
-    width:'80%',
+    width: '80%',
     alignItems: 'center',
   },
   modalText: {
@@ -124,23 +131,22 @@ const styles = StyleSheet.create({
   },
   modalButtonContainer: {
     flexDirection: 'row',
-    gap:8,
-    marginTop:16,
-    
+    gap: 8,
+    marginTop: 16,
   },
   modalButton1: {
     backgroundColor: '#07AC7D',
     paddingVertical: 10,
     width: 130,
     borderRadius: 5,
-    alignItems:'center'
+    alignItems: 'center',
   },
   modalButton: {
     backgroundColor: '#07AC7D',
     paddingVertical: 10,
     width: 130,
     borderRadius: 5,
-    alignItems:'center'
+    alignItems: 'center',
   },
   modalButtonText: {
     color: '#fff',

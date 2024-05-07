@@ -42,6 +42,7 @@ const Chat = () => {
 
   const toggleMakeNameModal = () => {
     setIsModalMakeNameVisible(!isModalMakeNameVisible);
+    setGroupName('');
   };
 
   useEffect(() => {
@@ -68,7 +69,6 @@ const Chat = () => {
       const usersSnapshot = await firestore().collection('users').get();
       const userList = usersSnapshot.docs.map(doc => doc.data());
       setUsers(userList);
-      // console.log('users:', users);
     } catch (error) {
       console.error('Error: ', error);
     }
@@ -86,7 +86,6 @@ const Chat = () => {
     } catch (error) {
       console.error('Error fetching current user: ', error);
     }
-    // console.log('currentUserUID:', currentUserUID);
   };
 
   const fetchChatRooms = async () => {
@@ -111,7 +110,6 @@ const Chat = () => {
     } else {
       setSelectedUsers(selectedUsers.filter(id => id !== userId));
     }
-    // console.log('selectedUsers:', selectedUsers);
   };
 
   const createGroupChat = async () => {
@@ -128,6 +126,7 @@ const Chat = () => {
       });
       setSelectedUsers([]);
       fetchChatRooms();
+      setGroupName('');
     } catch (error) {
       console.error('Error: ', error);
     }
@@ -143,6 +142,7 @@ const Chat = () => {
     return (
       <TouchableOpacity onPress={goToChatRoom} style={styles.chatRoomItem}>
         <Text>{item.name}</Text>
+        <Text>{item.members.length}명</Text>
       </TouchableOpacity>
     );
   };
@@ -208,31 +208,7 @@ const Chat = () => {
         </TouchableOpacity>
       </View>
 
-      <View
-        style={{
-          flexDirection: 'row',
-          width: width,
-          height: 50,
-          alignItems: 'center',
-        }}>
-        <View
-          style={{
-            width: width - 80,
-            height: 40,
-            justifyContent: 'center',
-            marginHorizontal: 12,
-            paddingHorizontal: 12,
-            borderRadius: 10,
-            backgroundColor: '#D9D9D9',
-          }}>
-          <TextInput placeholder="채팅방 검색" />
-        </View>
-        <TouchableOpacity>
-          <Text style={{fontSize: 16}}>취소</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View>
+      <View style={{flex: 1}}>
         <FlatList
           data={chatRooms}
           renderItem={renderGroups}
@@ -251,8 +227,7 @@ const Chat = () => {
           <FlatList
             data={users.filter(user => user.id !== currentUserUID)}
             renderItem={renderItem}
-            // keyExtractor={item => item.id}
-            key={item => item.id.toString()}
+            keyExtractor={item => item.id.toString()}
           />
           <TouchableOpacity onPress={toggleMakeNameModal}>
             <Text style={{fontSize: 18, fontWeight: '700'}}>초대하기</Text>
@@ -324,11 +299,14 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   chatRoomItem: {
+    justifyContent: 'space-between',
+    marginHorizontal: 24,
     padding: 16,
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 8,
     marginBottom: 12,
+    flexDirection: 'row',
   },
 });
 
