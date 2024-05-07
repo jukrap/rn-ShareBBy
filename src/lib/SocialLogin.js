@@ -6,6 +6,8 @@ import auth from '@react-native-firebase/auth';
 import {WEB_CLIENT_ID} from '@env';
 import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import useStore from './useStore';
 
 // 네이버 로그인 초기화
 const initializeNaverLogin = async () => {
@@ -47,6 +49,7 @@ export const handleNaverLogin = async navigation => {
     await initializeNaverLogin();
     const result = await NaverLogin.login();
     if (result) {
+      useStore.setState({userToken: 'accessToken'});
       await getNaverProfiles(navigation);
     } else {
       Alert.alert('네이버 로그인 실패', '네이버 로그인에 실패하였습니다.');
@@ -93,7 +96,7 @@ const getNaverProfiles = async navigation => {
         nickname: profileData.response.nickname,
         profileImage: profileImageUrl,
       });
-
+      await AsyncStorage.setItem('userToken', user.uid);
       navigation.navigate('BottomTab');
     } else {
       Alert.alert(
@@ -128,8 +131,9 @@ export const onGoogleButtonPress = async navigation => {
         nickname: displayName,
         profileImage: profileImageUrl,
       });
-
+      await AsyncStorage.setItem('userToken', user.uid);
       navigation.navigate('BottomTab');
+      useStore.setState({userToken: 'user.uid'});
     } else {
       Alert.alert('사용자 정보가 없습니다.');
     }
@@ -149,6 +153,7 @@ export const kakaoLogins = async navigation => {
     const result = await KakaoLogin.login();
     if (result) {
       await getKakaoProfile(navigation);
+      useStore.setState({userToken: 'user.uid'});
     } else {
       Alert.alert('카카오 로그인 실패', '카카오 로그인에 실패했습니다.');
     }
@@ -194,7 +199,7 @@ const registerKakaoUser = async (profile, navigation) => {
       nickname: profile.nickname,
       profileImage: profileImageUrl,
     });
-
+    await AsyncStorage.setItem('userToken', user.uid);
     navigation.navigate('BottomTab');
   } catch (error) {
     Alert.alert('오류', '사용자 등록 및 정보 저장 중 오류가 발생했습니다.');
