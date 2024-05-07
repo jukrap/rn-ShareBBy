@@ -80,7 +80,6 @@ const CommunityAddPost = () => {
           post_content: postContent,
           post_files: imageUrls,
           post_created: firestore.Timestamp.fromDate(new Date()),
-          post_like: 0,
           post_actflag: true,
         });
 

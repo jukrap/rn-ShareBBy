@@ -27,7 +27,8 @@ const PostCard = ({item, onDelete, onPress, onEdit}) => {
     return () => unsubscribe();
   }, []);
 
-  const isLiked = item.post_like > 0;
+  const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(item.likeCount || 0);
   const likeIcon = isLiked ? heartLineIcon : heartRedIcon;
 
   // 좋아요 개수 가져오기
@@ -61,6 +62,72 @@ const PostCard = ({item, onDelete, onPress, onEdit}) => {
 
   const toggleModal = () => {
     setIsModalVisible(!isModalVisible);
+  };
+
+  useEffect(() => {
+    // 현재 사용자가 해당 게시글에 좋아요를 눌렀는지 확인
+    const checkLikeStatus = async () => {
+      if (currentUser) {
+        const likeDoc = await firestore()
+          .collection('likes')
+          .where('postId', '==', item.id)
+          .where('userId', '==', currentUser.uid)
+          .get();
+
+        if (!likeDoc.empty) {
+          setIsLiked(true);
+        }
+      }
+    };
+
+    checkLikeStatus();
+  }, [currentUser, item.id]);
+
+  const handleLikePress = async () => {
+    if (currentUser) {
+      if (isLiked) {
+        // 좋아요 취소
+        await firestore()
+          .collection('likes')
+          .where('postId', '==', item.id)
+          .where('userId', '==', currentUser.uid)
+          .get()
+          .then(querySnapshot => {
+            querySnapshot.forEach(doc => {
+              doc.ref.delete();
+            });
+          });
+
+        setIsLiked(false);
+        setLikeCount(prevCount => prevCount - 1);
+
+        // 파베 내 게시글 doc의 likeCount 감소
+        await firestore()
+          .collection('posts')
+          .doc(item.id)
+          .update({
+            likeCount: firestore.FieldValue.increment(-1),
+          });
+      } else {
+        // 좋아요 추가
+        await firestore().collection('likes').add({
+          postId: item.id,
+          userId: currentUser.uid,
+          createdAt: firestore.FieldValue.serverTimestamp(),
+        });
+
+        setIsLiked(true);
+        setLikeCount(prevCount => prevCount + 1);
+
+        // 파베 내 게시글 doc의 likeCount 늘리기
+        await firestore()
+          .collection('posts')
+          .doc(item.id)
+          .update({
+            likeCount: firestore.FieldValue.increment(1),
+          });
+      }
+    }
   };
 
   return (
@@ -138,14 +205,17 @@ const PostCard = ({item, onDelete, onPress, onEdit}) => {
               styles.interactionButton,
               isLiked && styles.activeInteractionButton,
             ]}
-            onPress={() => {}}>
-            <Image source={likeIcon} style={{width: 24, height: 24}} />
+            onPress={handleLikePress}>
+            <Image
+              source={isLiked ? heartRedIcon : heartLineIcon}
+              style={{width: 24, height: 24}}
+            />
             <Text
               style={[
                 styles.interactionText,
                 isLiked && styles.activeInteractionText,
               ]}>
-              {getLikeCount()}
+              {likeCount}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.interactionButton} onPress={onPress}>
