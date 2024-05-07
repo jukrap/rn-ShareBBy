@@ -153,6 +153,14 @@ const CommunityEditPost = () => {
     }
   };
 
+  //이미지 삭제 함수
+  const removeImage = image => {
+    setSelectedImages(prevState => ({
+      existingImages: prevState.existingImages.filter(img => img !== image),
+      newImages: prevState.newImages.filter(img => img !== image),
+    }));
+  };
+
   // 이미지 선택기 열기
   const openImagePicker = () => {
     setIsImagePickerModalVisible(true);
@@ -240,11 +248,14 @@ const CommunityEditPost = () => {
           </TouchableOpacity>
           {[...selectedImages.existingImages, ...selectedImages.newImages].map(
             (image, index) => (
-              <Image
-                key={index}
-                source={{uri: image}}
-                style={styles.imageThumbnail}
-              />
+              <View key={index} style={styles.imageThumbnailContainer}>
+                <Image source={{uri: image}} style={styles.imageThumbnail} />
+                <TouchableOpacity
+                  style={styles.removeImageButton}
+                  onPress={() => removeImage(image)}>
+                  <Text style={styles.removeImageButtonText}>X</Text>
+                </TouchableOpacity>
+              </View>
             ),
           )}
         </View>
@@ -356,11 +367,30 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#07ac7d',
   },
+  imageThumbnailContainer: {
+    position: 'relative',
+    marginRight: 8,
+  },
   imageThumbnail: {
     width: 80,
     height: 80,
     borderRadius: 8,
-    marginRight: 8,
+  },
+  removeImageButton: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    borderRadius: 50,
+    width: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  removeImageButtonText: {
+    color: '#FEFFFE',
+    fontSize: 12,
+    fontWeight: 'bold',
   },
   imagePickerModalContainer: {
     flex: 1,
