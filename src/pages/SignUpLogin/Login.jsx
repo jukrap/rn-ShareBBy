@@ -80,6 +80,7 @@ const Login = ({navigation}) => {
               autoCompleteType="email"
               autoCapitalize="none"
               keyboardType="email-address"
+              
             />
           </View>
 
@@ -91,6 +92,7 @@ const Login = ({navigation}) => {
               onChangeText={setPassword}
               placeholderTextColor={'#A7A7A7'}
               autoCapitalize="none"
+              secureTextEntry={true}
             />
           </View>
 
