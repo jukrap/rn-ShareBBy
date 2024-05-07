@@ -88,8 +88,6 @@ const Join = ({ navigation, route }) => {
         const diffHours = dayjs(item._data.deadline).diff(now, 'hours')
         const diffMins = dayjs(item._data.deadline).diff(now, 'minutes')
 
-        console.log(item);
-
         const moveMarkerLocation = () => {
             const Region = {
                 latitude: item._data.latitude,
@@ -111,7 +109,8 @@ const Join = ({ navigation, route }) => {
         }
 
         return (
-            <TouchableOpacity 
+            <TouchableOpacity
+                activeOpacity={0.6} 
                 style={styles.listView}
                 onPress={moveMarkerLocation}>
                 <View style={{ justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row', paddingTop: 8 }}>
@@ -175,7 +174,6 @@ const Join = ({ navigation, route }) => {
                 </View>
                 <View style={{ bottom: 30, position: 'absolute', zIndex: 2,   }}>
                     <FlatList
-                    
                         data={hobbiesData.reverse()}
                         renderItem={renderItem}
                         keyExtractor={item => item.id}

@@ -1,13 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
-import { SafeAreaView, View, Text, TouchableOpacity, StyleSheet, ScrollView, Dimensions, Image, FlatList } from "react-native";
+import { SafeAreaView, View, Text, Animated, StyleSheet, ScrollView, Dimensions, Image, FlatList, TouchableOpacity } from "react-native";
 import { NaverMapView, NaverMapMarkerOverlay } from "@mj-studio/react-native-naver-map";
+import dayjs from 'dayjs';
+
+import TopTab from "../../components/Main/TobTab";
+import BottomButtons from "../../components/Main/BottomButtons";
 
 const { width, height } = Dimensions.get('window');
 
 const Show = ({ navigation, route }) => {
     console.log('show ===============> ', route.params._data);
-
-    const { address, content, deadline, latitude, longitude, nickname, peopleCount, tag, title, writeTime } = route.params._data;
+    const showValue = useRef(new Animated.Value(0)).current;
+    const { address, detail_address, content, deadline, latitude, longitude, nickname, peopleCount, tag, title, writeTime } = route.params._data;
     
     const [initialRegion, setInitialRegion] = useState({
         latitude: latitude,
@@ -15,9 +19,15 @@ const Show = ({ navigation, route }) => {
         latitudeDelta: 0,
         longitudeDelta: 0,
     });
+    const showAnimated = (value) => Animated.timing(showValue, { toValue: value, useNativeDriver: true, duration: 300 });
+
+    useEffect(() => {
+        showAnimated(1).start()
+    }, []);
 
     return (
         <SafeAreaView style={{flex : 1, backgroundColor : '#fff'}}>
+            <TopTab navigation={navigation} title={title} />
             <NaverMapView
                 style={{width : width, height : width/1.6 }}
                 layerGroups={{
@@ -29,9 +39,17 @@ const Show = ({ navigation, route }) => {
                     TRANSIT: false,
                 }}
                 initialRegion={initialRegion}
+                isShowLocationButton={false}
+                isShowZoomControls={false}
+                isRotateGesturesEnabled={false}
+                isScrollGesturesEnabled={false}
+                isTiltGesturesEnabled={false}
+                isStopGesturesEnabled={false}
+                isZoomGesturesEnabled={false}
                 locale={'ko'}
                 maxZoom={16}
                 minZoom={16}
+
             >
                 <NaverMapMarkerOverlay
                     latitude={latitude}
@@ -40,50 +58,41 @@ const Show = ({ navigation, route }) => {
                     height={45}
                 />
             </NaverMapView>
-            <View style={{ gap : 10}}>
+            <View style={{ flex : 1, gap : 10,}}>
                 <View style={{ paddingHorizontal : 16, paddingTop : 10, gap : 8}}>
                     <Text style={{fontSize : 20, fontWeight : '700'}}>{title}</Text>
-                    <Text style={{fontSize : 14, fontWeight : '600'}}>{tag}</Text>
+                    <Text style={{fontSize : 16}}>{tag}</Text>
                 </View>
                 <View style={{ paddingHorizontal : 16, paddingTop : 10, gap : 8}}>
-                    <View style={{justifyContent : 'flex-start', alignItems : 'center', flexDirection : 'row', gap : 8}}>
-                        <Image source={addressIcon} style={{width : 20, height : 20}} />
-                        <Text>{address}</Text>
+                    <View style={{justifyContent : 'flex-start', alignItems : 'center', flexDirection : 'row', gap : 16}}>
+                        <Text style={{fontWeight : '700', color : '#07AC7D'}}>장소</Text>
+                        <Text numberOfLines={1} ellipsizeMode="tail" style={{width : width-100}}>{address} {detail_address}</Text>
                     </View>
-                    <View style={{justifyContent : 'flex-start', alignItems : 'center', flexDirection : 'row', gap : 8}}>
-                        <Image source={timeIcon} style={{width : 20, height : 20}} />
-                        <Text>{deadline}</Text>
+                    <View style={{justifyContent : 'flex-start', alignItems : 'center', flexDirection : 'row', gap : 16}}>
+                        <Text style={{fontWeight : '700', color : '#07AC7D'}}>시간</Text>
+                        <Text>{dayjs(deadline).format('YYYY년 MM월 DD일 (ddd) HH:mm')} 까지</Text>
                     </View>
-                    <View style={{justifyContent : 'flex-start', alignItems : 'center', flexDirection : 'row', gap : 8}}>
-                        <Image source={recruitIcon} style={{width : 20, height : 20}} />
-                        <Text>{peopleCount}</Text>
+                    <View style={{justifyContent : 'flex-start', alignItems : 'center', flexDirection : 'row', gap : 16}}>
+                        <Text style={{fontWeight : '700', color : '#07AC7D'}}>인원</Text>
+                        <Text>{peopleCount} 명</Text>
                     </View>
                 </View>
-                <View style={{width : width, height : 8, backgroundColor : '#f4f4f4'}} />
-                <ScrollView style={{ minHeight : '50%'}}>
+                <View style={{width : width, height : 1, backgroundColor : '#f4f4f4'}} />
+                    <View style={{ flex : 1}}>
+                    <ScrollView style={{}}>
                     <View style={{ paddingHorizontal : 16, paddingVertical : 10, gap : 8}}>
                         <Text style={{fontSize : 16, fontWeight : '600'}}>상세내용</Text>
                         <Text>{content}</Text>
                     </View>
-                    {/* <View style={{width : width, height : 8, backgroundColor : '#f4f4f4'}} />
-                    <View style={{ paddingHorizontal : 16, }}>
+                    <View style={{ paddingHorizontal : 16, paddingTop : 10 }}>
                         <Text style={{fontSize : 16, fontWeight : '600'}}>참여인원</Text>
                         <Text>{nickname}</Text>
-                    </View> */}
-                </ScrollView>
-
-            </View>
-            <View style={{height : 80, justifyContent : 'center', marginTop : 'auto', paddingHorizontal : 16, borderTopWidth : 1, borderTopColor : '#07AC7D'}}>
-                <View style={{justifyContent : 'space-between', alignItems : 'center', flexDirection : 'row'}}>
-                    <View style={{ justifyContent : 'center', alignItems : 'center', gap : 4}}>
-                        <Text style={{fontSize : 14, fontWeight : 600, color : '#898989'}}>참여가능인원</Text>
-                        <Text style={{color : '#898989'}}><Text style={{color : '#07AC7D'}}>0</Text> / {peopleCount}</Text>
                     </View>
-                    <TouchableOpacity style={{ paddingHorizontal : 26, paddingVertical : 12, borderRadius : 8, backgroundColor : '#07AC7D'}}>
-                        <Text style={{fontSize : 16, fontWeight : '600', color : '#fff'}}>참여하기</Text>
-                    </TouchableOpacity>
-                </View>
+                    </ScrollView>
+                    </View>
             </View>
+            <BottomButtons showValue={showValue} peopleCount={peopleCount}/>
+        
         </SafeAreaView>
     )
 }
@@ -94,6 +103,24 @@ const recruitIcon = require('../../assets/icons/recruitIcon.png');
 const addressIcon = require('../../assets/icons/addressIcon.png');
 const timeIcon = require('../../assets/icons/timeIcon.png');
 
+const styles = StyleSheet.create({
+    bottom: {
+        position: 'absolute',
+        height : 100,
+        bottom: 0,
+        left: 0,
+        right: 0,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingHorizontal: 24,
+        borderStyle: 'solid',
+        borderColor: '#c3c3c3',
+        borderWidth: 0.5,
+        backgroundColor: '#fff',
+        borderTopLeftRadius: 24,
+        borderTopRightRadius: 24,
+    },
+})
 // import React, { useEffect } from "react";
 // import { SafeAreaView, View, Text, Image, TouchableOpacity, Dimensions, StyleSheet, ScrollView } from "react-native";
 // import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";

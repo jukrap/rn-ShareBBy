@@ -1,12 +1,10 @@
 import React, { useRef, useState } from "react";
 import { SafeAreaView, Text, View, TextInput, TouchableOpacity, Dimensions, StyleSheet, Image, FlatList, ScrollView } from "react-native";
 import dayjs from 'dayjs';
-import 'dayjs/locale/ko';
 import DatePicker from 'react-native-date-picker'
 import Modal from "react-native-modal";
 
 import { recruitHobby } from "../../lib/hobby";
-
 import Tobbar from '../../components/Main/TobTab'
 
 const { width, height } = Dimensions.get('window');
@@ -293,7 +291,7 @@ const Detail = ({ route, navigation }) => {
                             <Text style={[styles.contentText,]}>주소 : {detailContent.address}</Text>
                             <Text style={[styles.contentText,]}>상세 주소 : {detailContent.detailAddress}</Text>
                             <Text style={[styles.contentText,]}>태그 : {detailContent.showTag}</Text>
-                            <Text style={[styles.contentText,]}>모집 기간 : {detailContent.deadLine}</Text>
+                            <Text style={[styles.contentText,]}>모집 기간 : {dayjs(detailContent.deadLine).format('YYYY년 MM월 DD일 (ddd) HH:mm')} 까지</Text>
                             <Text style={[styles.contentText,]}>모집 인원 : {detailContent.peopleCount} 명</Text>
                             <Text style={[styles.contentText, { textAlign: 'center', paddingTop: 16, fontWeight: 600 }]}>제목, 본문 확인하셨나요?</Text>
                         </View>

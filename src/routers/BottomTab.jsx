@@ -24,7 +24,7 @@ const AboutMap = ({params}) => {
       <Stack.Screen name="Recruit" component={Recruit} initialParams={params} />
       <Stack.Screen name="Join" component={Join} initialParams={params} />
       <Stack.Screen name="Detail" component={Detail} initialParams={params} />
-      <Stack.Screen name="Show" component={Show} initialParams={params} />
+      {/* <Stack.Screen name="Show" component={Show} initialParams={params} /> */}
     </Stack.Navigator>
   );
 };
