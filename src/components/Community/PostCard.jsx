@@ -14,7 +14,7 @@ import {ko} from 'date-fns/locale';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 
-const PostCard = ({item, onDelete, onComment, onEdit, onProfilePress}) => {
+const PostCard = ({item, onDelete, onComment, onEdit, onProfile}) => {
   const [postUserData, setPostUserData] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -139,7 +139,7 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfilePress}) => {
       <View style={styles.userInfoContainer}>
         <TouchableOpacity
           style={styles.userInfoWrapper}
-          onPress={() => onProfilePress(item.userId)}>
+          onPress={() => onProfile(item.userId)}>
           <Image
             style={styles.userProfileImage}
             source={{uri: postUserData?.profileImage}}
@@ -224,13 +224,10 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfilePress}) => {
           </TouchableOpacity>
         </View>
         <View style={styles.rightInteractionContainer}>
-          {currentUser && currentUser.uid === item.userId && (
             <TouchableOpacity
-              style={styles.interactionButton}
-              onPress={() => onDelete(item.id)}>
+              style={styles.interactionButton}>
               <Image source={shareIcon} style={{width: 24, height: 24}} />
             </TouchableOpacity>
-          )}
         </View>
       </View>
 

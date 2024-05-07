@@ -271,7 +271,7 @@ const CommunityBoard = ({navigation}) => {
                   onComment={() =>
                     navigation.navigate('HomeProfile', {userId: item.userId})
                   }
-                  onProfilePress={handleProfilePress}
+                  onProfile={handleProfilePress}
                 />
               )}
               keyExtractor={item => item.id}
