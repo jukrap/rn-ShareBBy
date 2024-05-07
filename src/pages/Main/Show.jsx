@@ -17,9 +17,9 @@ const Show = ({ navigation, route }) => {
     });
 
     return (
-        <SafeAreaView style={{flex : 1}}>
+        <SafeAreaView style={{flex : 1, backgroundColor : '#fff'}}>
             <NaverMapView
-                style={{width : width, height : width }}
+                style={{width : width, height : width/1.6 }}
                 layerGroups={{
                     BUILDING: true,
                     BICYCLE: false,
@@ -29,18 +29,9 @@ const Show = ({ navigation, route }) => {
                     TRANSIT: false,
                 }}
                 initialRegion={initialRegion}
-                // isIndoorEnabled={indoor}
-                // symbolScale={symbolScale}
-                // lightness={lightness}
-                // isNightModeEnabled={nightMode}
-                // isShowCompass={compass}
-                // isShowIndoorLevelPicker={indoorLevelPicker}
-                // isShowScaleBar={scaleBar}
-                // isShowZoomControls={zoomControls}
-                // isShowLocationButton={myLocation}
-                // isExtentBoundedInKorea
-                logoAlign={'TopRight'}
                 locale={'ko'}
+                maxZoom={16}
+                minZoom={16}
             >
                 <NaverMapMarkerOverlay
                     latitude={latitude}
@@ -49,12 +40,59 @@ const Show = ({ navigation, route }) => {
                     height={45}
                 />
             </NaverMapView>
+            <View style={{ gap : 10}}>
+                <View style={{ paddingHorizontal : 16, paddingTop : 10, gap : 8}}>
+                    <Text style={{fontSize : 20, fontWeight : '700'}}>{title}</Text>
+                    <Text style={{fontSize : 14, fontWeight : '600'}}>{tag}</Text>
+                </View>
+                <View style={{ paddingHorizontal : 16, paddingTop : 10, gap : 8}}>
+                    <View style={{justifyContent : 'flex-start', alignItems : 'center', flexDirection : 'row', gap : 8}}>
+                        <Image source={addressIcon} style={{width : 20, height : 20}} />
+                        <Text>{address}</Text>
+                    </View>
+                    <View style={{justifyContent : 'flex-start', alignItems : 'center', flexDirection : 'row', gap : 8}}>
+                        <Image source={timeIcon} style={{width : 20, height : 20}} />
+                        <Text>{deadline}</Text>
+                    </View>
+                    <View style={{justifyContent : 'flex-start', alignItems : 'center', flexDirection : 'row', gap : 8}}>
+                        <Image source={recruitIcon} style={{width : 20, height : 20}} />
+                        <Text>{peopleCount}</Text>
+                    </View>
+                </View>
+                <View style={{width : width, height : 8, backgroundColor : '#f4f4f4'}} />
+                <ScrollView style={{ minHeight : '50%'}}>
+                    <View style={{ paddingHorizontal : 16, paddingVertical : 10, gap : 8}}>
+                        <Text style={{fontSize : 16, fontWeight : '600'}}>상세내용</Text>
+                        <Text>{content}</Text>
+                    </View>
+                    {/* <View style={{width : width, height : 8, backgroundColor : '#f4f4f4'}} />
+                    <View style={{ paddingHorizontal : 16, }}>
+                        <Text style={{fontSize : 16, fontWeight : '600'}}>참여인원</Text>
+                        <Text>{nickname}</Text>
+                    </View> */}
+                </ScrollView>
+
+            </View>
+            <View style={{height : 80, justifyContent : 'center', marginTop : 'auto', paddingHorizontal : 16, borderTopWidth : 1, borderTopColor : '#07AC7D'}}>
+                <View style={{justifyContent : 'space-between', alignItems : 'center', flexDirection : 'row'}}>
+                    <View style={{ justifyContent : 'center', alignItems : 'center', gap : 4}}>
+                        <Text style={{fontSize : 14, fontWeight : 600, color : '#898989'}}>참여가능인원</Text>
+                        <Text style={{color : '#898989'}}><Text style={{color : '#07AC7D'}}>0</Text> / {peopleCount}</Text>
+                    </View>
+                    <TouchableOpacity style={{ paddingHorizontal : 26, paddingVertical : 12, borderRadius : 8, backgroundColor : '#07AC7D'}}>
+                        <Text style={{fontSize : 16, fontWeight : '600', color : '#fff'}}>참여하기</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
         </SafeAreaView>
     )
 }
 
 export default Show;
 
+const recruitIcon = require('../../assets/icons/recruitIcon.png');
+const addressIcon = require('../../assets/icons/addressIcon.png');
+const timeIcon = require('../../assets/icons/timeIcon.png');
 
 // import React, { useEffect } from "react";
 // import { SafeAreaView, View, Text, Image, TouchableOpacity, Dimensions, StyleSheet, ScrollView } from "react-native";
