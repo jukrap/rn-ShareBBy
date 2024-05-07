@@ -342,6 +342,13 @@ const ChatRoom = ({route, navigation}) => {
             </Text>
             {showTime && <View style={{marginBottom: 8}}></View>}
           </View>
+        ) : isSystemMessage ? (
+          <View style={{justifyContent: 'center', alignItems: 'center'}}>
+            <Text style={{paddingVertical: 22, color: '#aaa', fontSize: 12}}>
+              {item.text}
+            </Text>
+            {showTime && <View style={{marginBottom: 8}}></View>}
+          </View>
         ) : (
           <View style={styles.sentByOtherWrapper}>
             {item.image ? (
