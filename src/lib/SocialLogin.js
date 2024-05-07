@@ -133,7 +133,6 @@ export const onGoogleButtonPress = async navigation => {
       });
       await AsyncStorage.setItem('userToken', user.uid);
       navigation.navigate('BottomTab');
-      useStore.setState({userToken: 'user.uid'});
     } else {
       Alert.alert('사용자 정보가 없습니다.');
     }
