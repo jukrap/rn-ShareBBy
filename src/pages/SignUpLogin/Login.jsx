@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   Text,
   View,
@@ -10,8 +10,10 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import {signIn} from '../../lib/auth';
+import { signIn } from '../../lib/auth';
 import firestore from '@react-native-firebase/firestore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import useStore from '../../lib/useStore'; // Zustand 스토어 import
 
 import {
   onGoogleButtonPress,
@@ -24,17 +26,20 @@ const googleIcon = require('../../assets/icons/google.png');
 
 const LoginTitle = require('../../assets/images/LoginTitle.png');
 
-const Login = ({navigation}) => {
-
+const Login = ({ navigation }) => {
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
   const [isEmailValid, setIsEmailValid] = useState(false);
 
+  const setUserToken = useStore(state => state.setUserToken); // Zustand 스토어 custom hook 사용
+
   const onSignIn = async () => {
     try {
-      const {user} = await signIn({email, password});
+      const { user } = await signIn({ email, password });
       const userCollection = firestore().collection('users');
       console.log((await userCollection.doc(user.uid).get()).data());
+      await AsyncStorage.setItem('userToken', user.uid);
+      setUserToken(user.uid); // Zustand 스토어에 사용자 토큰 설정
       navigation.navigate('BottomTab');
     } catch (e) {
       console.error('로그인 실패:', e);
@@ -55,7 +60,7 @@ const Login = ({navigation}) => {
   };
 
   return (
-    <KeyboardAvoidingView style={{flex: 1}}>
+    <KeyboardAvoidingView style={{ flex: 1 }}>
       <View style={styles.firstContainer}>
         <View>
           <Image source={LoginTitle} />
@@ -72,10 +77,10 @@ const Login = ({navigation}) => {
 
           <View style={styles.loginTextInput}>
             <TextInput
-              style={{paddingLeft: 12}}
+              style={{ paddingLeft: 12 }}
               value={email}
               placeholder="아이디를 입력해주세요"
-              onChangeText={handleEmailChange} // 이메일 변경 핸들러로 변경
+              onChangeText={handleEmailChange}
               placeholderTextColor={'#A7A7A7'}
               autoCompleteType="email"
               autoCapitalize="none"
@@ -85,12 +90,13 @@ const Login = ({navigation}) => {
 
           <View style={styles.passwordTextInput}>
             <TextInput
-              style={{paddingLeft: 12}}
+              style={{ paddingLeft: 12 }}
               value={password}
               placeholder="비밀번호를 입력해주세요"
               onChangeText={setPassword}
               placeholderTextColor={'#A7A7A7'}
               autoCapitalize="none"
+              secureTextEntry={true}
             />
           </View>
 
@@ -98,9 +104,9 @@ const Login = ({navigation}) => {
             onPress={onSignIn}
             style={[
               styles.loginButton,
-              !isEmailValid && {backgroundColor: '#A7A7A7'},
+              !isEmailValid && { backgroundColor: '#A7A7A7' },
             ]}
-            disabled={!isEmailValid} // 이메일이 유효하지 않으면 버튼 비활성화
+            disabled={!isEmailValid}
           >
             <Text style={styles.loginButtonText}>로그인</Text>
           </TouchableOpacity>
@@ -113,14 +119,16 @@ const Login = ({navigation}) => {
               <View style={styles.searchBar} />
             </View>
             <TouchableOpacity
-              onPress={() => navigation.navigate('SearchPassword')}>
+              onPress={() => navigation.navigate('SearchPassword')}
+            >
               <Text style={styles.searchPassword}>비밀번호 찾기</Text>
             </TouchableOpacity>
           </View>
 
           <TouchableOpacity
             onPress={() => navigation.navigate('SignUp')}
-            style={styles.signInButton}>
+            style={styles.signInButton}
+          >
             <Text style={styles.signInText}>Are You Ready 가입하기</Text>
           </TouchableOpacity>
 
