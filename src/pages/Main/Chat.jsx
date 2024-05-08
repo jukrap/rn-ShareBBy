@@ -8,7 +8,7 @@ import {
   FlatList,
   Image,
   TextInput,
-  useWindowDimensions,
+  Dimensions,
 } from 'react-native';
 
 import Modal from 'react-native-modal';
@@ -16,9 +16,9 @@ import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import {useNavigation} from '@react-navigation/native';
 
+const {width, height} = Dimensions.get('window');
+
 const Chat = ({route}) => {
-  console.log('userInfo ====> ', route.key);
-  const {width, height} = useWindowDimensions();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isModalMakeNameVisible, setIsModalMakeNameVisible] = useState(false);
   const [users, setUsers] = useState([]);
@@ -27,11 +27,6 @@ const Chat = ({route}) => {
   const [chatRooms, setChatRooms] = useState([]);
   const [currentUserUID, setCurrentUserUID] = useState(null);
   const navigation = useNavigation();
-
-  const handleLogout = () => {
-    auth().signOut();
-    navigation.navigate('LoginTab');
-  };
 
   const handleGroupNameChange = text => {
     setGroupName(text);
@@ -113,25 +108,25 @@ const Chat = ({route}) => {
     }
   };
 
-  const createGroupChat = async () => {
-    try {
-      const chatRoomRef = await firestore().collection('chatRooms').add({
-        name: groupName,
-        members: selectedUsers,
-      });
-      const chatRoomId = chatRoomRef.id;
-      toggleModal();
-      navigation.navigate('ChatRoom', {
-        chatRoomId: chatRoomId,
-        chatRoomName: groupName,
-      });
-      setSelectedUsers([]);
-      fetchChatRooms();
-      setGroupName('');
-    } catch (error) {
-      console.error('Error: ', error);
-    }
-  };
+  // const createGroupChat = async () => {
+  //   try {
+  //     const chatRoomRef = await firestore().collection('chatRooms').add({
+  //       name: groupName,
+  //       members: selectedUsers,
+  //     });
+  //     const chatRoomId = chatRoomRef.id;
+  //     toggleModal();
+  //     navigation.navigate('ChatRoom', {
+  //       chatRoomId: chatRoomId,
+  //       chatRoomName: groupName,
+  //     });
+  //     setSelectedUsers([]);
+  //     fetchChatRooms();
+  //     setGroupName('');
+  //   } catch (error) {
+  //     console.error('Error: ', error);
+  //   }
+  // };
 
   const renderGroups = ({item}) => {
     const goToChatRoom = () => {
@@ -142,8 +137,50 @@ const Chat = ({route}) => {
     };
     return (
       <TouchableOpacity onPress={goToChatRoom} style={styles.chatRoomItem}>
-        <Text>{item.name}</Text>
-        <Text>{item.members.length}명</Text>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'flex-start',
+          }}>
+          <Image
+            style={{width: 48, height: 48, borderRadius: 8}}
+            source={require('../../assets/images/defaultProfileImg.jpeg')}
+          />
+        </View>
+        <View
+          style={{
+            flex: 3.5,
+            alignItems: 'flex-start',
+            justifyContent: 'center',
+          }}>
+          <View
+            style={{
+              flex: 1.5,
+              flexDirection: 'row',
+              alignItems: 'flex-end',
+              gap: 4,
+            }}>
+            <Text style={{fontSize: 16, fontWeight: '600'}}>{item.name}</Text>
+            <Text style={{fontSize: 14, color: '#A7A7A7'}}>
+              {item.members.length}
+            </Text>
+          </View>
+          <View
+            style={{
+              flex: 1,
+              justifyContent: 'flex-end',
+              paddingBottom: 8,
+              fontSize: 10,
+            }}>
+            <Text style={{color: '#A7A7A7', fontSize: 13}}>
+              안녕하세요 다들 반가워요. 하이하이
+            </Text>
+          </View>
+        </View>
+        <View style={{justifyContent: 'flex-end', paddingBottom: 4}}>
+          <Text style={{fontSize: 10}}>오후 12:40</Text>
+        </View>
       </TouchableOpacity>
     );
   };
@@ -169,47 +206,26 @@ const Chat = ({route}) => {
   };
 
   return (
-    <SafeAreaView style={{flex: 1, gap: 16}}>
+    <SafeAreaView style={{flex: 1}}>
       <View
         style={{
+          paddingTop: 8,
           flexDirection: 'row',
           justifyContent: 'space-between',
           alignItems: 'center',
           paddingHorizontal: 16,
+          marginBottom: 32,
         }}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Image
-            style={{width: 30, height: 30}}
-            source={require('../../assets/icons/back.png')}
+            source={require('../../assets/icons/backIcon.png')}
+            style={{width: 24, height: 24}}
           />
         </TouchableOpacity>
-        <TouchableOpacity
-          style={{
-            width: 110,
-            height: 40,
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 16,
-          }}
-          onPress={toggleModal}>
-          <View
-            style={{
-              width: 100,
-              height: 35,
-              justifyContent: 'center',
-              alignItems: 'center',
-              backgroundColor: '#7AD2B9',
-              borderRadius: 12,
-            }}>
-            <Text style={{fontSize: 18, fontWeight: '700'}}>방 만들기</Text>
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handleLogout}>
-          <Text>Log Out</Text>
-        </TouchableOpacity>
+        <Text style={{fontSize: 24, fontWeight: '700'}}>채팅목록</Text>
+        <View />
       </View>
-
-      <View style={{flex: 1}}>
+      <View style={{flex: 1, alignItems: 'center'}}>
         <FlatList
           data={chatRooms}
           renderItem={renderGroups}
@@ -268,9 +284,9 @@ const Chat = ({route}) => {
               />
             </View>
             <View>
-              <TouchableOpacity onPress={createGroupChat}>
+              {/* <TouchableOpacity onPress={createGroupChat}>
                 <Text>확인</Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
               <TouchableOpacity onPress={toggleMakeNameModal}>
                 <Text>취소</Text>
               </TouchableOpacity>
@@ -281,6 +297,8 @@ const Chat = ({route}) => {
     </SafeAreaView>
   );
 };
+
+export default Chat;
 
 const styles = StyleSheet.create({
   container: {
@@ -301,8 +319,9 @@ const styles = StyleSheet.create({
   },
   chatRoomItem: {
     justifyContent: 'space-between',
-    marginHorizontal: 24,
-    padding: 16,
+    paddingHorizontal: 8,
+    width: width / 1.1,
+    height: height / 12,
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 8,
@@ -310,5 +329,3 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
 });
-
-export default Chat;

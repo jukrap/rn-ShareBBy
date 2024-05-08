@@ -3,24 +3,29 @@ import { SafeAreaView, View, Text, Animated, StyleSheet, ScrollView, Dimensions,
 import { NaverMapView, NaverMapMarkerOverlay } from "@mj-studio/react-native-naver-map";
 import dayjs from 'dayjs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getUser } from "../../lib/user";
 
 import TopTab from "../../components/Main/TobTab";
 import BottomButtons from "../../components/Main/BottomButtons";
+import Toast from "../../components/Main/Toast";
 
 const { width, height } = Dimensions.get('window');
 
 const Show = ({ navigation, route }) => {
     console.log('show ===============> ', route.params._data);
     const showValue = useRef(new Animated.Value(0)).current;
-    const { address, detail_address, content, deadline, latitude, longitude, nickname, peopleCount, tag, title, writeTime } = route.params._data;
+    const { address, detail_address, content, deadline, latitude, longitude, nickname, peopleCount, tag, title, writeTime, user_id } = route.params._data;
     
-    const [userInfo, setUserInfo] = useState()
+    const [userToken, setUserToken] = useState()
+    const [userInfo, setUserInfo] = useState([]);
     const [initialRegion, setInitialRegion] = useState({
         latitude: latitude,
         longitude: longitude,
         latitudeDelta: 0,
         longitudeDelta: 0,
     });
+    const [isToast, setIsToast] = useState('');
+    const toastValue = useRef(new Animated.Value(0)).current;
     const showAnimated = (value) => Animated.timing(showValue, { toValue: value, useNativeDriver: true, duration: 300 });
 
     useEffect(() => {
@@ -32,10 +37,13 @@ const Show = ({ navigation, route }) => {
         try {
           // 'userToken' 키를 사용하여 데이터 가져오기
           const userToken = await AsyncStorage.getItem('userToken');
+          const userInfo = await getUser(userToken);
           if (userToken !== null) {
             // 데이터가 있을 경우 처리
-            console.log('User Token:', userToken);
-            setUserInfo(userToken);
+            // console.log('User Token:', userToken);
+            // console.log('UserInfo:', userInfo);
+            setUserToken(userToken);
+            setUserInfo(userInfo)
           } else {
             console.log('User Token이 없습니다.');
           }
@@ -43,14 +51,27 @@ const Show = ({ navigation, route }) => {
           // 오류 처리
           console.error('AsyncStorage에서 데이터를 가져오는 중 오류 발생:', error);
         }
+        console.log('userInfo 값 ====>', userInfo);
       };
 
     const onPressToken = () => {
-        navigation.navigate('BottomTab', {
-            screen : 'AboutChat',
-            params : userInfo
-        });
+        const checkMyId = userToken === user_id
+        if (checkMyId) {
+            console.log('같아서 참여하기 누르면 본인 참가 했으니 중복참가 안된다고 함');
+            setIsToast(true);
+        } else {
+            navigation.navigate('BottomTab', {
+                screen : '채팅',
+                params : userToken
+            });
+            console.log('채팅방 페이지로 이동');
+
+        }
+
     }
+
+    
+
 // 참가하기를 눌렀을 때, 유저 아이디를 넘기기
     return (
         <SafeAreaView style={{flex : 1, backgroundColor : '#fff'}}>
@@ -105,29 +126,33 @@ const Show = ({ navigation, route }) => {
                 </View>
                 <View style={{width : width, height : 1, backgroundColor : '#f4f4f4'}} />
                     <View style={{ flex : 1}}>
-                    <ScrollView style={{}}>
-                    <View style={{ paddingHorizontal : 16, paddingVertical : 10, gap : 8}}>
+                    <ScrollView>
+                    <View style={{ paddingHorizontal : 16, paddingVertical : 20, gap : 8}}>
                         <Text style={{fontSize : 16, fontWeight : '600'}}>상세내용</Text>
                         <Text>{content}</Text>
                     </View>
-                    <View style={{ paddingHorizontal : 16, paddingTop : 10 }}>
+                    <View style={{ paddingHorizontal : 16 }}>
                         <Text style={{fontSize : 16, fontWeight : '600'}}>참여인원</Text>
+                        <View style={{justifyContent : 'center', paddingTop : 24,}}>
+                        <Image src={userInfo.profileImage} style={{width : 60, height : 60, borderRadius : 50}} />
                         <Text>{nickname}</Text>
+                        </View>
                     </View>
                     </ScrollView>
                     </View>
             </View>
-            <BottomButtons showValue={showValue} peopleCount={peopleCount} onPressToken={onPressToken}/>
-        
+            <BottomButtons showValue={showValue} peopleCount={peopleCount} onPressToken={onPressToken} />
+            <Toast  text="본인이 만든 취미에요!"
+                    visible={isToast}
+                    handleCancel={() => {
+                        setIsToast(false);
+                    }}
+            />
         </SafeAreaView>
     )
 }
 
 export default Show;
-
-const recruitIcon = require('../../assets/icons/recruitIcon.png');
-const addressIcon = require('../../assets/icons/addressIcon.png');
-const timeIcon = require('../../assets/icons/timeIcon.png');
 
 const styles = StyleSheet.create({
     bottom: {
