@@ -21,6 +21,7 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(item.likeCount || 0);
   const likeIcon = isLiked ? heartLineIcon : heartRedIcon;
+  const [commentCount, setCommentCount] = useState(0);
 
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged(user => {
@@ -32,6 +33,10 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
 
   useEffect(() => {
     fetchPostUserData();
+  }, []);
+
+  useEffect(() => {
+    fetchCommentCount();
   }, []);
 
   const toggleModal = () => {
@@ -83,6 +88,21 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
       }
     } catch (error) {
       console.log('사용자 데이터를 가져오는 중에 오류가 발생했습니다:', error);
+    }
+  };
+
+  const fetchCommentCount = async () => {
+    try {//개수 새로이 로딩하는 거 개선 필요
+      //그냥 개수 카운팅 별도로 하는 게 나을지도
+      const querySnapshot = await firestore()
+        .collection('comments')
+        .where('postId', '==', item.id)
+        .get();
+
+      const count = querySnapshot.size;
+      setCommentCount(count);
+    } catch (error) {
+      console.log('댓글 수를 가져오는 중에 오류가 발생했습니다:', error);
     }
   };
 
@@ -141,7 +161,11 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
           onPress={() => onProfile(item.userId)}>
           <Image
             style={styles.userProfileImage}
-            source={{uri: postUserData?.profileImage}}
+            source={
+              postUserData && postUserData.profileImage
+                ? {uri: postUserData.profileImage}
+                : require('../../assets/images/defaultProfileImg.jpeg')
+            }
           />
           <View style={styles.userInfoTextContainer}>
             <Text style={styles.userNameText}>{postUserData?.nickname}</Text>
@@ -214,7 +238,7 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
             style={styles.interactionButton}
             onPress={onComment}>
             <Image source={commentLineIcon} style={{width: 24, height: 24}} />
-            <Text style={styles.interactionText}>{getCommentCount()}</Text>
+            <Text style={styles.interactionText}>{commentCount}</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.rightInteractionContainer}>

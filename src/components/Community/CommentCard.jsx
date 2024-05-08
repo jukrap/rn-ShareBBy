@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   Modal,
 } from 'react-native';
-import {formatDistanceToNow} from 'date-fns';
+import {formatDistanceToNow, format} from 'date-fns';
 import {ko} from 'date-fns/locale';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
@@ -60,7 +60,11 @@ const CommentCard = ({item}) => {
         <View style={styles.userInfoContainer}>
           <Image
             style={styles.userProfileImage}
-            source={{uri: commentUserData?.profileImage}}
+            source={
+              commentUserData && commentUserData.profileImage
+                ? {uri: commentUserData.profileImage}
+                : require('../../assets/images/defaultProfileImg.jpeg')
+            }
           />
           <View style={styles.userInfoTextContainer}>
             <View style={styles.commentTopContainer}>
@@ -81,8 +85,7 @@ const CommentCard = ({item}) => {
               {item.comment_content}
             </Text>
             <Text style={styles.commentTimeText}>
-              {formatDistanceToNow(item.comment_created.toDate(), {
-                addSuffix: true,
+              {format(item.comment_created.toDate(), 'yyyy.MM.dd HH:mm', {
                 locale: ko,
               })}
             </Text>
@@ -158,7 +161,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 4,
   },
   moreIconContainer: {
     justifyContent: 'center',
@@ -177,6 +180,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Pretendard',
     marginBottom: 10,
+    marginRight: 8,
   },
   commentTimeText: {
     fontSize: 11,

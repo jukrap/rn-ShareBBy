@@ -269,9 +269,7 @@ const CommunityBoard = ({navigation}) => {
                   item={item}
                   onDelete={handleDelete}
                   onEdit={handleEdit}
-                  onComment={() =>
-                    navigation.navigate('HomeProfile', {userId: item.userId})
-                  }
+                  onComment={() => handlePostDetail(item.id)}
                   onProfile={handleProfilePress}
                   onDetail={() => handlePostDetail(item.id)}
                 />

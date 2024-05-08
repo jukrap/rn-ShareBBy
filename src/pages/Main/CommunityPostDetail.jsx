@@ -11,6 +11,7 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
 } from 'react-native';
+import {useFocusEffect} from '@react-navigation/native';
 import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
@@ -38,27 +39,34 @@ const CommunityPostDetail = ({route}) => {
   useEffect(() => {
     const {postId} = route.params;
     setPostId(postId);
-
-    const fetchComments = async () => {
-      try {
-        const querySnapshot = await firestore()
-          .collection('comments')
-          .where('postId', '==', postId)
-          .orderBy('comment_created', 'desc')
-          .get();
-
-        const commentData = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-
-        setComments(commentData);
-      } catch (error) {
-        console.log('댓글을 가져오는 중에 오류가 발생했습니다:', error);
-      }
-    };
-    fetchComments();
   }, [route.params]);
+
+  useEffect(() => {
+    if (postId) {
+      fetchComments();
+    }
+  }, [postId]);
+
+  const fetchComments = async () => {
+    try {
+      const querySnapshot = await firestore()
+        .collection('comments')
+        .where('postId', '==', postId)
+        .orderBy('comment_created', 'asc')
+        .get();
+
+      const commentData = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setComments(commentData);
+    } catch (error) {
+      console.log('댓글을 가져오는 중에 오류가 발생했습니다:', error);
+    }
+  };
+
+
 
   // 댓글 제출 핸들러
   const handleCommentSubmit = useCallback(() => {
@@ -117,7 +125,7 @@ const CommunityPostDetail = ({route}) => {
         keyboardVerticalOffset={48}
         style={{flex: 1, backgroundColor: 'white'}}>
         <View style={styles.container}>
-          {/* 여기에 다른 컨텐츠를 렌더링 */}
+          {/* 다른 것 추가할 곳 */}
           <FlatList
             data={comments}
             renderItem={({item}) => <CommentCard item={item} />}
