@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
   Image,
   SafeAreaView,
@@ -9,16 +9,15 @@ import {
   View,
   Dimensions,
 } from 'react-native';
-import firestore, {
-  collection,
-  query,
-  where,
-  getDocs,
-} from '@react-native-firebase/firestore';
+import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 // import ImagePicker from 'react-native-image-crop-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import useStore from '../../lib/useStore';
+import {useFocusEffect} from '@react-navigation/native';
+const heart = require('../../assets/newIcons/heart-icon.png');
+const pencil = require('../../assets/newIcons/pencil-icon.png');
+const marker = require('../../assets/newIcons/marker-icon.png');
 
 const {width, height} = Dimensions.get('window');
 const rightArrow = require('../../assets/icons/right-arrow.png');
@@ -30,23 +29,40 @@ const Profile = ({navigation, route}) => {
   const clearUserToken = useStore(state => state.clearUserToken);
   const userToken = useStore(state => state.userToken); // 토큰 상태 추가
 
-  useEffect(() => {
-    const fetchUserUid = async () => {
-      try {
-        const user = auth().currentUser;
-        if (user) {
-          //set uuid
-          const userUID = user.uid;
-          setUserUid(userUID);
-        }
-      } catch (error) {
-        console.error('Error fetching current user: ', error);
+  // useEffect(() => {
+  //   const fetchUserUid = async () => {
+  //     try {
+  //       const user = auth().currentUser;
+  //       if (user) {
+  //         //set uuid
+  //         const userUID = user.uid;
+  //         setUserUid(userUID);
+  //       }
+  //     } catch (error) {
+  //       console.error('Error fetching current user: ', error);
+  //     }
+  //     console.log('call user uid', userUid);
+  //   };
+  //   fetchUserUid();
+  // }, [navigation]);
+  const fetchUserUid = async () => {
+    try {
+      const user = auth().currentUser;
+      if (user) {
+        // set uuid
+        const userUID = user.uid;
+        setUserUid(userUID);
       }
-      console.log('call user uid', userUid);
-    };
-    fetchUserUid();
-  }, [navigation]);
-
+    } catch (error) {
+      console.error('Error fetching current user: ', error);
+    }
+    console.log('call user uid', userUid);
+  };
+  useFocusEffect(
+    useCallback(() => {
+      fetchUserUid();
+    }, [setUserUid]), // setUserUid를 의존성 배열에 포함
+  );
   useEffect(() => {
     if (userUid) {
       // userUid가 설정된 후에 fetchUserData 호출
@@ -78,7 +94,6 @@ const Profile = ({navigation, route}) => {
       console.error('로그아웃 실패:', error);
     }
   };
-  
 
   console.log('User Token:', userToken);
   return (
@@ -88,12 +103,10 @@ const Profile = ({navigation, route}) => {
           <Text style={styles.title}>마이페이지</Text>
           <View style={styles.profileHeader}>
             {/* onPress 추가 */}
-            <TouchableOpacity>
-              <Image
-                source={{uri: users.profileImage}}
-                style={styles.profileImageStyle}
-              />
-            </TouchableOpacity>
+            <Image
+              source={{uri: users.profileImage}}
+              style={styles.profileImageStyle}
+            />
             <View style={styles.profileName}>
               <TouchableOpacity
                 onPress={() =>
@@ -112,26 +125,32 @@ const Profile = ({navigation, route}) => {
             </View>
           </View>
           <View style={styles.infoStyle}>
-            <Text
-              // onPress={() => navigation.navigate('Home')}
-              style={styles.listStyle}>
-              내가 쓴 글
-            </Text>
-            <Text
-              // onPress={() => navigation.navigate('Home')}
-              style={styles.listStyle}>
-              찜한 글
-            </Text>
-            <Text
-              // onPress={() => navigation.navigate('Home')}
-              style={styles.listStyle}>
-              참여한 취미 목록
-            </Text>
-            <Text
-              // onPress={() => navigation.navigate('Home')}
-              style={styles.listStyle}>
-              취미 수정
-            </Text>
+            <View style={styles.myList}>
+              <Image source={pencil} style={styles.icon} />
+              <Text
+                //hobbies
+                // onPress={() => navigation.navigate('Home')}
+                style={styles.listStyle}>
+                내가 쓴 글
+              </Text>
+            </View>
+            <View style={styles.myList}>
+              <Image source={heart} style={styles.icon} />
+              <Text
+                //likes
+                // onPress={() => navigation.navigate('Home')}
+                style={styles.listStyle}>
+                찜한 글
+              </Text>
+            </View>
+            <View style={styles.myList}>
+              <Image source={marker} style={styles.icon} />
+              <Text
+                // onPress={() => navigation.navigate('Home')}
+                style={styles.listStyle}>
+                참여한 취미 목록
+              </Text>
+            </View>
           </View>
           <View style={styles.additionalInfo}>
             <Text style={styles.info}>기타</Text>
@@ -139,70 +158,19 @@ const Profile = ({navigation, route}) => {
               // onPress={() => navigation.navigate('Home')}
               style={styles.noticeWrapper}>
               <Text style={styles.noticeStyle}>공지사항</Text>
-              <Image
-                style={{
-                  width: 20,
-                  height: 20,
-                  marginTop: 8,
-                }}
-                source={rightArrow}
-              />
+              <Image style={styles.arrow} source={rightArrow} />
             </TouchableOpacity>
             <TouchableOpacity
               // onPress={() => getPhotos()}
               style={styles.noticeWrapper}>
               <Text style={styles.noticeStyle}>약관 및 개인정보 처리 방침</Text>
-              <Image
-                style={{
-                  width: 20,
-                  height: 20,
-                  marginTop: 8,
-                }}
-                source={rightArrow}
-              />
+              <Image style={styles.arrow} source={rightArrow} />
             </TouchableOpacity>
+
             <TouchableOpacity
-              // onPress={() => navigation.navigate('Home')}
-              style={styles.noticeWrapper}>
-              <Text
-                // onPress={() => navigation.navigate('Home')}
-                style={styles.noticeStyle}>
-                사업자 정보
-              </Text>
-              <Image
-                style={{
-                  width: 20,
-                  height: 20,
-                  marginTop: 8,
-                }}
-                source={rightArrow}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              //   onPress={() => navigation.navigate('Home')}
-              style={styles.noticeWrapper}>
-              <Text style={styles.noticeStyle}>앱 정보</Text>
-              <Image
-                style={{
-                  width: 20,
-                  height: 20,
-                  marginTop: 8,
-                }}
-                source={rightArrow}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-                onPress={handleLogout}
+              onPress={handleLogout}
               style={styles.noticeWrapper}>
               <Text style={styles.noticeStyle}>로그아웃</Text>
-              <Image
-                style={{
-                  width: 20,
-                  height: 20,
-                  marginTop: 8,
-                }}
-                source={rightArrow}
-              />
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -228,6 +196,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginLeft: 30,
     marginTop: 10,
+    marginBottom: 10,
   },
   profileHeader: {
     // paddingBottom: 15,
@@ -238,7 +207,9 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginLeft: 30,
   },
-  profileName: {},
+  profileName: {
+    justifyContent: 'center',
+  },
   name: {
     flexDirection: 'row',
   },
@@ -251,6 +222,7 @@ const styles = StyleSheet.create({
   arrow: {
     width: 20,
     height: 20,
+    alignItems: 'center',
   },
   emailStyle: {
     fontSize: 15,
@@ -272,6 +244,11 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 50,
     borderTopRightRadius: 50,
   },
+  icon: {
+    width: 16,
+    height: 16,
+    marginRight: 10,
+  },
   listStyle: {
     fontSize: 16,
     color: '#212529',
@@ -286,23 +263,33 @@ const styles = StyleSheet.create({
     // flexDirection: 'row',
     // textAlign: 'center',
     // justifyContent: 'center',
+    marginTop: 10,
     marginLeft: 30,
     marginRight: 30,
     fontSize: 16,
     fontWeight: 'bold',
   },
+  myList: {
+    margin: 5,
+    flexDirection: 'row',
+    textAlign: 'center',
+    alignItems: 'center',
+    // justifyContent: 'center',
+  },
   noticeStyle: {
     fontSize: 15,
     fontWeight: 'bold',
     color: '#3f3f3f',
-    marginLeft: 15,
-    marginTop: 10,
-    marginBottom: 15,
+    alignItems: 'center',
+    marginLeft: 5,
   },
   noticeWrapper: {
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 10,
+    marginBottom: 10,
   },
   additionalInfo: {
     marginLeft: 30,
@@ -312,7 +299,8 @@ const styles = StyleSheet.create({
     color: '#3F3F3F',
     fontWeight: 'bold',
     fontSize: 14,
-    margin: 15,
+    marginLeft: 5,
+    marginBottom: 15,
     marginTop: 25,
   },
 });
