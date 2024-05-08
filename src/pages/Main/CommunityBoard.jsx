@@ -95,9 +95,9 @@ const CommunityBoard = ({navigation}) => {
   }, [deleted]);
   */
 
-  const handleDelete = post_id => {
+  const handleDelete = postId => {
     if (post) {
-      const selectedPost = post.find(item => item.id === post_id);
+      const selectedPost = post.find(item => item.id === postId);
 
       if (
         selectedPost &&
@@ -115,7 +115,7 @@ const CommunityBoard = ({navigation}) => {
             },
             {
               text: '네',
-              onPress: () => deletePost(post_id),
+              onPress: () => deletePost(postId),
             },
           ],
           {cancelable: false},
@@ -126,10 +126,10 @@ const CommunityBoard = ({navigation}) => {
     }
   };
 
-  const deletePost = post_id => {
+  const deletePost = postId => {
     firestore()
       .collection('posts')
-      .doc(post_id)
+      .doc(postId)
       .update({
         post_actflag: false,
       })
@@ -142,9 +142,9 @@ const CommunityBoard = ({navigation}) => {
       });
   };
 
-  const handleEdit = post_id => {
+  const handleEdit = postId => {
     if (post) {
-      const selectedPost = post.find(item => item.id === post_id);
+      const selectedPost = post.find(item => item.id === postId);
 
       if (
         selectedPost &&
@@ -162,7 +162,7 @@ const CommunityBoard = ({navigation}) => {
             },
             {
               text: '네',
-              onPress: () => editPost(post_id),
+              onPress: () => editPost(postId),
             },
           ],
           {cancelable: false},
@@ -173,8 +173,8 @@ const CommunityBoard = ({navigation}) => {
     }
   };
 
-  const editPost = post_id => {
-    navigation.navigate('CommunityEditPost', {postId: post_id});
+  const editPost = postId => {
+    navigation.navigate('CommunityEditPost', {postId});
   };
 
   const handleProfilePress = userId => {
@@ -182,7 +182,7 @@ const CommunityBoard = ({navigation}) => {
   };
 
 
-  const handlePostDetail = postId => {
+  const handlePostDetail = (postId) => {
     navigation.navigate('CommunityPostDetail', { postId });
   };
 
@@ -273,7 +273,7 @@ const CommunityBoard = ({navigation}) => {
                     navigation.navigate('HomeProfile', {userId: item.userId})
                   }
                   onProfile={handleProfilePress}
-                  onDetail={handlePostDetail}
+                  onDetail={() => handlePostDetail(item.id)}
                 />
               )}
               keyExtractor={item => item.id}
