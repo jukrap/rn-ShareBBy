@@ -34,7 +34,6 @@ const ChatRoom = ({route, navigation}) => {
   const [chatRoomNameChangeModalVisible, setChatRoomNameChangeModalVisible] =
     useState(false);
   const [chatMembers, setChatMembers] = useState([]);
-  const [pickImage, setPickImage] = useState('');
 
   const uploadImage = async (localImagePath, chatRoomId) => {
     try {
@@ -63,7 +62,6 @@ const ChatRoom = ({route, navigation}) => {
         multiple: false,
       });
       const imageUrl = await uploadImage(image.sourceURL, chatRoomId);
-      setPickImage(imageUrl);
 
       const currentUser = auth().currentUser;
 
@@ -75,6 +73,7 @@ const ChatRoom = ({route, navigation}) => {
           .get();
         if (userSnapshot.exists) {
           currentUserNickname = userSnapshot.data().nickname;
+          senderProfileImg = userSnapshot.data().profileImage;
         }
       }
 
@@ -84,7 +83,7 @@ const ChatRoom = ({route, navigation}) => {
         senderId: currentUser.uid,
         timestamp: firestore.FieldValue.serverTimestamp(),
         senderProfileImg: senderProfileImg,
-        image: pickImage,
+        image: imageUrl,
       };
 
       await firestore()
