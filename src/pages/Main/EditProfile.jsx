@@ -12,7 +12,7 @@ import {
 import firestore from '@react-native-firebase/firestore';
 import ImagePicker from 'react-native-image-crop-picker';
 import storage from '@react-native-firebase/storage';
-const leftArrow = require('../../assets/newIcons/backIcon.png');
+const leftArrow = require('../../assets/icons/back.png');
 const EditProfile = ({navigation, route}) => {
   const [nickname, setNickname] = useState(route.params.nickname);
   const [editImage, setEditImage] = useState({
@@ -68,7 +68,7 @@ const EditProfile = ({navigation, route}) => {
     });
   };
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.safeAreaViewStyle}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Image style={styles.arrow} source={leftArrow} />
@@ -76,68 +76,49 @@ const EditProfile = ({navigation, route}) => {
         <Text style={styles.headtext}>프로필 수정</Text>
       </View>
 
-      <View style={styles.userContainer}>
-        <TouchableOpacity
-          style={styles.ImageWrapper}
-          onPress={() => getPhotos()}>
-          <Image
-            style={styles.image}
-            source={{uri: route.params.profileImage}}
-          />
-        </TouchableOpacity>
-        <View style={styles.editProfileWrapper}>
-          <Text style={styles.itemText}>이름</Text>
-          <TextInput
-            onChangeText={setNickname}
-            style={styles.nameBox}
-            value={nickname}
-          />
-
-          <Text style={styles.itemText}>주소</Text>
-          <View style={styles.addressBox}>
-            <Text style={styles.addressText}>{route.params.address}</Text>
-          </View>
-        </View>
-      </View>
-
-      <TouchableOpacity
-        onPress={async () => {
-          await UpdateNickname();
-          if (editImage.IsEdit) {
-            await UploadImage(editImage.ImageUrl);
-          }
-          await goHome();
-        }}
-        style={styles.submitBox}>
-        <Text style={styles.sumbitText}>완료</Text>
+      <TouchableOpacity style={styles.ImageWrapper} onPress={() => getPhotos()}>
+        <Image style={styles.image} source={{uri: route.params.profileImage}} />
       </TouchableOpacity>
-    </View>
+      <View style={styles.editProfileWrapper}>
+        <Text style={styles.myProfile}>내 정보</Text>
+        <Text style={styles.name}>이름</Text>
+        <TextInput
+          onChangeText={setNickname}
+          style={styles.nameBox}
+          value={nickname}
+        />
+
+        <Text style={styles.address}>주소</Text>
+        <View style={styles.addressBox}>
+          <Text>{route.params.address}</Text>
+        </View>
+
+        <TouchableOpacity
+          onPress={async () => {
+            await UpdateNickname();
+            if (editImage.IsEdit) {
+              await UploadImage(editImage.ImageUrl);
+            }
+            await goHome();
+          }}
+          style={styles.submitBox}>
+          <Text style={styles.sumbitText}>완료</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   );
 };
-
 const styles = StyleSheet.create({
-  container: {
+  safeAreaViewStyle: {
     flex: 1,
-    backgroundColor: '#fefffe',
+    backgroundColor: '#fefefe',
   },
   header: {
+    marginTop: 60,
     flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    marginTop: 70,
   },
-  arrow: {width: 22, height: 22},
-  headtext: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#212529',
-    marginLeft: 10,
-  },
-
-  userContainer: {
-    flex: 1,
-    marginTop: 20,
-  },
+  arrow: {width: 50, height: 50},
+  headtext: {fontSize: 20, fontWeight: 'bold', marginTop: 13},
   ImageWrapper: {
     justifyContent: 'center',
     alignItems: 'center',
@@ -155,24 +136,29 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 10,
   },
-  itemText: {
-    fontSize: 17,
+  name: {
+    fontSize: 16,
     fontWeight: 'bold',
     marginTop: 10,
     color: '#3f3f3f',
   },
   nameBox: {
-    height: 45,
+    height: 40,
     marginTop: 12,
     marginBottom: 12,
     borderWidth: 1,
     borderRadius: 10,
     borderColor: '#07AC7D',
     padding: 10,
-    fontSize: 17,
+  },
+  address: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginTop: 10,
+    color: '#3f3f3f',
   },
   addressBox: {
-    height: 45,
+    height: 40,
     marginTop: 12,
     marginBottom: 12,
     borderWidth: 1,
@@ -181,24 +167,19 @@ const styles = StyleSheet.create({
     borderColor: '#07AC7D',
     padding: 10,
   },
-  addressText: {
-    fontSize: 17,
-  },
   submitBox: {
     backgroundColor: '#07AC7D',
     alignItems: 'center',
     justifyContent: 'center',
-    height: 45,
+    height: 40,
+    marginTop: 12,
     marginBottom: 12,
     borderRadius: 10,
-    marginHorizontal: 25,
-    marginTop: 10,
   },
   sumbitText: {
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#fff',
   },
 });
-
 export default EditProfile;
