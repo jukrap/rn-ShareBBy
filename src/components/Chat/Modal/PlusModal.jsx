@@ -17,14 +17,13 @@ const PlusModal = ({isVisible, toggleModal, getPhotos}) => {
       }}>
       <View
         style={{
-          flex: 0.15,
+          flex: 0.17,
           width: '100%',
-          borderTopLeftRadius: 24,
-          borderTopRightRadius: 24,
+          paddingTop: 12,
           backgroundColor: '#fff',
           justifyContent: 'center',
           alignItems: 'center',
-          gap: 16,
+          gap: 12,
         }}>
         <View
           style={{
@@ -38,21 +37,21 @@ const PlusModal = ({isVisible, toggleModal, getPhotos}) => {
             style={{alignItems: 'center', justifyContent: 'center', gap: 8}}
             onPress={getPhotos}>
             <Image
-              style={{width: 32, height: 32}}
-              source={require('../../../assets/icons/image.png')}
+              style={{width: 28, height: 28}}
+              source={require('../../../assets/newIcons/imageIcon.png')}
             />
             <Text>사진</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={{alignItems: 'center', justifyContent: 'center', gap: 8}}>
             <Image
-              style={{width: 32, height: 32}}
-              source={require('../../../assets/icons/image.png')}
+              style={{width: 28, height: 28}}
+              source={require('../../../assets/newIcons/cameraIcon.png')}
             />
             <Text>카메라</Text>
           </TouchableOpacity>
         </View>
-        <TouchableOpacity style={{flex: 1}} onPress={toggleModal}>
+        <TouchableOpacity style={{flex: 1.5}} onPress={toggleModal}>
           <Text>취소</Text>
         </TouchableOpacity>
       </View>

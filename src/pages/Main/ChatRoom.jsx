@@ -107,9 +107,11 @@ const ChatRoom = ({route, navigation}) => {
   const toggleHamburgerModal = () => {
     setIsHamburgerModalVisible(!isHamburgerModalVisible);
   };
+
   const togglePlusModal = () => {
     setIsPlusModalVisible(!isPlusModalVisible);
   };
+
   const toggleChatRoomNameChangeModal = () => {
     setChatRoomNameChangeModalVisible(!chatRoomNameChangeModalVisible);
   };
@@ -261,7 +263,6 @@ const ChatRoom = ({route, navigation}) => {
   };
 
   const renderItem = ({item, index}) => {
-    console.log('item:', item);
     dayjs.locale('ko');
     const isSystemMessage = item.sender === '시스템';
     const isCurrentUser = item.senderId === auth().currentUser?.uid;
@@ -384,15 +385,15 @@ const ChatRoom = ({route, navigation}) => {
       <View style={styles.topBar}>
         <TouchableOpacity onPress={handleGoBack}>
           <Image
-            style={{width: 30, height: 30}}
-            source={require('../../assets/icons/back.png')}
+            source={require('../../assets/newIcons/backIcon.png')}
+            style={{width: 24, height: 24}}
           />
         </TouchableOpacity>
         <Text style={styles.roomName}>{chatRoomName}</Text>
         <TouchableOpacity onPress={toggleHamburgerModal}>
           <Image
-            style={{width: 40, height: 40}}
-            source={require('../../assets/icons/HamburgerMenu.png')}
+            style={{width: 24, height: 24}}
+            source={require('../../assets/newIcons/hamburgerIcon.png')}
           />
         </TouchableOpacity>
       </View>
@@ -435,125 +436,125 @@ const ChatRoom = ({route, navigation}) => {
         isVisible={isHamburgerModalVisible}
         animationIn="slideInRight"
         animationOut="slideOutRight"
-        backdropOpacity={0.5}
+        backdropOpacity={0.2}
         onBackdropPress={toggleHamburgerModal}
-        style={{margin: 0, justifyContent: 'flex-end'}}>
-        <SafeAreaView style={{flex: 1, alignItems: 'flex-end'}}>
-          <View style={styles.modalContent}>
+        style={{
+          flex: 1,
+          margin: 0,
+          justifyContent: 'flex-end',
+          alignItems: 'flex-end',
+        }}>
+        <View style={styles.modalContent}>
+          <View style={{flex: 0.25}}></View>
+          <View
+            style={{
+              width: '100%',
+              flex: 0.6,
+              paddingHorizontal: 12,
+              paddingVertical: 8,
+              gap: 16,
+              borderBottomWidth: 1,
+              borderBottomColor: '#E0E0E0',
+            }}>
             <View
               style={{
-                width: '100%',
-                flex: 1,
-                paddingHorizontal: 8,
-                paddingVertical: 8,
-                gap: 16,
-                borderBottomWidth: 1,
-                borderBottomColor: '#E0E0E0',
-              }}>
-              <View
-                style={{
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  flexDirection: 'row',
-                  marginHorizontal: 8,
-                  paddingTop: 8,
-                }}>
-                <TouchableOpacity>
-                  <Text style={{fontSize: 16}}>사진</Text>
-                </TouchableOpacity>
-                <TouchableOpacity>
-                  <Image
-                    source={require('../../assets/icons/right-arrow.png')}
-                    style={{width: 16, height: 16}}
-                  />
-                </TouchableOpacity>
-              </View>
-              <View
-                style={{
-                  width: '100%',
-                  flex: 2,
-                  alignItems: 'center',
-                }}>
-                <PhotoList chatRoomId={chatRoomId} />
-              </View>
-            </View>
-
-            <View
-              style={{
-                flex: 2,
-                width: '100%',
-                borderBottomWidth: 1,
-                borderBottomColor: '#E0E0E0',
-                gap: 8,
-                paddingHorizontal: 8,
-              }}>
-              <View style={{marginBottom: 8}}>
-                <Text style={{fontSize: 16}}>참여 멤버</Text>
-              </View>
-              <ChatMemberList chatMembers={chatMembers} />
-            </View>
-
-            <View
-              style={{
-                width: '100%',
-                flex: 0.2,
-                borderBottomWidth: 1,
-                borderBottomColor: '#E0E0E0',
-                paddingHorizontal: 8,
-                gap: 8,
-              }}>
-              <TouchableOpacity>
-                <Text
-                  style={{fontSize: 16, fontWeight: '700', marginBottom: 8}}>
-                  공지 사항
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            <View
-              style={{
-                width: '100%',
-                flex: 1,
-                borderBottomWidth: 1,
-                borderBottomColor: '#E0E0E0',
-                paddingHorizontal: 8,
-                gap: 8,
-              }}>
-              <Text style={{fontSize: 16, fontWeight: '700', marginBottom: 8}}>
-                채팅방 설정
-              </Text>
-              <TouchableOpacity onPress={toggleChatRoomNameChangeModal}>
-                <Text>채팅방 이름 변경</Text>
-              </TouchableOpacity>
-              <ChatRoomNameChangeModal
-                isVisible={chatRoomNameChangeModalVisible}
-                toggleChatRoomNameChangeModal={toggleChatRoomNameChangeModal}
-                updateChatRoomName={updateChatRoomName}
-              />
-              <TouchableOpacity>
-                <Text>채팅방 사진 변경</Text>
-              </TouchableOpacity>
-            </View>
-
-            <View
-              style={{
-                width: '100%',
-                justifyContent: 'flex-end',
+                justifyContent: 'space-between',
                 alignItems: 'center',
-                paddingBottom: 16,
-                gap: 8,
+                flexDirection: 'row',
+                marginHorizontal: 8,
+                paddingTop: 8,
               }}>
-              <TouchableOpacity
-                onPress={() => setChatOutModalVisible(!chatOutModalVisible)}>
-                <Text style={{fontSize: 18, fontWeight: '700'}}>
-                  채팅방 나가기
-                </Text>
+              <TouchableOpacity>
+                <Text style={{fontSize: 16, fontWeight: '700'}}>사진</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={toggleHamburgerModal}>
-                <Text>취소</Text>
+              <TouchableOpacity>
+                <Image
+                  source={require('../../assets/icons/right-arrow.png')}
+                  style={{width: 16, height: 16}}
+                />
               </TouchableOpacity>
+            </View>
+            <View
+              style={{
+                width: '100%',
+                flex: 2,
+                alignItems: 'flex-start',
+              }}>
+              <PhotoList chatRoomId={chatRoomId} />
             </View>
           </View>
+
+          <View
+            style={{
+              width: '100%',
+              flex: 0.2,
+              borderBottomWidth: 1,
+              borderBottomColor: '#E0E0E0',
+              paddingHorizontal: 12,
+              gap: 8,
+            }}>
+            <TouchableOpacity>
+              <Text style={{fontSize: 16, marginBottom: 8, fontWeight: '700'}}>
+                공지 사항
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <View
+            style={{
+              width: '100%',
+              flex: 0.5,
+              borderBottomWidth: 1,
+              borderBottomColor: '#E0E0E0',
+              paddingHorizontal: 12,
+              gap: 8,
+            }}>
+            <Text style={{fontSize: 16, marginBottom: 8, fontWeight: '700'}}>
+              채팅방 설정
+            </Text>
+            <TouchableOpacity onPress={toggleChatRoomNameChangeModal}>
+              <Text>채팅방 이름 변경</Text>
+            </TouchableOpacity>
+            <ChatRoomNameChangeModal
+              isVisible={chatRoomNameChangeModalVisible}
+              toggleChatRoomNameChangeModal={toggleChatRoomNameChangeModal}
+              updateChatRoomName={updateChatRoomName}
+            />
+            <TouchableOpacity>
+              <Text>채팅방 사진 변경</Text>
+            </TouchableOpacity>
+          </View>
+          <View
+            style={{
+              flex: 2,
+              width: '100%',
+              borderBottomWidth: 1,
+              borderBottomColor: '#E0E0E0',
+              gap: 8,
+              paddingHorizontal: 12,
+            }}>
+            <View style={{marginBottom: 8}}>
+              <Text style={{fontSize: 16, fontWeight: '700'}}>참여 멤버</Text>
+            </View>
+            <ChatMemberList chatMembers={chatMembers} />
+          </View>
+
+          <View
+            style={{
+              width: '100%',
+              alignItems: 'flex-end',
+              paddingBottom: 24,
+              paddingHorizontal: 32,
+            }}>
+            <TouchableOpacity
+              onPress={() => setChatOutModalVisible(!chatOutModalVisible)}>
+              <Image
+                style={{width: 18, height: 18}}
+                source={require('../../assets/newIcons/exitIcon.png')}
+              />
+            </TouchableOpacity>
+          </View>
+
           <Modal
             isVisible={chatOutModalVisible}
             animationIn={'bounceIn'}
@@ -594,7 +595,7 @@ const ChatRoom = ({route, navigation}) => {
               </View>
             </View>
           </Modal>
-        </SafeAreaView>
+        </View>
       </Modal>
 
       <PlusModal
@@ -702,8 +703,6 @@ const styles = StyleSheet.create({
     flex: 1,
     width: 300,
     marginBottom: 0,
-    borderTopLeftRadius: 24,
-    borderBottomLeftRadius: 24,
     backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
