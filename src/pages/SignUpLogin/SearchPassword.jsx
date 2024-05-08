@@ -8,6 +8,7 @@ import {
   TextInput,
   Alert,
   Image,
+  KeyboardAvoidingView,
 } from 'react-native';
 
 import auth from '@react-native-firebase/auth';
@@ -52,6 +53,10 @@ const SearchPassword = ({navigation}) => {
 
   return (
     <SafeAreaView style={{flex: 1}}>
+    <KeyboardAvoidingView
+    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    keyboardVerticalOffset={1}
+    style={{flex:1}}>
       <TouchableOpacity
         style={styles.backIcon}
         onPress={() => navigation.goBack()}>
@@ -66,12 +71,15 @@ const SearchPassword = ({navigation}) => {
             </Text>
           </View>
           <TextInput
-            style={styles.input}
-            placeholder="이메일을 입력해주세요."
-            placeholderTextColor={'#A7A7A7'}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            value={email}
+          style={styles.input}
+          placeholder="이메일을 입력해주세요."
+          placeholderTextColor={'#A7A7A7'}
+          onChangeText={setEmail}
+          value={email}
+          autoFocus={true}
+          autoCompleteType="email"
+          autoCapitalize="none"
+          keyboardType="email-address"
           />
         </View>
         <View>
@@ -80,6 +88,7 @@ const SearchPassword = ({navigation}) => {
           </TouchableOpacity>
         </View>
       </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };

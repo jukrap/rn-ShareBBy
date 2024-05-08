@@ -68,7 +68,7 @@ const EditProfile = ({navigation, route}) => {
     });
   };
   return (
-    <ScrollView style={styles.safeAreaViewStyle}>
+    <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Image style={styles.arrow} source={leftArrow} />
@@ -76,49 +76,63 @@ const EditProfile = ({navigation, route}) => {
         <Text style={styles.headtext}>프로필 수정</Text>
       </View>
 
-      <TouchableOpacity style={styles.ImageWrapper} onPress={() => getPhotos()}>
-        <Image style={styles.image} source={{uri: route.params.profileImage}} />
-      </TouchableOpacity>
-      <View style={styles.editProfileWrapper}>
-        <Text style={styles.myProfile}>내 정보</Text>
-        <Text style={styles.name}>이름</Text>
-        <TextInput
-          onChangeText={setNickname}
-          style={styles.nameBox}
-          value={nickname}
-        />
-
-        <Text style={styles.address}>주소</Text>
-        <View style={styles.addressBox}>
-          <Text>{route.params.address}</Text>
-        </View>
-
+      <View style={styles.userContainer}>
         <TouchableOpacity
-          onPress={async () => {
-            await UpdateNickname();
-            if (editImage.IsEdit) {
-              await UploadImage(editImage.ImageUrl);
-            }
-            await goHome();
-          }}
-          style={styles.submitBox}>
-          <Text style={styles.sumbitText}>완료</Text>
+          style={styles.ImageWrapper}
+          onPress={() => getPhotos()}>
+          <Image
+            style={styles.image}
+            source={{uri: route.params.profileImage}}
+          />
         </TouchableOpacity>
+        <View style={styles.editProfileWrapper}>
+          <Text style={styles.myProfile}>내 정보</Text>
+          <Text style={styles.name}>이름</Text>
+          <TextInput
+            onChangeText={setNickname}
+            style={styles.nameBox}
+            value={nickname}
+          />
+
+          <Text style={styles.address}>주소</Text>
+          <View style={styles.addressBox}>
+            <Text>{route.params.address}</Text>
+          </View>
+        </View>
       </View>
-    </ScrollView>
+
+      <TouchableOpacity
+        onPress={async () => {
+          await UpdateNickname();
+          if (editImage.IsEdit) {
+            await UploadImage(editImage.ImageUrl);
+          }
+          await goHome();
+        }}
+        style={styles.submitBox}>
+        <Text style={styles.sumbitText}>완료</Text>
+      </TouchableOpacity>
+    </View>
   );
 };
+
 const styles = StyleSheet.create({
-  safeAreaViewStyle: {
+  container: {
     flex: 1,
-    backgroundColor: '#fefefe',
+    backgroundColor: '#fefffe',
   },
   header: {
-    marginTop: 60,
     flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    marginTop: 60,
   },
   arrow: {width: 50, height: 50},
-  headtext: {fontSize: 20, fontWeight: 'bold', marginTop: 13},
+  headtext: {fontSize: 20, fontWeight: 'bold', marginLeft: 10},
+
+  userContainer: {
+    flex: 1,
+  },
   ImageWrapper: {
     justifyContent: 'center',
     alignItems: 'center',
@@ -172,9 +186,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     height: 40,
-    marginTop: 12,
     marginBottom: 12,
     borderRadius: 10,
+    marginHorizontal: 25,
+    marginTop: 10,
   },
   sumbitText: {
     fontSize: 16,
@@ -182,4 +197,5 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
 });
+
 export default EditProfile;
