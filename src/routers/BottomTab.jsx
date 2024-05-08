@@ -10,7 +10,8 @@ import Detail from '../pages/Main/Detail';
 import Show from '../pages/Main/Show';
 import Chat from '../pages/Main/Chat';
 import ChatRoom from '../pages/Main/ChatRoom';
-import Board from '../pages/Main/Board';
+import CommunityBoard from '../pages/Main/CommunityBoard';
+import CommunityAddPost from '../pages/Main/CommunityAddPost';
 import Profile from '../pages/Main/Profile';
 import EditProfile from '../pages/Main/EditProfile';
 
@@ -47,6 +48,15 @@ const AboutProfile = () => {
   );
 };
 
+const AboutCommunity = () => {
+  return (
+    <Stack.Navigator screenOptions={{headerShown: false}}>
+      <Stack.Screen name="CommunityBoard" component={CommunityBoard} />
+      <Stack.Screen name="CommunityAddPost" component={CommunityAddPost} />
+    </Stack.Navigator>
+  );
+};
+
 const BottomTab = ({navigation}) => {
   return (
     <Tab.Navigator
@@ -71,7 +81,7 @@ const BottomTab = ({navigation}) => {
         tabBarInactiveTintColor: '#A7A7A7', // 포커스 되지 않았을 때 타이틀 색상
       })}>
       <Tab.Screen name="홈" component={AboutMap} />
-      <Tab.Screen name="게시판" component={Board} />
+      <Tab.Screen name="게시판" component={AboutCommunity} />
       <Tab.Screen name="채팅" component={AboutChat} />
       <Tab.Screen name="프로필" component={AboutProfile} />
     </Tab.Navigator>

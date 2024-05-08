@@ -17,7 +17,8 @@ import firestore, {
 } from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 // import ImagePicker from 'react-native-image-crop-picker';
-import storage from '@react-native-firebase/storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import useStore from '../../lib/useStore';
 
 const {width, height} = Dimensions.get('window');
 const rightArrow = require('../../assets/icons/right-arrow.png');
@@ -26,6 +27,9 @@ const Profile = ({navigation, route}) => {
   const [users, setUsers] = useState(null);
   const [userUid, setUserUid] = useState(null);
   const usersCollection = firestore().collection('users');
+  const clearUserToken = useStore(state => state.clearUserToken);
+  const userToken = useStore(state => state.userToken); // 토큰 상태 추가
+
   useEffect(() => {
     const fetchUserUid = async () => {
       try {
@@ -42,6 +46,7 @@ const Profile = ({navigation, route}) => {
     };
     fetchUserUid();
   }, [navigation]);
+
   useEffect(() => {
     if (userUid) {
       // userUid가 설정된 후에 fetchUserData 호출
@@ -61,6 +66,21 @@ const Profile = ({navigation, route}) => {
     }
   }, [userUid]);
 
+  const handleLogout = async () => {
+    try {
+      // Firebase에서 로그아웃
+      await auth().signOut();
+
+      await AsyncStorage.removeItem('userToken');
+
+      navigation.navigate('LoginTab');
+    } catch (error) {
+      console.error('로그아웃 실패:', error);
+    }
+  };
+  
+
+  console.log('User Token:', userToken);
   return (
     <SafeAreaView style={styles.safeAreaViewStyle}>
       {users ? (
@@ -172,7 +192,7 @@ const Profile = ({navigation, route}) => {
               />
             </TouchableOpacity>
             <TouchableOpacity
-              //   onPress={() => navigation.navigate('Home')}
+                onPress={handleLogout}
               style={styles.noticeWrapper}>
               <Text style={styles.noticeStyle}>로그아웃</Text>
             </TouchableOpacity>
