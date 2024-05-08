@@ -98,7 +98,7 @@ const CommentCard = ({item}) => {
                 toggleModal();
               }}>
               <Image source={pencilIcon} style={{width: 24, height: 24}} />
-              <Text style={styles.modalButtonText}>게시글 수정</Text>
+              <Text style={styles.modalButtonText}>댓글 수정</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.modalButton}
@@ -106,7 +106,7 @@ const CommentCard = ({item}) => {
                 toggleModal();
               }}>
               <Image source={deleteIcon} style={{width: 24, height: 24}} />
-              <Text style={styles.modalButtonText}>게시글 삭제</Text>
+              <Text style={styles.modalButtonText}>댓글 삭제</Text>
             </TouchableOpacity>
           </View>
           <TouchableOpacity
