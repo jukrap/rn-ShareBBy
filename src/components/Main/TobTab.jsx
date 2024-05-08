@@ -3,7 +3,7 @@ import { SafeAreaView, View, Text, TouchableOpacity, StyleSheet, Dimensions, Ima
 
 const { width, height } = Dimensions.get('window');
 
-const TopTab = ({ navigation, route, leftFunc, rightFunc, onPressRight, title }) => {
+const TopTab = ({ navigation, leftFunc, rightFunc, onPressRight, title }) => {
 
     return (
         <SafeAreaView style={{ backgroundColor: '#FEFFFE' }}>
