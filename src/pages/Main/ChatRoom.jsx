@@ -9,7 +9,6 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
   Image,
-  Dimensions,
 } from 'react-native';
 import Modal from 'react-native-modal';
 
@@ -36,30 +35,6 @@ const ChatRoom = ({route, navigation}) => {
     useState(false);
   const [chatMembers, setChatMembers] = useState([]);
   const [pickImage, setPickImage] = useState('');
-
-  //사진 올리기 기능 아직 구현 안 돼서 임시로 dummy data
-  const photoList = [
-    {
-      id: 1,
-      imageUrl:
-        'https://firebasestorage.googleapis.com/v0/b/sharebby-4d82f.appspot.com/o/dummyprofile.png?alt=media&token=a34d85db-3310-4052-84f0-f0bdfc9e88c8',
-    },
-    {
-      id: 2,
-      imageUrl:
-        'https://firebasestorage.googleapis.com/v0/b/sharebby-4d82f.appspot.com/o/dummyprofile.png?alt=media&token=a34d85db-3310-4052-84f0-f0bdfc9e88c8',
-    },
-    {
-      id: 3,
-      imageUrl:
-        'https://firebasestorage.googleapis.com/v0/b/sharebby-4d82f.appspot.com/o/dummyprofile.png?alt=media&token=a34d85db-3310-4052-84f0-f0bdfc9e88c8',
-    },
-    {
-      id: 4,
-      imageUrl:
-        'https://firebasestorage.googleapis.com/v0/b/sharebby-4d82f.appspot.com/o/dummyprofile.png?alt=media&token=a34d85db-3310-4052-84f0-f0bdfc9e88c8',
-    },
-  ];
 
   const uploadImage = async (localImagePath, chatRoomId) => {
     try {
@@ -89,7 +64,35 @@ const ChatRoom = ({route, navigation}) => {
       });
       const imageUrl = await uploadImage(image.sourceURL, chatRoomId);
       setPickImage(imageUrl);
-      sendMessage();
+
+      const currentUser = auth().currentUser;
+
+      let currentUserNickname = 'Unknown';
+      if (currentUser) {
+        const userSnapshot = await firestore()
+          .collection('users')
+          .doc(currentUser.uid)
+          .get();
+        if (userSnapshot.exists) {
+          currentUserNickname = userSnapshot.data().nickname;
+        }
+      }
+
+      const newMessage = {
+        text: inputMessage,
+        sender: currentUserNickname,
+        senderId: currentUser.uid,
+        timestamp: firestore.FieldValue.serverTimestamp(),
+        senderProfileImg: senderProfileImg,
+        image: pickImage,
+      };
+
+      await firestore()
+        .collection('chatRooms')
+        .doc(chatRoomId)
+        .collection('messages')
+        .add(newMessage);
+
       togglePlusModal();
     } catch (error) {
       console.error('Error selecting or uploading image:', error);
@@ -196,7 +199,6 @@ const ChatRoom = ({route, navigation}) => {
         .add(newMessage);
 
       setInputMessage('');
-      setPickImage('');
     } catch (error) {
       console.error('Error sending message: ', error);
     }
@@ -259,6 +261,7 @@ const ChatRoom = ({route, navigation}) => {
   };
 
   const renderItem = ({item, index}) => {
+    console.log('item:', item);
     dayjs.locale('ko');
     const isSystemMessage = item.sender === '시스템';
     const isCurrentUser = item.senderId === auth().currentUser?.uid;
@@ -456,7 +459,7 @@ const ChatRoom = ({route, navigation}) => {
                   paddingTop: 8,
                 }}>
                 <TouchableOpacity>
-                  <Text style={{fontSize: 16, fontWeight: '700'}}>사진</Text>
+                  <Text style={{fontSize: 16}}>사진</Text>
                 </TouchableOpacity>
                 <TouchableOpacity>
                   <Image
@@ -485,7 +488,7 @@ const ChatRoom = ({route, navigation}) => {
                 paddingHorizontal: 8,
               }}>
               <View style={{marginBottom: 8}}>
-                <Text style={{fontSize: 16, fontWeight: '700'}}>참여 멤버</Text>
+                <Text style={{fontSize: 16}}>참여 멤버</Text>
               </View>
               <ChatMemberList chatMembers={chatMembers} />
             </View>
@@ -650,6 +653,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 10,
     borderTopWidth: 1,
     borderTopColor: '#ccc',
     padding: 10,

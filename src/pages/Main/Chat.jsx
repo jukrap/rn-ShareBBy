@@ -15,6 +15,7 @@ import Modal from 'react-native-modal';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import {useNavigation} from '@react-navigation/native';
+import Tobbar from '../../components/Main/TobTab';
 
 const Chat = () => {
   const {width, height} = useWindowDimensions();
@@ -203,11 +204,9 @@ const Chat = () => {
             <Text style={{fontSize: 18, fontWeight: '700'}}>방 만들기</Text>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity onPress={handleLogout}>
-          <Text>Log Out</Text>
-        </TouchableOpacity>
       </View>
 
+      {/* <Tobbar navigation={navigation} /> */}
       <View style={{flex: 1}}>
         <FlatList
           data={chatRooms}
