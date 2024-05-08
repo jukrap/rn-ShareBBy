@@ -16,7 +16,8 @@ import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import {useNavigation} from '@react-navigation/native';
 
-const Chat = () => {
+const Chat = ({route}) => {
+  console.log('userInfo ====> ', route.key);
   const {width, height} = useWindowDimensions();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isModalMakeNameVisible, setIsModalMakeNameVisible] = useState(false);

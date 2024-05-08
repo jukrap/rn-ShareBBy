@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { SafeAreaView, View, Text, Animated, StyleSheet, ScrollView, Dimensions, Image, FlatList, TouchableOpacity } from "react-native";
 import { NaverMapView, NaverMapMarkerOverlay } from "@mj-studio/react-native-naver-map";
 import dayjs from 'dayjs';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import TopTab from "../../components/Main/TobTab";
 import BottomButtons from "../../components/Main/BottomButtons";
@@ -13,6 +14,7 @@ const Show = ({ navigation, route }) => {
     const showValue = useRef(new Animated.Value(0)).current;
     const { address, detail_address, content, deadline, latitude, longitude, nickname, peopleCount, tag, title, writeTime } = route.params._data;
     
+    const [userInfo, setUserInfo] = useState()
     const [initialRegion, setInitialRegion] = useState({
         latitude: latitude,
         longitude: longitude,
@@ -23,8 +25,33 @@ const Show = ({ navigation, route }) => {
 
     useEffect(() => {
         showAnimated(1).start()
+        getUserToken()
     }, []);
 
+    const getUserToken = async () => {
+        try {
+          // 'userToken' 키를 사용하여 데이터 가져오기
+          const userToken = await AsyncStorage.getItem('userToken');
+          if (userToken !== null) {
+            // 데이터가 있을 경우 처리
+            console.log('User Token:', userToken);
+            setUserInfo(userToken);
+          } else {
+            console.log('User Token이 없습니다.');
+          }
+        } catch (error) {
+          // 오류 처리
+          console.error('AsyncStorage에서 데이터를 가져오는 중 오류 발생:', error);
+        }
+      };
+
+    const onPressToken = () => {
+        navigation.navigate('BottomTab', {
+            screen : 'AboutChat',
+            params : userInfo
+        });
+    }
+// 참가하기를 눌렀을 때, 유저 아이디를 넘기기
     return (
         <SafeAreaView style={{flex : 1, backgroundColor : '#fff'}}>
             <TopTab navigation={navigation} title={title} />
@@ -49,7 +76,6 @@ const Show = ({ navigation, route }) => {
                 locale={'ko'}
                 maxZoom={16}
                 minZoom={16}
-
             >
                 <NaverMapMarkerOverlay
                     latitude={latitude}
@@ -91,7 +117,7 @@ const Show = ({ navigation, route }) => {
                     </ScrollView>
                     </View>
             </View>
-            <BottomButtons showValue={showValue} peopleCount={peopleCount}/>
+            <BottomButtons showValue={showValue} peopleCount={peopleCount} onPressToken={onPressToken}/>
         
         </SafeAreaView>
     )

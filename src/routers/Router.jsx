@@ -7,6 +7,7 @@ import useStore  from '../lib/useStore'; // Zustand 스토어 import
 
 import BottomTab from '../routers/BottomTab';
 import LoginTab from '../routers/LoginTab';
+import Show from '../pages/Main/Show';
 
 const Stack = createNativeStackNavigator();
 
@@ -36,6 +37,7 @@ const Router = () => {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="LoginTab" component={LoginTab} />
       <Stack.Screen name="BottomTab" component={BottomTab} />
+      <Stack.Screen name="Show" component={Show} />
     </Stack.Navigator>
   );
 };

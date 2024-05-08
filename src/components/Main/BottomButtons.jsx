@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const PressalbeAnimated = Animated.createAnimatedComponent(Pressable);
 
-const BottomButtons = ({ peopleCount, showValue, isLike, isScrap, onLikePress, jumpTo, setCommmentModalVisible, setShareModalVisible, rightButtonText, onPressRightButton, commentCount }) => {
+const BottomButtons = ({ peopleCount, showValue, onLikePress, rightButtonText, onPressToken }) => {
     const insets = useSafeAreaInsets();
     const likeValue = useRef(new Animated.Value(0)).current;
     const pressValue = useRef(new Animated.Value(0)).current;
@@ -60,7 +60,10 @@ const BottomButtons = ({ peopleCount, showValue, isLike, isScrap, onLikePress, j
                     <Text style={{ fontSize: 14, fontWeight: 600, color: '#898989' }}>참여가능인원</Text>
                     <Text style={{ fontSize : 12, color: '#898989' }}><Text style={{ color: '#07AC7D' }}>0명</Text> / {peopleCount}명</Text>
                 </View>
-                <TouchableOpacity style={{ paddingHorizontal: 26, paddingVertical: 12, borderRadius: 8, backgroundColor: '#07AC7D' }}>
+                <TouchableOpacity 
+                    style={{ paddingHorizontal: 26, paddingVertical: 12, borderRadius: 8, backgroundColor: '#07AC7D' }}
+                    onPress={onPressToken}
+                >
                     <Text style={{ fontSize: 16, fontWeight: '600', color: '#fff' }}>참여하기</Text>
                 </TouchableOpacity>
             {/* </View> */}
