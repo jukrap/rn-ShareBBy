@@ -14,13 +14,10 @@ import {ko} from 'date-fns/locale';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 
-const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
+const PostCard = ({item, onDelete, onComment, onEdit, onProfile}) => {
   const [postUserData, setPostUserData] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isLiked, setIsLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(item.likeCount || 0);
-  const likeIcon = isLiked ? heartLineIcon : heartRedIcon;
 
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged(user => {
@@ -36,35 +33,6 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
 
   const toggleModal = () => {
     setIsModalVisible(!isModalVisible);
-  };
-
-  useEffect(() => {
-    // 현재 사용자가 해당 게시글에 좋아요를 눌렀는지 확인
-    const checkLikeStatus = async () => {
-      if (currentUser) {
-        const likeDoc = await firestore()
-          .collection('likes')
-          .where('postId', '==', item.id)
-          .where('userId', '==', currentUser.uid)
-          .get();
-
-        if (!likeDoc.empty) {
-          setIsLiked(true);
-        }
-      }
-    };
-
-    checkLikeStatus();
-  }, [currentUser, item.id]);
-
-  // 좋아요 개수 가져오기
-  const getLikeCount = () => {
-    return item.post_like ? `${item.post_like}` : '0';
-  };
-
-  // 댓글 개수 가져오기 (TODO: 댓글 카운팅 제작)
-  const getCommentCount = () => {
-    return '0';
   };
 
   // 게시글 작성자 정보 가져오기
@@ -83,53 +51,6 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
       }
     } catch (error) {
       console.log('사용자 데이터를 가져오는 중에 오류가 발생했습니다:', error);
-    }
-  };
-
-  const handleLikePress = async () => {
-    if (currentUser) {
-      if (isLiked) {
-        // 좋아요 취소
-        await firestore()
-          .collection('likes')
-          .where('postId', '==', item.id)
-          .where('userId', '==', currentUser.uid)
-          .get()
-          .then(querySnapshot => {
-            querySnapshot.forEach(doc => {
-              doc.ref.delete();
-            });
-          });
-
-        setIsLiked(false);
-        setLikeCount(prevCount => prevCount - 1);
-
-        // 파베 내 게시글 doc의 likeCount 감소
-        await firestore()
-          .collection('posts')
-          .doc(item.id)
-          .update({
-            likeCount: firestore.FieldValue.increment(-1),
-          });
-      } else {
-        // 좋아요 추가
-        await firestore().collection('likes').add({
-          postId: item.id,
-          userId: currentUser.uid,
-          createdAt: firestore.FieldValue.serverTimestamp(),
-        });
-
-        setIsLiked(true);
-        setLikeCount(prevCount => prevCount + 1);
-
-        // 파베 내 게시글 doc의 likeCount 늘리기
-        await firestore()
-          .collection('posts')
-          .doc(item.id)
-          .update({
-            likeCount: firestore.FieldValue.increment(1),
-          });
-      }
     }
   };
 
@@ -213,7 +134,7 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
           <TouchableOpacity
             style={styles.interactionButton}
             onPress={onComment}>
-            <Image source={commentLineIcon} style={{width: 24, height: 24}} />
+            <Image source={commentIcon} style={{width: 24, height: 24}} />
             <Text style={styles.interactionText}>{getCommentCount()}</Text>
           </TouchableOpacity>
         </View>
@@ -258,8 +179,7 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
 };
 
 const moreIcon = require('../../assets/icons/moreIcon.png');
-const commentLineIcon = require('../../assets/icons/commentLineIcon.png');
-const commentFillIcon = require('../../assets/icons/commentFillIcon.png');
+const commentIcon = require('../../assets/icons/commentIcon.png');
 const heartLineIcon = require('../../assets/icons/heartLineIcon.png');
 const heartRedIcon = require('../../assets/icons/heartRedIcon.png');
 const shareIcon = require('../../assets/icons/shareIcon.png');

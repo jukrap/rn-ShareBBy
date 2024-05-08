@@ -181,6 +181,11 @@ const CommunityBoard = ({navigation}) => {
     navigation.navigate('Profile', {userId});
   };
 
+
+  const handlePostDetail = postId => {
+    navigation.navigate('CommunityPostDetail', { postId });
+  };
+
   const ListHeader = () => {
     return null;
   };
@@ -268,6 +273,7 @@ const CommunityBoard = ({navigation}) => {
                     navigation.navigate('HomeProfile', {userId: item.userId})
                   }
                   onProfile={handleProfilePress}
+                  onDetail={handlePostDetail}
                 />
               )}
               keyExtractor={item => item.id}

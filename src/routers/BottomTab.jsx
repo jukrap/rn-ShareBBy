@@ -13,6 +13,7 @@ import ChatRoom from '../pages/Main/ChatRoom';
 import CommunityBoard from '../pages/Main/CommunityBoard';
 import CommunityAddPost from '../pages/Main/CommunityAddPost';
 import CommunityEditPost from '../pages/Main/CommunityEditPost';
+import CommunityPostDetail from '../pages/Main/CommunityPostDetail';
 import Profile from '../pages/Main/Profile';
 import EditProfile from '../pages/Main/EditProfile';
 
@@ -55,6 +56,7 @@ const AboutCommunity = () => {
       <Stack.Screen name="CommunityBoard" component={CommunityBoard} />
       <Stack.Screen name="CommunityAddPost" component={CommunityAddPost} />
       <Stack.Screen name="CommunityEditPost" component={CommunityEditPost} />
+      <Stack.Screen name="CommunityPostDetail" component={CommunityPostDetail} />
     </Stack.Navigator>
   );
 };

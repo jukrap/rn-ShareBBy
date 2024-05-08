@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   TextInput,
   Image,
+  SafeAreaView,
   TouchableOpacity,
   Modal,
 } from 'react-native';
@@ -205,7 +206,10 @@ const CommunityAddPost = () => {
         console.log('first input image : ' + image.path);
         const imageUri = Platform.OS === 'ios' ? image.sourceURL : image.path;
         console.log('imageUri1 = ', imageUri);
-        setSelectedImages(prevSelectedImages => [...prevSelectedImages, imageUri]);
+        setSelectedImages(prevSelectedImages => [
+          ...prevSelectedImages,
+          imageUri,
+        ]);
         //ㅅㅂ 이거 뭐야
         //이 구조로 setSelectedImages에 imageUri이 안들어갈 수 있나?
         //심지어 imageUri에는 파일이 있는데도?
@@ -219,85 +223,87 @@ const CommunityAddPost = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <PostHeader onSubmit={handlePostSubmit} />
-      <View style={styles.contentWrapper}>
-        <View style={styles.postInputContainer}>
-          <Text style={styles.postInputLabel}>내용</Text>
-          <TextInput
-            placeholder="여기에 작성"
-            multiline
-            numberOfLines={4}
-            value={postContent}
-            onChangeText={handlePostContentChange}
-            maxLength={maxPostContentLength}
-            autoCorrect={false}
-            style={styles.postInputField}
-          />
-          {isUploading ? (
-            <View style={styles.uploadStatusWrapper}>
-              <Text>{uploadProgress} % 업로드 진행</Text>
-              <ActivityIndicator size="large" color="#0000ff" />
-            </View>
-          ) : (
-            <View />
-          )}
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={styles.container}>
+        <PostHeader onSubmit={handlePostSubmit} />
+        <View style={styles.contentWrapper}>
+          <View style={styles.postInputContainer}>
+            <Text style={styles.postInputLabel}>내용</Text>
+            <TextInput
+              placeholder="여기에 작성"
+              multiline
+              numberOfLines={4}
+              value={postContent}
+              onChangeText={handlePostContentChange}
+              maxLength={maxPostContentLength}
+              autoCorrect={false}
+              style={styles.postInputField}
+            />
+            {isUploading ? (
+              <View style={styles.uploadStatusWrapper}>
+                <Text>{uploadProgress} % 업로드 진행</Text>
+                <ActivityIndicator size="large" color="#0000ff" />
+              </View>
+            ) : (
+              <View />
+            )}
+          </View>
+          <Text style={styles.postLengthText}>
+            {postContentLength}/{maxPostContentLength}
+          </Text>
+          <View style={styles.imageUploadContainer}>
+            <TouchableOpacity
+              style={styles.imageUploadButton}
+              onPress={openImagePicker}>
+              <Image source={cameraIcon} style={{width: 24, height: 24}} />
+              <Text style={styles.imageUploadButtonText}>
+                {selectedImages.length}
+              </Text>
+            </TouchableOpacity>
+            {selectedImages.map((image, index) => (
+              <View key={index} style={styles.imageThumbnailContainer}>
+                <Image source={{uri: image}} style={styles.imageThumbnail} />
+                <TouchableOpacity
+                  style={styles.removeImageButton}
+                  onPress={() => removeImage(image)}>
+                  <Text style={styles.removeImageButtonText}>X</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
         </View>
-        <Text style={styles.postLengthText}>
-          {postContentLength}/{maxPostContentLength}
-        </Text>
-        <View style={styles.imageUploadContainer}>
-          <TouchableOpacity
-            style={styles.imageUploadButton}
-            onPress={openImagePicker}>
-            <Image source={cameraIcon} style={{width: 24, height: 24}} />
-            <Text style={styles.imageUploadButtonText}>
-              {selectedImages.length}
-            </Text>
-          </TouchableOpacity>
-          {selectedImages.map((image, index) => (
-            <View key={index} style={styles.imageThumbnailContainer}>
-              <Image source={{uri: image}} style={styles.imageThumbnail} />
+        <Modal
+          visible={isImagePickerModalVisible}
+          animationType="slide"
+          transparent={true}>
+          <View style={styles.imagePickerModalContainer}>
+            <View style={styles.imagePickerModalContent}>
               <TouchableOpacity
-                style={styles.removeImageButton}
-                onPress={() => removeImage(image)}>
-                <Text style={styles.removeImageButtonText}>X</Text>
+                style={styles.imagePickerModalButton}
+                onPress={takePhotoFromCamera}>
+                <Image source={cameraIcon} style={{width: 24, height: 24}} />
+                <Text style={styles.imagePickerModalButtonText}>
+                  카메라로 촬영
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.imagePickerModalButton}
+                onPress={choosePhotoFromLibrary}>
+                <Image source={pictureIcon} style={{width: 24, height: 24}} />
+                <Text style={styles.imagePickerModalButtonText}>
+                  갤러리에서 선택
+                </Text>
               </TouchableOpacity>
             </View>
-          ))}
-        </View>
-      </View>
-      <Modal
-        visible={isImagePickerModalVisible}
-        animationType="slide"
-        transparent={true}>
-        <View style={styles.imagePickerModalContainer}>
-          <View style={styles.imagePickerModalContent}>
             <TouchableOpacity
-              style={styles.imagePickerModalButton}
-              onPress={takePhotoFromCamera}>
-              <Image source={cameraIcon} style={{width: 24, height: 24}} />
-              <Text style={styles.imagePickerModalButtonText}>
-                카메라로 촬영
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.imagePickerModalButton}
-              onPress={choosePhotoFromLibrary}>
-              <Image source={pictureIcon} style={{width: 24, height: 24}} />
-              <Text style={styles.imagePickerModalButtonText}>
-                갤러리에서 선택
-              </Text>
+              style={styles.imagePickerModalCloseButton}
+              onPress={() => setIsImagePickerModalVisible(false)}>
+              <Text style={styles.imagePickerModalCloseButtonText}>닫기</Text>
             </TouchableOpacity>
           </View>
-          <TouchableOpacity
-            style={styles.imagePickerModalCloseButton}
-            onPress={() => setIsImagePickerModalVisible(false)}>
-            <Text style={styles.imagePickerModalCloseButtonText}>닫기</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
-    </View>
+        </Modal>
+      </View>
+    </SafeAreaView>
   );
 };
 

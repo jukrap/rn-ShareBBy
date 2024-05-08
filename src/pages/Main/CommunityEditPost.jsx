@@ -8,6 +8,7 @@ import {
   TextInput,
   Image,
   TouchableOpacity,
+  SafeAreaView,
   Modal,
   Platform,
 } from 'react-native';
@@ -209,6 +210,7 @@ const CommunityEditPost = () => {
   };
 
   return (
+    <SafeAreaView style={{ flex: 1 }}>
     <View style={styles.container}>
       <PostHeader onSubmit={handlePostUpdate} />
       <View style={styles.contentWrapper}>
@@ -291,6 +293,7 @@ const CommunityEditPost = () => {
         </View>
       </Modal>
     </View>
+    </SafeAreaView>
   );
 };
 
