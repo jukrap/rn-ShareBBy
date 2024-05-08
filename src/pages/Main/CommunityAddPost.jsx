@@ -41,6 +41,21 @@ const CommunityAddPost = () => {
     return () => unsubscribe();
   }, []);
 
+  useEffect(() => {
+    if (route.params?.action === 'submitPost') {
+      if (postContent && postContent.trim() !== '') {
+        submitPost(navigation);
+      } else {
+        Alert.alert('게시글 내용을 입력해주세요.');
+        navigation.setParams({action: ''});
+      }
+    }
+  }, [route.params, postContent, submitPost, navigation]);
+
+  useEffect(() => {
+    console.log('selectedImages updated:', selectedImages);
+  }, [selectedImages]);
+
   // 게시글 제출 핸들러
   const handlePostSubmit = useCallback(() => {
     if (postContent && postContent.trim() !== '') {
@@ -69,6 +84,7 @@ const CommunityAddPost = () => {
         selectedImages.map(image => uploadImage(image)),
       );
 
+      console.log('selectedImages: ', selectedImages);
       console.log('이미지 URLs: ', imageUrls);
       console.log('게시글 내용: ', postContent);
 
@@ -97,17 +113,6 @@ const CommunityAddPost = () => {
 
     setIsUploading(false);
   };
-
-  useEffect(() => {
-    if (route.params?.action === 'submitPost') {
-      if (postContent && postContent.trim() !== '') {
-        submitPost(navigation);
-      } else {
-        Alert.alert('게시글 내용을 입력해주세요.');
-        navigation.setParams({action: ''});
-      }
-    }
-  }, [route.params, postContent, submitPost, navigation]);
 
   // 게시글 내용 변경 핸들러
   const handlePostContentChange = text => {
@@ -197,9 +202,15 @@ const CommunityAddPost = () => {
       cropping: true,
     })
       .then(image => {
-        console.log(image);
+        console.log('first input image : ' + image.path);
         const imageUri = Platform.OS === 'ios' ? image.sourceURL : image.path;
-        setSelectedImages([...selectedImages, imageUri]);
+        console.log('imageUri1 = ', imageUri);
+        setSelectedImages(prevSelectedImages => [...prevSelectedImages, imageUri]);
+        //ㅅㅂ 이거 뭐야
+        //이 구조로 setSelectedImages에 imageUri이 안들어갈 수 있나?
+        //심지어 imageUri에는 파일이 있는데도?
+        console.log('imageUri2 = ', imageUri);
+        console.log('selectedImages = ', selectedImages);
         setIsImagePickerModalVisible(false);
       })
       .catch(error => {

@@ -73,7 +73,6 @@ const CommunityBoard = ({navigation}) => {
         setLoading(false);
       }
 
-      console.log('Posts: ', list);
     } catch (e) {
       console.log(e);
     }
@@ -128,8 +127,6 @@ const CommunityBoard = ({navigation}) => {
   };
 
   const deletePost = post_id => {
-    console.log('현재 게시글 ID: ', post_id);
-
     firestore()
       .collection('posts')
       .doc(post_id)
@@ -177,7 +174,6 @@ const CommunityBoard = ({navigation}) => {
   };
 
   const editPost = post_id => {
-    console.log('현재 게시글 ID: ', post_id);
     navigation.navigate('CommunityEditPost', {postId: post_id});
   };
 

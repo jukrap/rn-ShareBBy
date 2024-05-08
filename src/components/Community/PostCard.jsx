@@ -18,6 +18,9 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile}) => {
   const [postUserData, setPostUserData] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(item.likeCount || 0);
+  const likeIcon = isLiked ? heartLineIcon : heartRedIcon;
 
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged(user => {
@@ -27,9 +30,33 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile}) => {
     return () => unsubscribe();
   }, []);
 
-  const [isLiked, setIsLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(item.likeCount || 0);
-  const likeIcon = isLiked ? heartLineIcon : heartRedIcon;
+  useEffect(() => {
+    fetchPostUserData();
+  }, []);
+
+  const toggleModal = () => {
+    setIsModalVisible(!isModalVisible);
+  };
+
+  useEffect(() => {
+    // 현재 사용자가 해당 게시글에 좋아요를 눌렀는지 확인
+    const checkLikeStatus = async () => {
+      if (currentUser) {
+        const likeDoc = await firestore()
+          .collection('likes')
+          .where('postId', '==', item.id)
+          .where('userId', '==', currentUser.uid)
+          .get();
+
+        if (!likeDoc.empty) {
+          setIsLiked(true);
+        }
+      }
+    };
+
+    checkLikeStatus();
+  }, [currentUser, item.id]);
+
 
   // 좋아요 개수 가져오기
   const getLikeCount = () => {
@@ -60,32 +87,6 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile}) => {
     }
   };
 
-  useEffect(() => {
-    fetchPostUserData();
-  }, []);
-
-  const toggleModal = () => {
-    setIsModalVisible(!isModalVisible);
-  };
-
-  useEffect(() => {
-    // 현재 사용자가 해당 게시글에 좋아요를 눌렀는지 확인
-    const checkLikeStatus = async () => {
-      if (currentUser) {
-        const likeDoc = await firestore()
-          .collection('likes')
-          .where('postId', '==', item.id)
-          .where('userId', '==', currentUser.uid)
-          .get();
-
-        if (!likeDoc.empty) {
-          setIsLiked(true);
-        }
-      }
-    };
-
-    checkLikeStatus();
-  }, [currentUser, item.id]);
 
   const handleLikePress = async () => {
     if (currentUser) {
@@ -183,7 +184,6 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile}) => {
       {item.post_files && item.post_files.length > 0 ? (
         <View style={styles.postImageWrapper}>
           {item.post_files.map((imageUrl, index) => {
-            console.log(`인덱스 ${index}의 이미지:`, imageUrl);
             return (
               <Image
                 key={index}
