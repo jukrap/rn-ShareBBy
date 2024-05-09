@@ -8,6 +8,7 @@ import {
   Modal,
   TextInput,
   TouchableOpacity,
+  Dimensions,
   StyleSheet,
   SafeAreaView,
   KeyboardAvoidingView,
@@ -20,6 +21,9 @@ import PostDetailHeader from '../../components/Community/PostDetailHeader';
 import CommentCard from '../../components/Community/CommentCard';
 import {formatDistanceToNow} from 'date-fns';
 import {ko} from 'date-fns/locale';
+import {SwiperFlatList} from 'react-native-swiper-flatlist';
+
+const { width, height } = Dimensions.get('window');
 
 const CommunityPostDetail = ({route}) => {
   const [post, setPost] = useState(null);
@@ -124,8 +128,6 @@ const CommunityPostDetail = ({route}) => {
 
           if (!likeDoc.empty) {
             setIsLiked(true);
-          } else {
-            setIsLiked(false);
           }
         }
       };
@@ -290,18 +292,35 @@ const CommunityPostDetail = ({route}) => {
           </View>
         </View>
         <Text style={styles.postContentText}>{post.post_content}</Text>
-        {post.post_files && post.post_files.length > 0 && (
+        {post?.post_files?.length > 0 ? (
           <View style={styles.postImageWrapper}>
-            {post.post_files.map((imageUrl, index) => (
-              <Image
-                key={index}
-                source={{uri: imageUrl}}
-                style={styles.postImage}
-                resizeMode="cover"
-              />
-            ))}
+          <SwiperFlatList
+          autoplay
+          autoplayDelay={5}
+          autoplayLoop
+          showPagination
+          paginationDefaultColor="#DBDBDB"
+          paginationActiveColor="#07AC7D"
+          paginationStyleItem={styles.paginationStyleItems}
+          paginationStyleItemActive={styles.paginationStyleItemActives}
+          data={post.post_files}
+          style={styles.postSwiperFlatList}
+          renderItem={({item}) => (
+            console.log('item.post_files: ' + item.post_files),
+            (
+                <Image
+                  style={styles.postImage}
+                  source={{uri: item}}
+                  resizeMode="cover"
+                  defaultSource={defaultPostImg}
+                />
+            )
+          )}
+        />
           </View>
-        )}
+      ) : (
+        <View style={styles.divider} />
+      )}
 
         <View style={styles.separatorTop} />
         <View style={styles.interactionContainer}>
@@ -376,7 +395,7 @@ const CommunityPostDetail = ({route}) => {
             <Image
               style={[styles.commentSubmitIcon, styles.frameItemLayout]}
               resizeMode="cover"
-              source={require('../../assets/icons/planeMessageIcon.png')}
+              source={require('../../assets/icons/planeMessageIcon.png')} //밑에 분리하기
             />
           </TouchableOpacity>
 
@@ -478,15 +497,31 @@ const styles = StyleSheet.create({
     fontFamily: 'Pretendard',
     color: '#898989',
   },
+
   postImageWrapper: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
+    alignItems: 'center',
     marginBottom: 32,
   },
+  postSwiperFlatList: {
+  },
   postImage: {
-    width: '48%',
-    height: 150,
+    height: height * 0.3,
+    width,
+  },
+  paginationStyleItems: {
+    top: 40,
+    width: 4,
+    height: 4,
+    borderRadius: 50,
+    marginHorizontal: 2,
+  },
+  paginationStyleItemActives: {
+    top: 39,
+    width: 6,
+    height: 6,
+    borderRadius: 50,
+    marginHorizontal: 2,
   },
   separatorTop: {
     height: 1,

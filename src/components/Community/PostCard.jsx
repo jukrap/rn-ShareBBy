@@ -7,6 +7,7 @@ import {
   Dimensions,
   StyleSheet,
   Modal,
+  ImageBackground,
 } from 'react-native';
 import ProgressiveImage from './ProgressiveImage';
 import {useFocusEffect} from '@react-navigation/native';
@@ -14,31 +15,29 @@ import {formatDistanceToNow} from 'date-fns';
 import {ko} from 'date-fns/locale';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
+import {SwiperFlatList} from 'react-native-swiper-flatlist';
+
+const { width, height } = Dimensions.get('window');
 
 const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
   const [postUserData, setPostUserData] = useState(null);
-  const [currentUser, setCurrentUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null); //나중에 전부 통일해서 빈문자열로 교체
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(item.likeCount || 0);
   const likeIcon = isLiked ? heartLineIcon : heartRedIcon;
   const [commentCount, setCommentCount] = useState(0);
   const [isLikeProcessing, setIsLikeProcessing] = useState(false);
+  const colors = ['tomato', 'thistle', 'skyblue', 'teal'];
 
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged(user => {
       setCurrentUser(user);
     });
 
-    return () => unsubscribe();
-  }, []);
-
-  useEffect(() => {
     fetchPostUserData();
-  }, []);
-
-  useEffect(() => {
     fetchCommentCount();
+    return () => unsubscribe();
   }, []);
 
   const toggleModal = () => {
@@ -58,8 +57,6 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
 
           if (!likeDoc.empty) {
             setIsLiked(true);
-          } else {
-            setIsLiked(false);
           }
         }
       };
@@ -80,16 +77,6 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
       updateLikeCount();
     }, [currentUser, item.id]),
   );
-
-  // 좋아요 개수 가져오기
-  const getLikeCount = () => {
-    return item.post_like ? `${item.post_like}` : '0';
-  };
-
-  // 댓글 개수 가져오기 (TODO: 댓글 카운팅 제작)
-  const getCommentCount = () => {
-    return '0';
-  };
 
   // 게시글 작성자 정보 가져오기
   const fetchPostUserData = async () => {
@@ -122,11 +109,13 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
       const count = querySnapshot.size;
       setCommentCount(count);
     } catch (error) {
+      //나중에 경고문으로 우회적 표현하는 게 좋음
       console.log('댓글 수를 가져오는 중에 오류가 발생했습니다:', error);
     }
   };
 
   const handleLikePress = async () => {
+    //handleIsLike로 함수명 변경
     if (currentUser && !isLikeProcessing) {
       setIsLikeProcessing(true);
 
@@ -160,7 +149,7 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
             userId: currentUser.uid,
             createdAt: firestore.FieldValue.serverTimestamp(),
           });
-
+          //try catch 깊이 좀 줄이기 (특정 부분 함수로 빼던지 하기)
           setIsLiked(true);
           setLikeCount(prevCount => prevCount + 1);
 
@@ -190,7 +179,7 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
             source={
               postUserData && postUserData.profileImage
                 ? {uri: postUserData.profileImage}
-                : require('../../assets/images/defaultProfileImg.jpeg')
+                : require('../../assets/images/defaultProfileImg.jpeg') //빼내기
             }
           />
           <View style={styles.userInfoTextContainer}>
@@ -214,8 +203,15 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
         </View>
       </View>
       <TouchableOpacity onPress={onDetail}>
-        <Text style={styles.postContentText} ellipsizeMode="tail">
-          {item.post_content ? item.post_content.slice(0, 300) : ''}
+        <Text
+          style={styles.postContentText}
+          ellipsizeMode="tail"
+          numberOfLines={2}>
+          {
+            item.post_content
+              ? item.post_content.slice(0, 300)
+              : '' /*300자 많음, 줄 단위로 개선*/
+          }
           {item.post_content && item.post_content.length > 300 && (
             <>
               ... <Text style={styles.readMoreText}>더보기</Text>
@@ -223,19 +219,33 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
           )}
         </Text>
       </TouchableOpacity>
-      {item.post_files && item.post_files.length > 0 ? (
+      {item?.post_files?.length > 0 ? (
+        //테두리 둥굴게, 이미지 전환을 보다 더 정확하게 하려고 했으나 안 됨
+        //사유: 파이어베이스에서 불러오는 이미지 + 라이브러리 자체가 하드 코딩되어 있음
         <View style={styles.postImageWrapper}>
-          {item.post_files.map((imageUrl, index) => {
-            return (
-              <Image
-                key={index}
-                defaultImageSource={defaultPostImg}
-                source={{uri: imageUrl}}
-                style={styles.postImage}
-                resizeMode="cover"
-              />
-            );
-          })}
+          <SwiperFlatList
+            autoplay
+            autoplayDelay={5}
+            autoplayLoop
+            showPagination
+            paginationDefaultColor="#DBDBDB"
+            paginationActiveColor="#07AC7D"
+            paginationStyleItem={styles.paginationStyleItems}
+            paginationStyleItemActive={styles.paginationStyleItemActives}
+            data={item.post_files}
+            style={styles.postSwiperFlatList}
+            renderItem={({item}) => (
+              console.log('item.post_files: ' + item.post_files),
+              (
+                  <Image
+                    style={styles.postImage}
+                    source={{uri: item}}
+                    resizeMode="cover"
+                    defaultSource={defaultPostImg}
+                  />
+              )
+            )}
+          />
         </View>
       ) : (
         <View style={styles.divider} />
@@ -273,7 +283,7 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
           </TouchableOpacity>
         </View>
       </View>
-
+      {/*모달 빼내기*/}
       <Modal visible={isModalVisible} animationType="slide" transparent={true}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
@@ -391,21 +401,35 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   postImageWrapper: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    marginBottom: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  postSwiperFlatList: {
   },
   postImage: {
-    width: '48%',
-    height: 150,
-    marginBottom: 8,
+    height: height * 0.3,
+    width,
   },
-
+  paginationStyleItems: {
+    top: 40,
+    width: 4,
+    height: 4,
+    borderRadius: 50,
+    marginHorizontal: 2,
+  },
+  paginationStyleItemActives: {
+    top: 39,
+    width: 6,
+    height: 6,
+    borderRadius: 50,
+    marginHorizontal: 2,
+  },
   divider: {},
   interactionContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    marginTop: 8,
   },
   leftInteractionContainer: {
     flexDirection: 'row',
