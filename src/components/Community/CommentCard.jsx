@@ -55,7 +55,6 @@ const CommentCard = ({item}) => {
 
   return (
     <View style={styles.topContainer}>
-      <View style={styles.separator} />
       <View style={styles.commentCard}>
         <View style={styles.userInfoContainer}>
           <Image
@@ -89,6 +88,7 @@ const CommentCard = ({item}) => {
                 locale: ko,
               })}
             </Text>
+              <View style={styles.separator} />
           </View>
         </View>
       </View>
@@ -137,9 +137,10 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: '#D9D9D9',
     width: '100%',
+    marginTop: 16,
   },
   commentCard: {
-    paddingVertical: 16,
+    paddingTop: 16,
     paddingHorizontal: 16,
   },
   userInfoContainer: {
