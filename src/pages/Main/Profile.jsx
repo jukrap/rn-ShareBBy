@@ -161,7 +161,7 @@ const Profile = ({navigation, route}) => {
               <Image style={styles.arrow} source={rightArrow} />
             </TouchableOpacity>
             <TouchableOpacity
-              // onPress={() => getPhotos()}
+              onPress={() => navigation.navigate('SynthesisAgree')}
               style={styles.noticeWrapper}>
               <Text style={styles.noticeStyle}>약관 및 개인정보 처리 방침</Text>
               <Image style={styles.arrow} source={rightArrow} />

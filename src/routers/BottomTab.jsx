@@ -14,6 +14,7 @@ import CommunityBoard from '../pages/Main/CommunityBoard';
 import CommunityAddPost from '../pages/Main/CommunityAddPost';
 import Profile from '../pages/Main/Profile';
 import EditProfile from '../pages/Main/EditProfile';
+import SynthesisAgree from '../components/SignUp/AgreeList/SynthesisAgree';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -43,7 +44,9 @@ const AboutProfile = () => {
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name="Profile" component={Profile} />
+      <Stack.Screen name="SynthesisAgree" component={SynthesisAgree} />
       <Stack.Screen name="EditProfile" component={EditProfile} />
+      
     </Stack.Navigator>
   );
 };

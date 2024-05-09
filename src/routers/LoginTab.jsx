@@ -25,23 +25,38 @@ const LoginTab = () => {
       screenOptions={{
         headerShown: false,
       }}>
-      
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="SignUp" component={SignUp} />
-      <Stack.Screen name="AgreeTab" component={SignUpAgree} />
+      <Stack.Screen name="AgreeTab" component={AgreeTab} />
       <Stack.Screen name="SignUpEmail" component={SignUpEmail} />
       <Stack.Screen name="SignUpPassword" component={SignUpPassword} />
       <Stack.Screen name="SignUpNickname" component={SignUpNickname} />
       <Stack.Screen name="SignUpAddress" component={SignUpAddress} />
       <Stack.Screen name="SearchId" component={SearchId} />
+      <Stack.Screen name="SearchPassword" component={SearchPassword} />
       <Stack.Screen name="TeenagerAgree" component={TeenagerAgree} />
       <Stack.Screen name="ServiceAgree" component={ServiceAgree} />
       <Stack.Screen name="InformationAgree" component={InformationAgree} />
       <Stack.Screen name="MarketingAgree" component={MarketingAgree} />
-      <Stack.Screen name="SearchPassword" component={SearchPassword} />
       <Stack.Screen name="Main" component={Main} />
     </Stack.Navigator>
   );
 };
+
+const AgreeTab = () => {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}>
+      <Stack.Screen name="SignUpAgree" component={SignUpAgree} />
+      <Stack.Screen name="TeenagerAgree" component={TeenagerAgree} />
+      <Stack.Screen name="ServiceAgree" component={ServiceAgree} />
+      <Stack.Screen name="InformationAgree" component={InformationAgree} />
+      <Stack.Screen name="MarketingAgree" component={MarketingAgree} />
+    </Stack.Navigator>
+  );
+};
+
 
 export default LoginTab;
