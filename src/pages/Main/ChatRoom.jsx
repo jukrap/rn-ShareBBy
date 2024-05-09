@@ -101,6 +101,11 @@ const ChatRoom = ({route, navigation}) => {
     navigation.goBack();
   };
 
+  const goToShowAllImages = () => {
+    navigation.navigate('ShowAllImages', {messages: messages});
+    setIsHamburgerModalVisible(false);
+  };
+
   //modal
   const toggleHamburgerModal = () => {
     setIsHamburgerModalVisible(!isHamburgerModalVisible);
@@ -452,7 +457,8 @@ const ChatRoom = ({route, navigation}) => {
               borderBottomWidth: 1,
               borderBottomColor: '#E0E0E0',
             }}>
-            <View
+            <TouchableOpacity
+              onPress={goToShowAllImages}
               style={{
                 justifyContent: 'space-between',
                 alignItems: 'center',
@@ -460,16 +466,13 @@ const ChatRoom = ({route, navigation}) => {
                 marginHorizontal: 8,
                 paddingTop: 8,
               }}>
-              <TouchableOpacity>
-                <Text style={{fontSize: 16, fontWeight: '700'}}>사진</Text>
-              </TouchableOpacity>
-              <TouchableOpacity>
-                <Image
-                  source={require('../../assets/icons/right-arrow.png')}
-                  style={{width: 16, height: 16}}
-                />
-              </TouchableOpacity>
-            </View>
+              <Text style={{fontSize: 16, fontWeight: '700'}}>사진</Text>
+              <Image
+                source={require('../../assets/icons/right-arrow.png')}
+                style={{width: 16, height: 16}}
+              />
+            </TouchableOpacity>
+
             <View
               style={{
                 width: '100%',

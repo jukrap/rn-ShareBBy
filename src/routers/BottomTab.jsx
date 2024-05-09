@@ -14,6 +14,7 @@ import CommunityBoard from '../pages/Main/CommunityBoard';
 import CommunityAddPost from '../pages/Main/CommunityAddPost';
 import Profile from '../pages/Main/Profile';
 import EditProfile from '../pages/Main/EditProfile';
+import ShowAllImages from '../pages/Main/ShowAllImages';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -35,6 +36,7 @@ const AboutChat = () => {
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name="Chat" component={Chat} />
       <Stack.Screen name="ChatRoom" component={ChatRoom} />
+      <Stack.Screen name="ShowAllImages" component={ShowAllImages} />
     </Stack.Navigator>
   );
 };
