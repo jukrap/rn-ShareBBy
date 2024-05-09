@@ -146,17 +146,16 @@ const Recruit = ({ navigation, route }) => {
         )
     },[]);
 
-    
 
     return (
         <SafeAreaView style={{flex : 1}}>
            <View style={styles.searchView}>
-                <View style={styles.searchOpacity}>
+                {/* <View style={styles.searchOpacity}>
                     <Image source={searchIcon} style={{ width: 24, height: 24 }} />
                     <TextInput placeholder='원하는 취미, 위치 검색'
                         placeholderTextColor='#898989'
                         style={{ flex: 1, fontSize: 12, fontFamily: 'Pretendard' }} />
-                </View>
+                </View> */}
                 <TouchableOpacity
                     style={{ marginLeft: 'auto', paddingTop: 10 }}
                     onPress={moveCurrLocation}>
@@ -176,7 +175,7 @@ const Recruit = ({ navigation, route }) => {
                 }}
                 initialRegion={initialRegion}
                 isShowIndoorLevelPicker={true}
-                isShowLocationButton={moveCurrLocation}
+                isShowLocationButton={false}
                 locale={'ko'}
                 onTapMap={(props) => {
                             console.log('🚀 ===============>  : ', props);

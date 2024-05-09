@@ -6,6 +6,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
+  KeyboardAvoidingView,
+
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import ImagePicker from 'react-native-image-crop-picker';
@@ -66,7 +68,10 @@ const EditProfile = ({navigation, route}) => {
     });
   };
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView
+    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    keyboardVerticalOffset={1}
+    style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Image style={styles.arrow} source={leftArrow} />
@@ -109,7 +114,7 @@ const EditProfile = ({navigation, route}) => {
         style={styles.submitBox}>
         <Text style={styles.sumbitText}>완료</Text>
       </TouchableOpacity>
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 
