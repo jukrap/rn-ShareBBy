@@ -8,9 +8,7 @@ import {
   Dimensions,
 } from 'react-native';
 
-
 import CheckBox from './CheckBox';
-
 
 const SignUpAgree = ({onNextStep, navigation}) => {
   const {width, height} = Dimensions.get('window');
@@ -29,9 +27,6 @@ const SignUpAgree = ({onNextStep, navigation}) => {
     onNextStep({checkboxState});
   };
 
-  console.log('navigation prop in SignUpAgree:', navigation);
-
-  
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.secondContainer}>
@@ -44,7 +39,7 @@ const SignUpAgree = ({onNextStep, navigation}) => {
           </View>
 
           <View style={styles.checkboxContainer}>
-            <CheckBox  navigation={navigation} onChange={handleCheckBoxChange} />
+            <CheckBox navigation={navigation} onChange={handleCheckBoxChange} />
           </View>
         </View>
 
@@ -95,7 +90,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: '#07AC7D',
     alignItems: 'center',
-    justifyContent:'center',
+    justifyContent: 'center',
     marginHorizontal: 16,
     marginTop: 16,
     paddingVertical: 16,
@@ -106,7 +101,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
-    
   },
 });
 
