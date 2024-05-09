@@ -489,7 +489,7 @@ const Detail = ({route, navigation}) => {
   const userData = route.params;
   const {pickAddress, pickLatitude, pickLongitude, id, nickname} = userData;
 
-  const writeTime = new Date().getTime(); // 내가 쓴 모집글 시간을 저장
+  const writeTime = new Date(); // 내가 쓴 모집글 시간을 저장
   const [date, setDate] = useState(new Date());
   const [isDateModal, setIsDateModal] = useState(false);
   const [isPeopleModal, setIsPeopleModal] = useState(false);
@@ -724,6 +724,7 @@ const Detail = ({route, navigation}) => {
                 confirmText="확인"
                 cancelText="취소"
                 minuteInterval={5}
+                minimumDate={writeTime}
                 modal
                 open={isDateModal}
                 date={date}
@@ -846,7 +847,7 @@ const Detail = ({route, navigation}) => {
         animationIn={'slideInUp'}
         animationOut={'slideOutDown'}
         isVisible={isPeopleModal}
-        backdropOpacity={0.8}
+        backdropOpacity={0.3}
         backdropColor="#000"
         style={{justifyContent: 'flex-end', margin: 0}}
         onBackdropPress={() => {

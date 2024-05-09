@@ -71,6 +71,7 @@ const Join = ({ navigation, route }) => {
         mapView?.current?.setLocationTrackingMode("Follow")
     };
 
+    
     const renderMarker = useCallback((marker) => {
         return (
             <NaverMapMarkerOverlay
@@ -87,8 +88,31 @@ const Join = ({ navigation, route }) => {
         const diffHours = dayjs(item._data.deadline).diff(now, 'hours')
         const diffMins = dayjs(item._data.deadline).diff(now, 'minutes')
 
+        const moveMarkerLocation = () => {
+            const Region = {
+                latitude: item._data.latitude,
+                latitudeDelta: 0,
+                longitude: item._data.longitude,
+                longitudeDelta: 0,
+            }
+            const CameraMoveBaseParams = {
+                duration: 700,
+                easing : "EaseOut",
+                pivot : {
+                    x: 0.5,
+                    y: 0.5,
+                }
+            }
+            mapView?.current?.animateRegionTo(
+                Region, CameraMoveBaseParams
+            )
+        }
+
         return (
-            <View style={styles.listView}>
+            <TouchableOpacity
+                activeOpacity={0.6} 
+                style={styles.listView}
+                onPress={moveMarkerLocation}>
                 <View style={{ justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row', paddingTop: 8 }}>
                     <Text style={styles.listTitle}>{item._data.title}</Text>
                     {
@@ -122,26 +146,26 @@ const Join = ({ navigation, route }) => {
                         ) : (
                             <TouchableOpacity
                                 style={styles.showBtn}
-                                onPress={() => navigation.navigate('Show', route)}>
+                                onPress={() => navigation.navigate('Show', item)}>
                                 <Text style={[styles.showCommText, { fontWeight: 600, fontSize: 14, color: '#FEFFFE' }]}>참여신청</Text>
                             </TouchableOpacity>
                         )
                     }
                 </View>
-            </View>
+            </TouchableOpacity>
         )
     }
 
     return (
         <SafeAreaView style={{flex : 1}}>
             <View style={styles.searchView}>
-                    <View style={styles.searchOpacity}>
+                    {/* <View style={styles.searchOpacity}>
                         <Image source={searchIcon} style={{ width: 24, height: 24 }} />
                         <TextInput
                             placeholder='원하는 취미, 위치 검색'
                             placeholderTextColor='#898989'
                             style={{ flex: 1, fontSize: 12, fontFamily: 'Pretendard' }} />
-                    </View>
+                    </View> */}
                     <TouchableOpacity
                          style={{ marginLeft: 'auto', paddingTop: 10 }}
                          onPress={moveCurrLocation}>
@@ -150,7 +174,6 @@ const Join = ({ navigation, route }) => {
                 </View>
                 <View style={{ bottom: 30, position: 'absolute', zIndex: 2,   }}>
                     <FlatList
-                    
                         data={hobbiesData.reverse()}
                         renderItem={renderItem}
                         keyExtractor={item => item.id}
@@ -178,6 +201,8 @@ const Join = ({ navigation, route }) => {
                 initialRegion={initialRegion}
                 locale={'ko'}
                 isShowLocationButton={false}
+                maxZoom={15}
+                minZoom={15}
             >
                 {hobbiesData.map((v) => renderMarker(v))}
             </NaverMapView>

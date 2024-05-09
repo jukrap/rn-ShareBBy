@@ -2,7 +2,6 @@ import React, {useState} from 'react';
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   SafeAreaView,
   Image,
@@ -10,18 +9,33 @@ import {
   Dimensions,
 } from 'react-native';
 
+import ImageDetail from '../../components/Chat/Modal/ImageDetail';
+
 const ShowAllImages = ({navigation, route}) => {
   const {messages} = route.params;
   const {width, height} = Dimensions.get('window');
 
+  const [imageUri, setImageUri] = useState('');
+  const [isVisible, setIsVisible] = useState(false);
+
+  const toggleModal = imageUri => {
+    setImageUri(imageUri);
+    setIsVisible(true);
+  };
+
+  const closeModal = () => {
+    setIsVisible(false);
+  };
+
   const renderImages = ({item}) => {
-    console.log('item:', item);
     return (
-      <TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => toggleModal(item.image)}
+        style={{marginHorizontal: 1.5}}>
         {item.image && (
           <Image
             source={{uri: item.image}}
-            style={{width: width / 3 - 10, height: width / 3 - 10}}
+            style={{width: width / 3 - 4, height: width / 3 - 4}}
           />
         )}
       </TouchableOpacity>
@@ -45,17 +59,23 @@ const ShowAllImages = ({navigation, route}) => {
             style={{width: 24, height: 24}}
           />
         </TouchableOpacity>
-        <Text style={{fontSize: 22, fontWeight: '600'}}>앨범</Text>
+        <Text style={{fontSize: 20, fontWeight: '600'}}>앨범</Text>
         <View />
       </View>
 
-      <View style={{flex: 1, backgroundColor: 'gray'}}>
+      <View style={{flex: 1}}>
         <FlatList
           data={messages}
           renderItem={renderImages}
           keyExtractor={(item, index) => index.toString()}
+          numColumns={3}
         />
       </View>
+      <ImageDetail
+        isVisible={isVisible}
+        imageUri={imageUri}
+        closeModal={closeModal}
+      />
     </SafeAreaView>
   );
 };

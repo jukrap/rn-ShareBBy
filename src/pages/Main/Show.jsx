@@ -1,19 +1,83 @@
 import React, { useEffect, useRef, useState } from "react";
-import { SafeAreaView, View, Text, TouchableOpacity, StyleSheet, ScrollView, Dimensions, Image, FlatList } from "react-native";
+import { SafeAreaView, View, Text, Animated, StyleSheet, ScrollView, Dimensions, Image, FlatList, TouchableOpacity } from "react-native";
 import { NaverMapView, NaverMapMarkerOverlay } from "@mj-studio/react-native-naver-map";
+import dayjs from 'dayjs';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getUser } from "../../lib/user";
+
+import TopTab from "../../components/Main/TobTab";
+import BottomButtons from "../../components/Main/BottomButtons";
+import Toast from "../../components/Main/Toast";
+
+const { width, height } = Dimensions.get('window');
 
 const Show = ({ navigation, route }) => {
-    const jejuRegion = {
-        latitude: 33.20530773,
-        longitude: 126.14656715029,
-        latitudeDelta: 0.38,
-        longitudeDelta: 0.8,
+    console.log('show ===============> ', route.params._data);
+    const showValue = useRef(new Animated.Value(0)).current;
+    const { address, detail_address, content, deadline, latitude, longitude, nickname, peopleCount, tag, title, writeTime, user_id } = route.params._data;
+    
+    const [userToken, setUserToken] = useState()
+    const [userInfo, setUserInfo] = useState([]);
+    const [initialRegion, setInitialRegion] = useState({
+        latitude: latitude,
+        longitude: longitude,
+        latitudeDelta: 0,
+        longitudeDelta: 0,
+    });
+    const [isToast, setIsToast] = useState('');
+    const toastValue = useRef(new Animated.Value(0)).current;
+    const showAnimated = (value) => Animated.timing(showValue, { toValue: value, useNativeDriver: true, duration: 300 });
+
+    useEffect(() => {
+        showAnimated(1).start()
+        getUserToken()
+    }, []);
+
+    const getUserToken = async () => {
+        try {
+          // 'userToken' 키를 사용하여 데이터 가져오기
+          const userToken = await AsyncStorage.getItem('userToken');
+          const userInfo = await getUser(userToken);
+          if (userToken !== null) {
+            // 데이터가 있을 경우 처리
+            // console.log('User Token:', userToken);
+            // console.log('UserInfo:', userInfo);
+            setUserToken(userToken);
+            setUserInfo(userInfo)
+          } else {
+            console.log('User Token이 없습니다.');
+          }
+        } catch (error) {
+          // 오류 처리
+          console.error('AsyncStorage에서 데이터를 가져오는 중 오류 발생:', error);
+        }
+        console.log('userInfo 값 ====>', userInfo);
       };
 
+    const onPressToken = () => {
+        const checkMyId = userToken === user_id
+        if (checkMyId) {
+            console.log('같아서 참여하기 누르면 본인 참가 했으니 중복참가 안된다고 함');
+            setIsToast(true);
+        } else {
+            navigation.navigate('BottomTab', {
+                screen : '채팅',
+                params : userToken
+            });
+            console.log('채팅방 페이지로 이동');
+
+        }
+
+    }
+
+    
+
+// 참가하기를 눌렀을 때, 유저 아이디를 넘기기
     return (
-        <SafeAreaView style={{flex : 1}}>
+        <SafeAreaView style={{flex : 1, backgroundColor : '#fff'}}>
+            <TopTab navigation={navigation} title={title} />
             <NaverMapView
-                style={{ flex: 1 }}
+                style={{width : width, height : width/1.6 }}
                 layerGroups={{
                     BUILDING: true,
                     BICYCLE: false,
@@ -22,48 +86,92 @@ const Show = ({ navigation, route }) => {
                     TRAFFIC: false,
                     TRANSIT: false,
                 }}
-                initialRegion={jejuRegion}
-                // isIndoorEnabled={indoor}
-                // symbolScale={symbolScale}
-                // lightness={lightness}
-                // isNightModeEnabled={nightMode}
-                // isShowCompass={compass}
-                // isShowIndoorLevelPicker={indoorLevelPicker}
-                // isShowScaleBar={scaleBar}
-                // isShowZoomControls={zoomControls}
-                // isShowLocationButton={myLocation}
-                // isExtentBoundedInKorea
-                logoAlign={'TopRight'}
+                initialRegion={initialRegion}
+                isShowLocationButton={false}
+                isShowZoomControls={false}
+                isRotateGesturesEnabled={false}
+                isScrollGesturesEnabled={false}
+                isTiltGesturesEnabled={false}
+                isStopGesturesEnabled={false}
+                isZoomGesturesEnabled={false}
                 locale={'ko'}
-                onInitialized={() => console.log('initialized!')}
-                onOptionChanged={() => console.log('Option Changed!')}
-                // onCameraChanged={(args) => console.log(`Camera Changed: ${formatJson(args)}`)}
-                // onTapMap={(args) => console.log(`Map Tapped: ${formatJson(args)}`)}
+                maxZoom={16}
+                minZoom={16}
             >
                 <NaverMapMarkerOverlay
-                    latitude={33.3565607356}
-                    longitude={126.48599018}
-                    onTap={() => console.log(1)}
-                    // anchor={{ x: 0.5, y: 1 }}
-                    caption={{
-                    key: '1',
-                    text: 'hello',
-                    }}
-                    subCaption={{
-                    key: '1234',
-                    text: '123',
-                    }}
-                    width={20}
-                    height={20}
+                    latitude={latitude}
+                    longitude={longitude}
+                    width={35}
+                    height={45}
                 />
             </NaverMapView>
+            <View style={{ flex : 1, gap : 10,}}>
+                <View style={{ paddingHorizontal : 16, paddingTop : 10, gap : 8}}>
+                    <Text style={{fontSize : 20, fontWeight : '700'}}>{title}</Text>
+                    <Text style={{fontSize : 16}}>{tag}</Text>
+                </View>
+                <View style={{ paddingHorizontal : 16, paddingTop : 10, gap : 8}}>
+                    <View style={{justifyContent : 'flex-start', alignItems : 'center', flexDirection : 'row', gap : 16}}>
+                        <Text style={{fontWeight : '700', color : '#07AC7D'}}>장소</Text>
+                        <Text numberOfLines={1} ellipsizeMode="tail" style={{width : width-100}}>{address} {detail_address}</Text>
+                    </View>
+                    <View style={{justifyContent : 'flex-start', alignItems : 'center', flexDirection : 'row', gap : 16}}>
+                        <Text style={{fontWeight : '700', color : '#07AC7D'}}>시간</Text>
+                        <Text>{dayjs(deadline).format('YYYY년 MM월 DD일 (ddd) HH:mm')} 까지</Text>
+                    </View>
+                    <View style={{justifyContent : 'flex-start', alignItems : 'center', flexDirection : 'row', gap : 16}}>
+                        <Text style={{fontWeight : '700', color : '#07AC7D'}}>인원</Text>
+                        <Text>{peopleCount} 명</Text>
+                    </View>
+                </View>
+                <View style={{width : width, height : 1, backgroundColor : '#f4f4f4'}} />
+                    <View style={{ flex : 1}}>
+                    <ScrollView>
+                    <View style={{ paddingHorizontal : 16, paddingVertical : 20, gap : 8}}>
+                        <Text style={{fontSize : 16, fontWeight : '600'}}>상세내용</Text>
+                        <Text>{content}</Text>
+                    </View>
+                    <View style={{ paddingHorizontal : 16 }}>
+                        <Text style={{fontSize : 16, fontWeight : '600'}}>참여인원</Text>
+                        <View style={{justifyContent : 'center', paddingTop : 24,}}>
+                        <Image src={userInfo.profileImage} style={{width : 60, height : 60, borderRadius : 50}} />
+                        <Text>{nickname}</Text>
+                        </View>
+                    </View>
+                    </ScrollView>
+                    </View>
+            </View>
+            <BottomButtons showValue={showValue} peopleCount={peopleCount} onPressToken={onPressToken} />
+            <Toast  text="본인이 만든 취미에요!"
+                    visible={isToast}
+                    handleCancel={() => {
+                        setIsToast(false);
+                    }}
+            />
         </SafeAreaView>
     )
 }
 
 export default Show;
 
-
+const styles = StyleSheet.create({
+    bottom: {
+        position: 'absolute',
+        height : 100,
+        bottom: 0,
+        left: 0,
+        right: 0,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingHorizontal: 24,
+        borderStyle: 'solid',
+        borderColor: '#c3c3c3',
+        borderWidth: 0.5,
+        backgroundColor: '#fff',
+        borderTopLeftRadius: 24,
+        borderTopRightRadius: 24,
+    },
+})
 // import React, { useEffect } from "react";
 // import { SafeAreaView, View, Text, Image, TouchableOpacity, Dimensions, StyleSheet, ScrollView } from "react-native";
 // import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";

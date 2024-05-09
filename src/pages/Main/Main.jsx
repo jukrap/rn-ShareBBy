@@ -20,6 +20,8 @@ const Main = ({navigation, route}) => {
   const [optionClick, setOptionClick] = useState(null);
   const [currUserData, setCurrUserData] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0); // 현재 배너 인덱스 상태 추가
+  const [imageUrl, setImageUrl] = useState('');
+
   const bannerRef = useRef(null); // 배너 FlatList에 대한 ref
 
   const userToken = useStore(state => state.userToken); // 상태 가져오기
@@ -27,6 +29,31 @@ const Main = ({navigation, route}) => {
   useEffect(() => {
     console.log('User token:', userToken); // 콘솔에 토큰 출력
   }, [userToken]);
+
+  useEffect(() => {
+    // 파이어베이스 스토리지에서 사용자의 프로필 이미지 URL과 정보를 가져오기 위한 함수
+    const fetchData = async () => {
+      try {
+        // 현재 사용자의 Firestore 데이터를 쿼리하여 프로필 이미지 URL과 정보를 가져옴
+        const user = auth().currentUser;
+        if (user) {
+          const userCollection = firestore().collection('users');
+          const currUser = await userCollection.doc(user.uid).get();
+          const userData = currUser.data();
+          setCurrUserData(userData);
+          setImageUrl(userData.profileImage);
+        } else {
+          console.log('사용자를 찾을 수 없음');
+        }
+      } catch (error) {
+        console.error('데이터를 가져오는 중 오류 발생:', error);
+      }
+    };
+  
+    // 컴포넌트가 마운트될 때 사용자의 프로필 정보와 이미지 URL을 가져오기 위한 함수 호출
+    fetchData();
+  }, []);
+  
 
   useEffect(() => {
     // 배너 자동 스크롤링
@@ -44,21 +71,6 @@ const Main = ({navigation, route}) => {
     return () => clearInterval(scrollInterval); // 컴포넌트가 언마운트될 때 interval 정리
   }, [currentIndex]); // 현재 인덱스가 변경될 때마다 useEffect 다시 실행
 
-  useEffect(() => {
-    currUserInfo();
-  }, []);
-
-  const currUserInfo = async () => {
-    const user = auth().currentUser;
-    if (user) {
-      const userCollection = firestore().collection('users');
-      const currUser = await userCollection.doc(user.uid).get();
-      const currUserData = currUser.data();
-      setCurrUserData(currUserData);
-    } else {
-      console.log('불러오지 못함!');
-    }
-  };
 
   const handleOptionClick = id => {
     setOptionClick(id);
@@ -107,7 +119,7 @@ const Main = ({navigation, route}) => {
   };
 
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <SafeAreaView style={{flex: 1, backgroundColor:'#fff'}}>
       <View style={styles.topbarView}>
         <Text style={{fontSize: 24, fontWeight: 700, color: '#07AC7D'}}>
           ShareBBy
@@ -147,7 +159,7 @@ const Main = ({navigation, route}) => {
         <View style={styles.divisionView} />
         <View style={{marginBottom: 20, paddingHorizontal: 16, gap: 6}}>
           <View style={styles.hobbyNameView}>
-            <Image source={dummyProfileIcon} style={{width: 20, height: 20}} />
+            <Image source={{ uri: imageUrl }}  style={{borderwidth:1, borderRadius:10, width: 20, height: 20, bottom:1,}} />
             <Text style={[styles.nomalText, {fontSize: 16, color: '#07AC7D'}]}>
               {currUserData.nickname}
               <Text style={[styles.nomalText, {fontWeight: '500'}]}>
@@ -253,7 +265,7 @@ const Main = ({navigation, route}) => {
             </View>
           </View>
         </View>
-        <View style={styles.divisionView} />
+        
       </ScrollView>
     </SafeAreaView>
   );
@@ -321,6 +333,7 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     borderBottomWidth: 1,
     borderBottomColor: '#DBDBDB',
+    backgroundColor:'#fff'
   },
   searchView: {
     width: width,
@@ -410,8 +423,8 @@ const styles = StyleSheet.create({
   },
   divisionView: {
     width: width,
-    height: 10,
-    backgroundColor: '#E6E6E6',
+    borderWidth:1,
+    borderColor:'#DBDBDB'
   },
   pressLocaView: {
     marginHorizontal: 30,

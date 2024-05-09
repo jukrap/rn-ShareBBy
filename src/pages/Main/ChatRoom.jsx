@@ -20,6 +20,7 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/ko';
 
 import ChatRoomNameChangeModal from '../../components/Chat/Modal/ChatRoomNameChangeModal';
+import ImageDetail from '../../components/Chat/Modal/ImageDetail';
 import PlusModal from '../../components/Chat/Modal/PlusModal';
 import PhotoList from '../../components/Chat/PhotoList';
 import ChatMemberList from '../../components/Chat/ChatMemberList';
@@ -34,6 +35,8 @@ const ChatRoom = ({route, navigation}) => {
   const [chatRoomNameChangeModalVisible, setChatRoomNameChangeModalVisible] =
     useState(false);
   const [chatMembers, setChatMembers] = useState([]);
+  const [isVisible, setIsVisible] = useState(false);
+  const [imageUri, setImageUri] = useState('');
 
   const uploadImage = async (localImagePath, chatRoomId) => {
     try {
@@ -113,6 +116,15 @@ const ChatRoom = ({route, navigation}) => {
 
   const togglePlusModal = () => {
     setIsPlusModalVisible(!isPlusModalVisible);
+  };
+
+  const toggleModal = imageUri => {
+    setImageUri(imageUri);
+    setIsVisible(true);
+  };
+
+  const closeModal = () => {
+    setIsVisible(false);
   };
 
   const toggleChatRoomNameChangeModal = () => {
@@ -330,10 +342,12 @@ const ChatRoom = ({route, navigation}) => {
             )}
 
             {item.image ? (
-              <Image
-                source={{uri: item.image}}
-                style={{width: 150, height: 150, borderRadius: 8}}
-              />
+              <TouchableOpacity onPress={() => toggleModal(item.image)}>
+                <Image
+                  source={{uri: item.image}}
+                  style={{width: 150, height: 150, borderRadius: 8}}
+                />
+              </TouchableOpacity>
             ) : (
               <View style={styles.sentByUserMessage}>
                 <Text>{item.text}</Text>
@@ -357,10 +371,12 @@ const ChatRoom = ({route, navigation}) => {
         ) : (
           <View style={styles.sentByOtherWrapper}>
             {item.image ? (
-              <Image
-                source={{uri: item.image}}
-                style={{width: 150, height: 150, borderRadius: 8}}
-              />
+              <TouchableOpacity onPress={() => toggleModal(item.image)}>
+                <Image
+                  source={{uri: item.image}}
+                  style={{width: 150, height: 150, borderRadius: 8}}
+                />
+              </TouchableOpacity>
             ) : (
               <View style={styles.sentByOtherMessage}>
                 <Text>{item.text}</Text>
@@ -601,6 +617,11 @@ const ChatRoom = ({route, navigation}) => {
         isVisible={isPlusModalVisible}
         toggleModal={togglePlusModal}
         getPhotos={getPhotos}
+      />
+      <ImageDetail
+        isVisible={isVisible}
+        imageUri={imageUri}
+        closeModal={closeModal}
       />
     </SafeAreaView>
   );

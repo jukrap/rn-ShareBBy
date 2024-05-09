@@ -60,7 +60,7 @@ const Login = ({ navigation }) => {
   };
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }}>
+    <KeyboardAvoidingView style={{ flex: 1, backgroundColor:'#fff' }}>
       <View style={styles.firstContainer}>
         <View>
           <Image source={LoginTitle} />
@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#eef0ed',
+    backgroundColor: '#FFF',
   },
   titleTextContainer: {
     alignSelf: 'center',
