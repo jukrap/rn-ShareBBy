@@ -7,13 +7,14 @@ import Main from '../pages/Main/Main';
 import Recruit from '../pages/Main/Recruit';
 import Join from '../pages/Main/Join';
 import Detail from '../pages/Main/Detail';
-import Chat from '../pages/Main/Chat'; 
+import Chat from '../pages/Main/Chat';
 import ChatRoom from '../pages/Main/ChatRoom';
 import CommunityBoard from '../pages/Main/CommunityBoard';
 import CommunityAddPost from '../pages/Main/CommunityAddPost';
 import Profile from '../pages/Main/Profile';
 import EditProfile from '../pages/Main/EditProfile';
 import MyPosts from '../pages/Main/MyPosts';
+import SynthesisAgree from '../components/SignUp/AgreeList/SynthesisAgree';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -45,6 +46,7 @@ const AboutProfile = () => {
       <Stack.Screen name="Profile" component={Profile} />
       <Stack.Screen name="EditProfile" component={EditProfile} />
       <Stack.Screen name="MyPosts" component={MyPosts} />
+      <Stack.Screen name="SynthesisAgree" component={SynthesisAgree} />
     </Stack.Navigator>
   );
 };
