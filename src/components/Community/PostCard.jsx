@@ -9,6 +9,7 @@ import {
   Modal,
 } from 'react-native';
 import ProgressiveImage from './ProgressiveImage';
+import {useFocusEffect} from '@react-navigation/native';
 import {formatDistanceToNow} from 'date-fns';
 import {ko} from 'date-fns/locale';
 import firestore from '@react-native-firebase/firestore';
@@ -43,24 +44,39 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
     setIsModalVisible(!isModalVisible);
   };
 
-  useEffect(() => {
-    // 현재 사용자가 해당 게시글에 좋아요를 눌렀는지 확인
-    const checkLikeStatus = async () => {
-      if (currentUser) {
-        const likeDoc = await firestore()
-          .collection('likes')
-          .where('postId', '==', item.id)
-          .where('userId', '==', currentUser.uid)
-          .get();
-
-        if (!likeDoc.empty) {
-          setIsLiked(true);
+  useFocusEffect(
+    React.useCallback(() => {
+      // 현재 사용자가 해당 게시글에 좋아요를 눌렀는지 확인
+      const checkLikeStatus = async () => {
+        if (currentUser) {
+          const likeDoc = await firestore()
+            .collection('likes')
+            .where('postId', '==', item.id)
+            .where('userId', '==', currentUser.uid)
+            .get();
+  
+          if (!likeDoc.empty) {
+            setIsLiked(true);
+          } else {
+            setIsLiked(false);
+          }
         }
-      }
-    };
-
-    checkLikeStatus();
-  }, [currentUser, item.id]);
+      };
+  
+      // 좋아요 카운팅 업데이트
+      const updateLikeCount = async () => {
+        const postDoc = await firestore().collection('posts').doc(item.id).get();
+        if (postDoc.exists) {
+          const postData = postDoc.data();
+          setLikeCount(postData.likeCount || 0);
+        }
+      };
+  
+      checkLikeStatus();
+      updateLikeCount();
+    }, [currentUser, item.id]),
+  );
+  
 
   // 좋아요 개수 가져오기
   const getLikeCount = () => {
@@ -92,7 +108,8 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
   };
 
   const fetchCommentCount = async () => {
-    try {//개수 새로이 로딩하는 거 개선 필요
+    try {
+      //개수 새로이 로딩하는 거 개선 필요
       //그냥 개수 카운팅 별도로 하는 게 나을지도
       const querySnapshot = await firestore()
         .collection('comments')

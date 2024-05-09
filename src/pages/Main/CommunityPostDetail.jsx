@@ -53,7 +53,6 @@ const CommunityPostDetail = ({route}) => {
   useEffect(() => {
     if (postId) {
       fetchComments();
-      fetchLikeStatus();
       fetchCommentCount();
     }
   }, [postId]);
@@ -111,23 +110,28 @@ const CommunityPostDetail = ({route}) => {
     }
   };
 
-  const fetchLikeStatus = async () => {
-    try {
-      if (currentUser) {
-        const likeDoc = await firestore()
-          .collection('likes')
-          .where('postId', '==', postId)
-          .where('userId', '==', currentUser.uid)
-          .get();
+  useFocusEffect(
+    React.useCallback(() => {
+      // 현재 사용자가 해당 게시글에 좋아요를 눌렀는지 확인
+      const checkLikeStatus = async () => {
+        if (currentUser) {
+          const likeDoc = await firestore()
+            .collection('likes')
+            .where('postId', '==', postId)
+            .where('userId', '==', currentUser.uid)
+            .get();
 
-        if (!likeDoc.empty) {
-          setIsLiked(true);
+          if (!likeDoc.empty) {
+            setIsLiked(true);
+          } else {
+            setIsLiked(false);
+          }
         }
-      }
-    } catch (error) {
-      console.log('좋아요 상태를 가져오는 중에 오류가 발생했습니다:', error);
-    }
-  };
+      };
+
+      checkLikeStatus();
+    }, [currentUser, postId]),
+  );
 
   const fetchCommentCount = async () => {
     try {
@@ -159,13 +163,13 @@ const CommunityPostDetail = ({route}) => {
 
         setIsLiked(false);
         setLikeCount(prevCount => prevCount - 1);
-
         await firestore()
           .collection('posts')
           .doc(postId)
           .update({
             likeCount: firestore.FieldValue.increment(-1),
           });
+        setLikeCount(prevCount => prevCount - 1);
       } else {
         await firestore().collection('likes').add({
           postId,
@@ -182,6 +186,7 @@ const CommunityPostDetail = ({route}) => {
           .update({
             likeCount: firestore.FieldValue.increment(1),
           });
+        setLikeCount(prevCount => prevCount + 1);
       }
     }
   };
