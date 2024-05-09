@@ -1,12 +1,11 @@
 import React, { useRef, useState } from "react";
 import { SafeAreaView, Text, View, TextInput, TouchableOpacity, Dimensions, StyleSheet, Image, FlatList, ScrollView } from "react-native";
 import dayjs from 'dayjs';
-import 'dayjs/locale/ko';
 import DatePicker from 'react-native-date-picker'
 import Modal from "react-native-modal";
+import firestore from '@react-native-firebase/firestore';
 
 import { recruitHobby } from "../../lib/hobby";
-
 import Tobbar from '../../components/Main/TobTab'
 
 const { width, height } = Dimensions.get('window');
@@ -15,10 +14,12 @@ const Detail = ({ route, navigation }) => {
     const userData = route.params
     const { pickAddress, pickLatitude, pickLongitude, id, nickname } = userData;
 
-    const writeTime = new Date().getTime() // 내가 쓴 모집글 시간을 저장
+    const writeTime = new Date() // 내가 쓴 모집글 시간을 저장
     const [date, setDate] = useState(new Date())
     const [isDateModal, setIsDateModal] = useState(false)
     const [isPeopleModal, setIsPeopleModal] = useState(false)
+    const [selectedUsers, setSelectedUsers] = useState([]);
+
     // const [saveDate, setSaveDate] = useState(0);
     const [detailContent, setDetailConetent] = useState({
         address: pickAddress,
@@ -45,6 +46,7 @@ const Detail = ({ route, navigation }) => {
     });
     const [isModalVisible, setIsModalVisible] = useState(false);
 
+    
 
     const handleInputContent = (name, value) => {
         setDetailConetent({
@@ -86,11 +88,30 @@ const Detail = ({ route, navigation }) => {
             content: detailContent.showContent,
             writeTime,
         }
-        await recruitHobby(body)
-        navigation.navigate('Main');
-        console.log('==============> 🚀 success post body : ', body);
-        setIsModalVisible(false)
+        try {
+            await recruitHobby(body)
+            console.log('==============> 🚀 success post body : ', body);
+            // setSelectedUsers([body.user_id])
+            setIsModalVisible(false)
+            createGroupChat()         
+        } catch (e){
+            console.log('error ======> ', e);
+        }
     }
+
+    const createGroupChat = async () => {
+        try {
+            const chatRoomRef = await firestore().collection('chatRooms').add({
+                name: detailContent.showTitle,
+                members: [id],
+        });
+            setSelectedUsers([]);
+            console.log('채팅방 생성됨');
+            navigation.navigate('BottomTab', {screen : '채팅'});
+        } catch (error) {
+            console.error('Error: ', error);
+        }
+    };
 
 
     const renderItem = ({ item }) => {
@@ -157,7 +178,6 @@ const Detail = ({ route, navigation }) => {
                             setIsDateModal(true)
                             handleFocus('deadLine')
                         }}
-
                     >
                         <View style={styles.detailIndex}>
                             <Text style={[styles.commonText, isTextClick.deadLine ? { color: '#07AC7D' } : { color: '#A7A7A7' }]}>모집시간</Text>
@@ -173,6 +193,7 @@ const Detail = ({ route, navigation }) => {
                                 confirmText="확인"
                                 cancelText="취소"
                                 minuteInterval={5}
+                                minimumDate={writeTime}
                                 modal
                                 open={isDateModal}
                                 date={date}
@@ -182,6 +203,7 @@ const Detail = ({ route, navigation }) => {
                                     setDate(date)
                                     handleInputContent('deadLine', postDate)
                                     handleBlur('deadLine')
+                                    
                                 }}
                                 onCancel={() => {
                                     setIsDateModal(false)
@@ -194,7 +216,7 @@ const Detail = ({ route, navigation }) => {
                     <TouchableOpacity
                         style={styles.detailOption}
                         onPress={() => {
-                            setIsPeopleModal(true)
+                            setIsPeopleModal(true) 
                             handleFocus('peopleCount')
                         }}>
                         <View style={styles.detailIndex}>
@@ -243,7 +265,7 @@ const Detail = ({ route, navigation }) => {
                 animationIn={"slideInUp"}
                 animationOut={"slideOutDown"}
                 isVisible={isPeopleModal}
-                backdropOpacity={0.8}
+                backdropOpacity={0.3}
                 backdropColor="#000"
                 style={{ justifyContent: 'flex-end', margin: 0 }}
                 onBackdropPress={() => {
@@ -293,7 +315,7 @@ const Detail = ({ route, navigation }) => {
                             <Text style={[styles.contentText,]}>주소 : {detailContent.address}</Text>
                             <Text style={[styles.contentText,]}>상세 주소 : {detailContent.detailAddress}</Text>
                             <Text style={[styles.contentText,]}>태그 : {detailContent.showTag}</Text>
-                            <Text style={[styles.contentText,]}>모집 기간 : {detailContent.deadLine}</Text>
+                            <Text style={[styles.contentText,]}>모집 기간 : {dayjs(detailContent.deadLine).format('YYYY년 MM월 DD일 (ddd) HH:mm')} 까지</Text>
                             <Text style={[styles.contentText,]}>모집 인원 : {detailContent.peopleCount} 명</Text>
                             <Text style={[styles.contentText, { textAlign: 'center', paddingTop: 16, fontWeight: 600 }]}>제목, 본문 확인하셨나요?</Text>
                         </View>
@@ -308,7 +330,7 @@ const Detail = ({ route, navigation }) => {
                                 activeOpacity={0.6}
                                 style={[styles.pressOptionBtn, { backgroundColor: '#07AC7D' }]}
                                 onPress={() => {
-                                    postHobby()
+                                    postHobby() 
                                 }}>
                                 <Text style={styles.pressOptionText}>예</Text>
                             </TouchableOpacity>

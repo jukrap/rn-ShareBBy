@@ -7,14 +7,14 @@ import Main from '../pages/Main/Main';
 import Recruit from '../pages/Main/Recruit';
 import Join from '../pages/Main/Join';
 import Detail from '../pages/Main/Detail';
-import Show from '../pages/Main/Show';
-import Chat from '../pages/Main/Chat';
+import Chat from '../pages/Main/Chat'; 
 import ChatRoom from '../pages/Main/ChatRoom';
 import CommunityBoard from '../pages/Main/CommunityBoard';
 import CommunityAddPost from '../pages/Main/CommunityAddPost';
 import Profile from '../pages/Main/Profile';
 import EditProfile from '../pages/Main/EditProfile';
 import SynthesisAgree from '../components/SignUp/AgreeList/SynthesisAgree';
+import MyPosts from '../pages/Main/MyPosts';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -26,7 +26,7 @@ const AboutMap = ({params}) => {
       <Stack.Screen name="Recruit" component={Recruit} initialParams={params} />
       <Stack.Screen name="Join" component={Join} initialParams={params} />
       <Stack.Screen name="Detail" component={Detail} initialParams={params} />
-      <Stack.Screen name="Show" component={Show} initialParams={params} />
+      {/* <Stack.Screen name="Show" component={Show} initialParams={params} /> */}
     </Stack.Navigator>
   );
 };
@@ -46,7 +46,7 @@ const AboutProfile = () => {
       <Stack.Screen name="Profile" component={Profile} />
       <Stack.Screen name="SynthesisAgree" component={SynthesisAgree} />
       <Stack.Screen name="EditProfile" component={EditProfile} />
-      
+      <Stack.Screen name="MyPosts" component={MyPosts} />
     </Stack.Navigator>
   );
 };
