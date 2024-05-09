@@ -34,10 +34,12 @@ const ChatRoom = ({route, navigation}) => {
   const [isPlusModalVisible, setIsPlusModalVisible] = useState(false);
   const [chatOutModalVisible, setChatOutModalVisible] = useState(false);
   const [chatRoomNameChangeModalVisible, setChatRoomNameChangeModalVisible] =
-    useState(false);
+    useState(false); //이름 수정 너무 김.
   const [chatMembers, setChatMembers] = useState([]);
   const [isVisible, setIsVisible] = useState(false);
   const [imageUri, setImageUri] = useState('');
+
+  //useEffect는 순서 지키는 것이 좋음. 맨위로, 그 밑에는 외부에서 오는 데이터 관련 함수들
 
   //이미지 업로드
   const uploadImage = async (localImagePath, chatRoomId) => {
@@ -45,17 +47,14 @@ const ChatRoom = ({route, navigation}) => {
       const fileName = localImagePath.substring(
         localImagePath.lastIndexOf('/') + 1,
       );
-      const reference = storage().ref(
-        `chatRoomImages/${chatRoomId}/${fileName}`,
-      );
+      const path = storage().ref(`chatRoomImages/${chatRoomId}/${fileName}`);
 
-      await reference.putFile(localImagePath);
+      await path.putFile(localImagePath);
 
-      const url = await reference.getDownloadURL();
-      return url;
+      return await path.getDownloadURL();
     } catch (error) {
       console.error('Error uploading image to Firebase Storage:', error);
-      throw error;
+      throw error; //alert으로 처리 (토스트) 컴포넌트 - 메인에 있음
     }
   };
 
@@ -107,11 +106,11 @@ const ChatRoom = ({route, navigation}) => {
   };
 
   const goToShowAllImages = () => {
+    //이름 바꾸기,
     navigation.navigate('ShowAllImages', {messages: messages});
     setIsHamburgerModalVisible(false);
   };
 
-  //modal
   const toggleHamburgerModal = () => {
     setIsHamburgerModalVisible(!isHamburgerModalVisible);
   };
@@ -134,6 +133,7 @@ const ChatRoom = ({route, navigation}) => {
   };
 
   useEffect(() => {
+    // 위로 빼기
     const messageListener = firestore()
       .collection('chatRooms')
       .doc(chatRoomId)
@@ -178,16 +178,17 @@ const ChatRoom = ({route, navigation}) => {
   };
 
   useEffect(() => {
+    // 위로 올리기
     getChatRoomMembers();
-  }, [chatRoomId]);
+  }, []);
 
   const sendMessage = async () => {
     try {
       if (!inputMessage.trim()) {
-        return;
+        return; // 아예 안눌리게 수정. input length == 0 안 되게
       }
 
-      const currentUser = auth().currentUser;
+      const currentUser = auth().currentUser; //
 
       let senderName = 'Unknown';
       if (currentUser) {
@@ -215,7 +216,7 @@ const ChatRoom = ({route, navigation}) => {
         .collection('messages')
         .add(newMessage);
 
-      setInputMessage('');
+      setInputMessage(''); //
     } catch (error) {
       console.error('Error sending message: ', error);
     }
@@ -278,7 +279,7 @@ const ChatRoom = ({route, navigation}) => {
   };
 
   const renderItem = ({item, index}) => {
-    dayjs.locale('ko');
+    dayjs.locale('ko'); //
     const isSystemMessage = item.sender === '시스템';
     const isCurrentUser = item.senderId === auth().currentUser?.uid;
     const isFirstMessage = index === messages.length - 1;
@@ -290,7 +291,7 @@ const ChatRoom = ({route, navigation}) => {
       !dayjs(item.timestamp?.toDate() || new Date()).isSame(
         dayjs(prevItem.timestamp?.toDate() || new Date()),
         'day',
-      );
+      ); //
 
     const showDateSeparator = isFirstMessage || isDifferentDay;
 
@@ -304,7 +305,7 @@ const ChatRoom = ({route, navigation}) => {
         !dayjs(item.timestamp.toDate()).isSame(
           dayjs(messages[index - 1].timestamp.toDate()),
           'minute',
-        ));
+        )); //
 
     const showProfileInfo =
       ((showDateSeparator && item.senderId !== auth().currentUser?.uid) ||
@@ -331,7 +332,7 @@ const ChatRoom = ({route, navigation}) => {
             <Text style={styles.showProfileInfoNickname}>{item.sender}</Text>
           </View>
         )}
-        {isCurrentUser ? (
+        {isCurrentUser ? ( // 스위치 케이스로 처리
           <View style={styles.sentByUserWrapper}>
             {showTime && (
               <View style={{marginBottom: 8}}>
@@ -355,13 +356,6 @@ const ChatRoom = ({route, navigation}) => {
                 <Text>{item.text}</Text>
               </View>
             )}
-          </View>
-        ) : isSystemMessage ? (
-          <View style={{justifyContent: 'center', alignItems: 'center'}}>
-            <Text style={{paddingVertical: 22, color: '#aaa', fontSize: 12}}>
-              {item.text}
-            </Text>
-            {showTime && <View style={{marginBottom: 8}}></View>}
           </View>
         ) : isSystemMessage ? (
           <View style={{justifyContent: 'center', alignItems: 'center'}}>
@@ -419,7 +413,7 @@ const ChatRoom = ({route, navigation}) => {
       <FlatList
         data={messages}
         renderItem={renderItem}
-        keyExtractor={(item, index) => index.toString()}
+        keyExtractor={(item, index) => index.toString()} // item.id 로
         inverted
       />
       <KeyboardAvoidingView
@@ -432,7 +426,7 @@ const ChatRoom = ({route, navigation}) => {
             source={require('../../assets/icons/plus.png')}
           />
         </TouchableOpacity>
-        <TextInput
+        <TextInput //키보드 타입 고민
           style={styles.textInput}
           placeholder="메시지를 입력하세요"
           maxLength={500}
@@ -451,7 +445,7 @@ const ChatRoom = ({route, navigation}) => {
         </TouchableOpacity>
       </KeyboardAvoidingView>
 
-      <Modal
+      <Modal //duration 설정
         isVisible={isHamburgerModalVisible}
         animationIn="slideInRight"
         animationOut="slideOutRight"
@@ -467,7 +461,7 @@ const ChatRoom = ({route, navigation}) => {
           <View style={{flex: 0.25}}></View>
           <View
             style={{
-              width: '100%',
+              width: '100%', //디멘션, flex box
               flex: 0.6,
               paddingHorizontal: 12,
               paddingVertical: 8,
@@ -572,7 +566,7 @@ const ChatRoom = ({route, navigation}) => {
             </TouchableOpacity>
           </View>
 
-          <Modal
+          <Modal // 모달들 맨 밑으로, 컴포넌트처리
             isVisible={chatOutModalVisible}
             animationIn={'bounceIn'}
             animationOut={'bounceOut'}
