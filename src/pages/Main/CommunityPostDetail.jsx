@@ -33,6 +33,7 @@ const CommunityPostDetail = ({route}) => {
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [commentCount, setCommentCount] = useState(0);
+  const [isLikeProcessing, setIsLikeProcessing] = useState(false);
 
   const maxCommentContentLength = 200;
 
@@ -148,46 +149,53 @@ const CommunityPostDetail = ({route}) => {
   };
 
   const handleLikePress = async () => {
-    if (currentUser) {
-      if (isLiked) {
-        await firestore()
-          .collection('likes')
-          .where('postId', '==', postId)
-          .where('userId', '==', currentUser.uid)
-          .get()
-          .then(querySnapshot => {
-            querySnapshot.forEach(doc => {
-              doc.ref.delete();
+    if (currentUser && !isLikeProcessing) {
+      setIsLikeProcessing(true);
+
+      try {
+        if (isLiked) {
+          await firestore()
+            .collection('likes')
+            .where('postId', '==', postId)
+            .where('userId', '==', currentUser.uid)
+            .get()
+            .then(querySnapshot => {
+              querySnapshot.forEach(doc => {
+                doc.ref.delete();
+              });
             });
+
+          setIsLiked(false);
+          setLikeCount(prevCount => prevCount - 1);
+
+          await firestore()
+            .collection('posts')
+            .doc(postId)
+            .update({
+              likeCount: firestore.FieldValue.increment(-1),
+            });
+        } else {
+          await firestore().collection('likes').add({
+            postId: postId,
+            userId: currentUser.uid,
+            createdAt: firestore.FieldValue.serverTimestamp(),
           });
 
-        setIsLiked(false);
-        setLikeCount(prevCount => prevCount - 1);
-        await firestore()
-          .collection('posts')
-          .doc(postId)
-          .update({
-            likeCount: firestore.FieldValue.increment(-1),
-          });
-        setLikeCount(prevCount => prevCount - 1);
-      } else {
-        await firestore().collection('likes').add({
-          postId,
-          userId: currentUser.uid,
-          createdAt: firestore.FieldValue.serverTimestamp(),
-        });
+          setIsLiked(true);
+          setLikeCount(prevCount => prevCount + 1);
 
-        setIsLiked(true);
-        setLikeCount(prevCount => prevCount + 1);
-
-        await firestore()
-          .collection('posts')
-          .doc(postId)
-          .update({
-            likeCount: firestore.FieldValue.increment(1),
-          });
-        setLikeCount(prevCount => prevCount + 1);
+          await firestore()
+            .collection('posts')
+            .doc(postId)
+            .update({
+              likeCount: firestore.FieldValue.increment(1),
+            });
+        }
+      } catch (error) {
+        console.log('좋아요 처리 중 오류 발생:', error);
       }
+
+      setIsLikeProcessing(false);
     }
   };
 
@@ -381,7 +389,7 @@ const CommunityPostDetail = ({route}) => {
                 <TouchableOpacity
                   style={styles.modalButton}
                   onPress={() => {
-                    onEdit(item.id); // 게시글 수정 기능 호출
+                    onEdit(postId); // 게시글 수정 기능 호출
                     toggleModal();
                   }}>
                   <Image source={pencilIcon} style={{width: 24, height: 24}} />
@@ -390,7 +398,7 @@ const CommunityPostDetail = ({route}) => {
                 <TouchableOpacity
                   style={styles.modalButton}
                   onPress={() => {
-                    onDelete(item.id); // 게시글 삭제 기능 호출
+                    onDelete(postId); // 게시글 삭제 기능 호출
                     toggleModal();
                   }}>
                   <Image source={deleteIcon} style={{width: 24, height: 24}} />

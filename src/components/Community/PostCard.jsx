@@ -23,6 +23,7 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
   const [likeCount, setLikeCount] = useState(item.likeCount || 0);
   const likeIcon = isLiked ? heartLineIcon : heartRedIcon;
   const [commentCount, setCommentCount] = useState(0);
+  const [isLikeProcessing, setIsLikeProcessing] = useState(false);
 
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged(user => {
@@ -54,7 +55,7 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
             .where('postId', '==', item.id)
             .where('userId', '==', currentUser.uid)
             .get();
-  
+
           if (!likeDoc.empty) {
             setIsLiked(true);
           } else {
@@ -62,21 +63,23 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
           }
         }
       };
-  
+
       // 좋아요 카운팅 업데이트
       const updateLikeCount = async () => {
-        const postDoc = await firestore().collection('posts').doc(item.id).get();
+        const postDoc = await firestore()
+          .collection('posts')
+          .doc(item.id)
+          .get();
         if (postDoc.exists) {
           const postData = postDoc.data();
           setLikeCount(postData.likeCount || 0);
         }
       };
-  
+
       checkLikeStatus();
       updateLikeCount();
     }, [currentUser, item.id]),
   );
-  
 
   // 좋아요 개수 가져오기
   const getLikeCount = () => {
@@ -124,49 +127,55 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
   };
 
   const handleLikePress = async () => {
-    if (currentUser) {
-      if (isLiked) {
-        // 좋아요 취소
-        await firestore()
-          .collection('likes')
-          .where('postId', '==', item.id)
-          .where('userId', '==', currentUser.uid)
-          .get()
-          .then(querySnapshot => {
-            querySnapshot.forEach(doc => {
-              doc.ref.delete();
+    if (currentUser && !isLikeProcessing) {
+      setIsLikeProcessing(true);
+
+      try {
+        if (isLiked) {
+          // 좋아요 취소 처리
+          await firestore()
+            .collection('likes')
+            .where('postId', '==', item.id)
+            .where('userId', '==', currentUser.uid)
+            .get()
+            .then(querySnapshot => {
+              querySnapshot.forEach(doc => {
+                doc.ref.delete();
+              });
             });
+
+          setIsLiked(false);
+          setLikeCount(prevCount => prevCount - 1);
+
+          await firestore()
+            .collection('posts')
+            .doc(item.id)
+            .update({
+              likeCount: firestore.FieldValue.increment(-1),
+            });
+        } else {
+          // 좋아요 추가 처리
+          await firestore().collection('likes').add({
+            postId: item.id,
+            userId: currentUser.uid,
+            createdAt: firestore.FieldValue.serverTimestamp(),
           });
 
-        setIsLiked(false);
-        setLikeCount(prevCount => prevCount - 1);
+          setIsLiked(true);
+          setLikeCount(prevCount => prevCount + 1);
 
-        // 파베 내 게시글 doc의 likeCount 감소
-        await firestore()
-          .collection('posts')
-          .doc(item.id)
-          .update({
-            likeCount: firestore.FieldValue.increment(-1),
-          });
-      } else {
-        // 좋아요 추가
-        await firestore().collection('likes').add({
-          postId: item.id,
-          userId: currentUser.uid,
-          createdAt: firestore.FieldValue.serverTimestamp(),
-        });
-
-        setIsLiked(true);
-        setLikeCount(prevCount => prevCount + 1);
-
-        // 파베 내 게시글 doc의 likeCount 늘리기
-        await firestore()
-          .collection('posts')
-          .doc(item.id)
-          .update({
-            likeCount: firestore.FieldValue.increment(1),
-          });
+          await firestore()
+            .collection('posts')
+            .doc(item.id)
+            .update({
+              likeCount: firestore.FieldValue.increment(1),
+            });
+        }
+      } catch (error) {
+        console.log('좋아요 처리 중 오류 발생:', error);
       }
+
+      setIsLikeProcessing(false);
     }
   };
 
