@@ -78,7 +78,6 @@ const ChatRoom = ({route, navigation}) => {
       }
 
       const newMessage = {
-        text: inputMessage,
         sender: currentUserNickname,
         senderId: currentUser.uid,
         timestamp: firestore.FieldValue.serverTimestamp(),
@@ -130,7 +129,6 @@ const ChatRoom = ({route, navigation}) => {
           setMessages(newMessages);
         }
       });
-
     return () => messageListener();
   }, [chatRoomId]);
 
@@ -166,7 +164,7 @@ const ChatRoom = ({route, navigation}) => {
 
   const sendMessage = async () => {
     try {
-      if (!inputMessage.trim() && !pickImage) {
+      if (!inputMessage.trim()) {
         return;
       }
 
@@ -190,7 +188,6 @@ const ChatRoom = ({route, navigation}) => {
         senderId: currentUser.uid,
         timestamp: firestore.FieldValue.serverTimestamp(),
         senderProfileImg: senderProfileImg,
-        image: pickImage,
       };
 
       await firestore()
