@@ -22,7 +22,6 @@ const LoginTab = () => {
       screenOptions={{
         headerShown: false,
       }}>
-      
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="SignUp" component={SignUp} />
       <Stack.Screen name="SignUpAgree" component={SignUpAgree} />

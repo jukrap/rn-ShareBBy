@@ -7,8 +7,7 @@ import Main from '../pages/Main/Main';
 import Recruit from '../pages/Main/Recruit';
 import Join from '../pages/Main/Join';
 import Detail from '../pages/Main/Detail';
-import Show from '../pages/Main/Show';
-import Chat from '../pages/Main/Chat';
+import Chat from '../pages/Main/Chat'; 
 import ChatRoom from '../pages/Main/ChatRoom';
 import CommunityBoard from '../pages/Main/CommunityBoard';
 import CommunityAddPost from '../pages/Main/CommunityAddPost';
@@ -25,7 +24,7 @@ const AboutMap = ({params}) => {
       <Stack.Screen name="Recruit" component={Recruit} initialParams={params} />
       <Stack.Screen name="Join" component={Join} initialParams={params} />
       <Stack.Screen name="Detail" component={Detail} initialParams={params} />
-      <Stack.Screen name="Show" component={Show} initialParams={params} />
+      {/* <Stack.Screen name="Show" component={Show} initialParams={params} /> */}
     </Stack.Navigator>
   );
 };
