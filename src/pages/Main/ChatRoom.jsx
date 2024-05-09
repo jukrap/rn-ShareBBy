@@ -27,6 +27,7 @@ import ChatMemberList from '../../components/Chat/ChatMemberList';
 
 const ChatRoom = ({route, navigation}) => {
   const {chatRoomId, chatRoomName} = route.params;
+
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isHamburgerModalVisible, setIsHamburgerModalVisible] = useState(false);
@@ -38,6 +39,7 @@ const ChatRoom = ({route, navigation}) => {
   const [isVisible, setIsVisible] = useState(false);
   const [imageUri, setImageUri] = useState('');
 
+  //이미지 업로드
   const uploadImage = async (localImagePath, chatRoomId) => {
     try {
       const fileName = localImagePath.substring(
