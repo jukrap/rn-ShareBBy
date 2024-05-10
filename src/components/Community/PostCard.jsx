@@ -29,6 +29,7 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
   const likeIcon = isLiked ? heartLineIcon : heartRedIcon;
   const [commentCount, setCommentCount] = useState(item.commentCount || 0);
   const [isLikeProcessing, setIsLikeProcessing] = useState(false);
+  const [isMoreContent, setIsMoreContent] = useState(false);
   const colors = ['tomato', 'thistle', 'skyblue', 'teal'];
 
   useEffect(() => {
@@ -198,19 +199,18 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
       <TouchableOpacity onPress={onDetail}>
         <Text
           style={styles.postContentText}
+          numberOfLines={2}
           ellipsizeMode="tail"
-          numberOfLines={2}>
-          {
-            item.post_content
-              ? item.post_content.slice(0, 300)
-              : '' /*300자 많음, 줄 단위로 개선*/
-          }
-          {item.post_content && item.post_content.length > 300 && (
-            <>
-              ... <Text style={styles.readMoreText}>더보기</Text>
-            </>
-          )}
+          onTextLayout={({nativeEvent: {lines}}) => {
+            if (lines.length > 2) {
+              setIsMoreContent(true);
+            } else {
+              setIsMoreContent(false);
+            }
+          }}>
+          {item.post_content}
         </Text>
+        {isMoreContent && <Text style={styles.readMoreText}>...더보기</Text>}
       </TouchableOpacity>
       {item?.post_files?.length > 0 ? (
         //테두리 둥굴게, 이미지 전환을 보다 더 정확하게 하려고 했으나 안 됨
@@ -441,9 +441,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
     fontFamily: 'Pretendard',
-    color: '#898989',
-    textDecorationLine: 'underline',
-    paddingLeft: 20,
+    color: '#A7A7A7',
+    alignSelf: 'flex-start',
+    marginBottom: 8,
   },
   modalContainer: {
     justifyContent: 'flex-end',
