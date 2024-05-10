@@ -376,25 +376,8 @@ const CommunityPostDetail = ({route}) => {
         currentUser &&
         currentUser.uid === selectedComment.userId
       ) {
-        Alert.alert(
-          '댓글 수정',
-          '해당 댓글을 수정하겠습니까?',
-          [
-            {
-              text: '아니오',
-              onPress: () => console.log('아니오를 클릭'),
-              style: 'cancel',
-            },
-            {
-              text: '네',
-              onPress: () => {
-                setEditingCommentId(commentId);
-                setCommentContent(selectedComment.comment_content);
-              },
-            },
-          ],
-          {cancelable: false},
-        );
+        setEditingCommentId(commentId);
+        setCommentContent(selectedComment.comment_content);
       } else {
         Alert.alert('권한 없음', '댓글 작성자만 수정할 수 있습니다.');
       }
