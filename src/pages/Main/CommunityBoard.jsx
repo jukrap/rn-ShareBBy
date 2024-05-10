@@ -27,7 +27,7 @@ const {width, height} = Dimensions.get('window');
 
 
 const CommunityBoard = ({navigation}) => {
-  const [post, setPost] = useState(null);
+  const [post, setPost] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deleted, setDeleted] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
@@ -329,6 +329,7 @@ const styles = StyleSheet.create({
   realtimeText: {
     color: '#07AC7D',
     fontSize: 24,
+    fontFamily: 'Pretendard',
     letterSpacing: 0,
     fontWeight: '600',
   },

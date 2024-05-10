@@ -794,6 +794,7 @@ const styles = StyleSheet.create({
   modalButtonText: {
     marginLeft: 8,
     fontSize: 16,
+    fontFamily: 'Pretendard',
     color: '#898989',
   },
   modalCloseButton: {
@@ -803,6 +804,7 @@ const styles = StyleSheet.create({
   },
   modalCloseButtonText: {
     fontSize: 16,
+    fontFamily: 'Pretendard',
     color: '#212529',
   },
 });

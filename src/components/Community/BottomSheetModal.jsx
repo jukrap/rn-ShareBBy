@@ -41,6 +41,7 @@ const styles = StyleSheet.create({
   },
   modalCloseButtonText: {
     fontSize: 16,
+    fontFamily: 'Pretendard',
     color: '#212529',
   },
 });

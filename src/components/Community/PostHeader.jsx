@@ -66,6 +66,7 @@ const styles = StyleSheet.create({
   },
   submitButtonText: {
     color: '#07AC7D',
+    fontFamily: 'Pretendard',
     fontSize: 18,
   },
 });

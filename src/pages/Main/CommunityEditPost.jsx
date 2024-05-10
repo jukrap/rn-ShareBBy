@@ -11,13 +11,14 @@ import {
   SafeAreaView,
   Modal,
   Platform,
+  ScrollView,
 } from 'react-native';
 import ImagePicker from 'react-native-image-crop-picker';
 
 import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import PostHeader from '../../components/Community/PostHeader';
 
 const CommunityEditPost = ({route}) => {
@@ -166,6 +167,13 @@ const CommunityEditPost = ({route}) => {
 
   // 카메라로 사진 촬영
   const takePhotoFromCamera = () => {
+    if (selectedImages.length >= 7) {
+      Alert.alert(
+        '이미지 업로드 제한',
+        '최대 7장까지 이미지를 업로드할 수 있습니다.',
+      );
+      return;
+    }
     ImagePicker.openCamera({
       width: 1200,
       height: 780,
@@ -187,6 +195,13 @@ const CommunityEditPost = ({route}) => {
 
   // 갤러리에서 사진 선택
   const choosePhotoFromLibrary = () => {
+    if (selectedImages.length >= 7) {
+      Alert.alert(
+        '이미지 업로드 제한',
+        '최대 7장까지 이미지를 업로드할 수 있습니다.',
+      );
+      return;
+    }
     ImagePicker.openPicker({
       width: 900,
       height: 900,
@@ -207,89 +222,115 @@ const CommunityEditPost = ({route}) => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-    <View style={styles.container}>
-      <PostHeader onSubmit={handlePostUpdate} />
-      <View style={styles.contentWrapper}>
-        <View style={styles.postInputContainer}>
-          <Text style={styles.postInputLabel}>내용</Text>
-          <TextInput
-            placeholder="여기에 작성"
-            multiline
-            numberOfLines={4}
-            value={postContent}
-            onChangeText={handlePostContentChange}
-            maxLength={maxPostContentLength}
-            autoCorrect={false}
-            style={styles.postInputField}
-          />
-          {isUploading ? (
-            <View style={styles.uploadStatusWrapper}>
-              <Text>{uploadProgress} % 업로드 진행</Text>
-              <ActivityIndicator size="large" color="#0000ff" />
-            </View>
-          ) : (
-            <View />
-          )}
-        </View>
-        <Text style={styles.postLengthText}>
-          {postContentLength}/{maxPostContentLength}
-        </Text>
-        <View style={styles.imageUploadContainer}>
-          <TouchableOpacity
-            style={styles.imageUploadButton}
-            onPress={openImagePicker}>
-            <Image source={cameraIcon} style={{width: 24, height: 24}} />
-            <Text style={styles.imageUploadButtonText}>
-              {selectedImages.existingImages.length +
-                selectedImages.newImages.length}
-            </Text>
-          </TouchableOpacity>
-          {[...selectedImages.existingImages, ...selectedImages.newImages].map(
-            (image, index) => (
-              <View key={index} style={styles.imageThumbnailContainer}>
-                <Image source={{uri: image}} style={styles.imageThumbnail} />
-                <TouchableOpacity
-                  style={styles.removeImageButton}
-                  onPress={() => removeImage(image)}>
-                  <Text style={styles.removeImageButtonText}>X</Text>
-                </TouchableOpacity>
+    <SafeAreaView style={{flex: 1}}>
+      <View style={styles.container}>
+        <PostHeader onSubmit={handlePostUpdate} />
+        <View style={styles.contentWrapper}>
+          <View style={styles.postInputContainer}>
+            <Text style={styles.postInputLabel}>내용</Text>
+            <TextInput
+              placeholder="여기에 작성"
+              multiline
+              numberOfLines={4}
+              value={postContent}
+              onChangeText={handlePostContentChange}
+              maxLength={maxPostContentLength}
+              autoCorrect={false}
+              style={styles.postInputField}
+            />
+            {isUploading ? (
+              <View style={styles.uploadStatusWrapper}>
+                <Text>{uploadProgress} % 업로드 진행</Text>
+                <ActivityIndicator size="large" color="#0000ff" />
               </View>
-            ),
-          )}
+            ) : (
+              <View />
+            )}
+          </View>
+          <Text style={styles.postLengthText}>
+            {postContentLength}/{maxPostContentLength}
+          </Text>
+          <View style={styles.imageUploadContainer}>
+            <View style={styles.imageUploadButtonRow}>
+              <TouchableOpacity
+                style={styles.imageUploadButton}
+                onPress={openImagePicker}>
+                <Image source={cameraIcon} style={{width: 24, height: 24}} />
+                <Text style={styles.imageUploadButtonText}>
+                  {selectedImages.existingImages.length +
+                    selectedImages.newImages.length}
+                </Text>
+              </TouchableOpacity>
+              <ScrollView horizontal>
+                {[...selectedImages.existingImages, ...selectedImages.newImages]
+                  .slice(0, 3)
+                  .map((image, index) => (
+                    <View key={index} style={styles.imageThumbnailContainer}>
+                      <Image
+                        source={{uri: image}}
+                        style={styles.imageThumbnail}
+                      />
+                      <TouchableOpacity
+                        style={styles.removeImageButton}
+                        onPress={() => removeImage(image)}>
+                        <Text style={styles.removeImageButtonText}>X</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ))}
+              </ScrollView>
+            </View>
+            <ScrollView>
+              <View style={styles.imageGrid}>
+                {[...selectedImages.existingImages, ...selectedImages.newImages]
+                  .slice(3)
+                  .map((image, index) => (
+                    <View key={index} style={styles.imageThumbnailContainer}>
+                      <Image
+                        source={{uri: image}}
+                        style={styles.imageThumbnail}
+                      />
+                      <TouchableOpacity
+                        style={styles.removeImageButton}
+                        onPress={() => removeImage(image)}>
+                        <Text style={styles.removeImageButtonText}>X</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ))}
+              </View>
+            </ScrollView>
+          </View>
         </View>
-      </View>
-      <Modal
-        visible={isImagePickerModalVisible}
-        animationType="slide"
-        transparent={true}>
-        <View style={styles.imagePickerModalContainer}>
-          <View style={styles.imagePickerModalContent}>
+        <Modal
+          visible={isImagePickerModalVisible}
+          animationType="slide"
+          transparent={true}>
+          <View style={styles.imagePickerModalContainer}>
+            <View style={styles.imagePickerModalContent}>
+              <TouchableOpacity
+                style={styles.imagePickerModalButton}
+                onPress={takePhotoFromCamera}>
+                <Image source={cameraIcon} style={{width: 24, height: 24}} />
+                <Text style={styles.imagePickerModalButtonText}>
+                  카메라로 촬영
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.imagePickerModalButton}
+                onPress={choosePhotoFromLibrary}>
+                <Image source={pictureIcon} style={{width: 24, height: 24}} />
+                <Text style={styles.imagePickerModalButtonText}>
+                  갤러리에서 선택
+                </Text>
+              </TouchableOpacity>
+            </View>
             <TouchableOpacity
-              style={styles.imagePickerModalButton}
-              onPress={takePhotoFromCamera}>
-              <Image source={cameraIcon} style={{width: 24, height: 24}} />
-              <Text style={styles.imagePickerModalButtonText}>
-                카메라로 촬영
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.imagePickerModalButton}
-              onPress={choosePhotoFromLibrary}>
-              <Image source={pictureIcon} style={{width: 24, height: 24}} />
-              <Text style={styles.imagePickerModalButtonText}>
-                갤러리에서 선택
-              </Text>
+              style={styles.imagePickerModalCloseButton}
+              onPress={() => setIsImagePickerModalVisible(false)}>
+              <Text style={styles.imagePickerModalCloseButtonText}>닫기</Text>
             </TouchableOpacity>
           </View>
-          <TouchableOpacity
-            style={styles.imagePickerModalCloseButton}
-            onPress={() => setIsImagePickerModalVisible(false)}>
-            <Text style={styles.imagePickerModalCloseButtonText}>닫기</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
-    </View>
+        </Modal>
+      </View>
     </SafeAreaView>
   );
 };
@@ -311,6 +352,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
+    marginTop: 48,
   },
   postInputContainer: {
     position: 'relative',
@@ -331,11 +373,13 @@ const styles = StyleSheet.create({
     fontFamily: 'Pretendard',
     paddingHorizontal: 8,
     fontSize: 14,
+    fontFamily: 'Pretendard',
     fontWeight: 'bold',
     color: '#07ac7d',
   },
   postInputField: {
     fontSize: 16,
+    fontFamily: 'Pretendard',
     textAlignVertical: 'top',
     width: '100%',
     height: 250,
@@ -344,12 +388,21 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
     marginRight: 20,
     fontSize: 14,
+    fontFamily: 'Pretendard',
     color: '#898989',
   },
   imageUploadContainer: {
+    flex: 1,
+    marginTop: 24,
+  },
+  imageUploadButtonRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 16,
+  },
+  imageGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-start',
   },
   imageUploadButton: {
     width: 80,
@@ -360,16 +413,17 @@ const styles = StyleSheet.create({
     borderStyle: 'dashed',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 16,
+    margin: 6,
   },
   imageUploadButtonText: {
     marginTop: 8,
     fontSize: 14,
+    fontFamily: 'Pretendard',
     color: '#07ac7d',
   },
   imageThumbnailContainer: {
     position: 'relative',
-    marginRight: 8,
+    margin: 6,
   },
   imageThumbnail: {
     width: 80,
@@ -413,6 +467,7 @@ const styles = StyleSheet.create({
   imagePickerModalButtonText: {
     marginLeft: 8,
     fontSize: 16,
+    fontFamily: 'Pretendard',
     color: '#898989',
   },
   imagePickerModalCloseButton: {
@@ -422,6 +477,7 @@ const styles = StyleSheet.create({
   },
   imagePickerModalCloseButtonText: {
     fontSize: 16,
+    fontFamily: 'Pretendard',
     color: '#212529',
   },
   uploadStatusWrapper: {
