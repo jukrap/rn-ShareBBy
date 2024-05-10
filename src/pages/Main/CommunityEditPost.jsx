@@ -20,6 +20,7 @@ import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import {useNavigation} from '@react-navigation/native';
 import PostHeader from '../../components/Community/PostHeader';
+import BottomSheetModal from '../../components/Community/BottomSheetModal';
 
 const CommunityEditPost = ({route}) => {
   const navigation = useNavigation();
@@ -300,36 +301,24 @@ const CommunityEditPost = ({route}) => {
             </ScrollView>
           </View>
         </View>
-        <Modal
-          visible={isImagePickerModalVisible}
-          animationType="slide"
-          transparent={true}>
-          <View style={styles.imagePickerModalContainer}>
-            <View style={styles.imagePickerModalContent}>
-              <TouchableOpacity
-                style={styles.imagePickerModalButton}
-                onPress={takePhotoFromCamera}>
-                <Image source={cameraIcon} style={{width: 24, height: 24}} />
-                <Text style={styles.imagePickerModalButtonText}>
-                  카메라로 촬영
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.imagePickerModalButton}
-                onPress={choosePhotoFromLibrary}>
-                <Image source={pictureIcon} style={{width: 24, height: 24}} />
-                <Text style={styles.imagePickerModalButtonText}>
-                  갤러리에서 선택
-                </Text>
-              </TouchableOpacity>
-            </View>
+        <BottomSheetModal
+          isVisible={isImagePickerModalVisible}
+          onClose={() => setIsImagePickerModalVisible(false)}>
+          <View style={styles.modalContent}>
             <TouchableOpacity
-              style={styles.imagePickerModalCloseButton}
-              onPress={() => setIsImagePickerModalVisible(false)}>
-              <Text style={styles.imagePickerModalCloseButtonText}>닫기</Text>
+              style={styles.modalButton}
+              onPress={takePhotoFromCamera}>
+              <Image source={cameraIcon} style={{width: 24, height: 24}} />
+              <Text style={styles.modalButtonText}>카메라로 촬영</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={choosePhotoFromLibrary}>
+              <Image source={pictureIcon} style={{width: 24, height: 24}} />
+              <Text style={styles.modalButtonText}>갤러리에서 선택</Text>
             </TouchableOpacity>
           </View>
-        </Modal>
+        </BottomSheetModal>
       </View>
     </SafeAreaView>
   );
@@ -483,5 +472,30 @@ const styles = StyleSheet.create({
   uploadStatusWrapper: {
     alignItems: 'center',
     marginTop: 16,
+  },  modalContent: {
+    padding: 16,
+  },
+  modalButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#FEFFFE',
+  },
+  modalButtonText: {
+    marginLeft: 8,
+    fontSize: 16,
+    fontFamily: 'Pretendard',
+    color: '#898989',
+  },
+  modalCloseButton: {
+    backgroundColor: '#FEFFFE',
+    padding: 16,
+    alignItems: 'center',
+  },
+  modalCloseButtonText: {
+    fontSize: 16,
+    fontFamily: 'Pretendard',
+    color: '#212529',
   },
 });

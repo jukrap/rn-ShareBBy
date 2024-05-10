@@ -273,7 +273,6 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
           </TouchableOpacity>
         </View>
       </View>
-      {/*모달 빼내기*/}
       <BottomSheetModal isVisible={isModalVisible} onClose={toggleModal}>
         <View style={styles.modalContent}>
           <TouchableOpacity
