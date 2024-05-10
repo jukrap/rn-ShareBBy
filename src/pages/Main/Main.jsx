@@ -14,6 +14,8 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import useStore from '../../lib/useStore';
 
+import { getHobbiesDetail } from '../../lib/hobby';
+
 const {width, height} = Dimensions.get('window');
 
 const Main = ({navigation, route}) => {
@@ -25,7 +27,13 @@ const Main = ({navigation, route}) => {
   const userToken = useStore(state => state.userToken); // 상태 가져오기
 
   useEffect(() => {
-    console.log('User token:', userToken); // 콘솔에 토큰 출력
+    // console.log('User token:', userToken); // 콘솔에 토큰 출력
+    async function fetchAndProcessHobbies() {
+      const hobbydataList = await getHobbiesDetail();
+      const processedData = hobbydataList.map(item => item.data);
+      console.log(processedData);
+  }
+    fetchAndProcessHobbies();
   }, [userToken]);
 
   useEffect(() => {
