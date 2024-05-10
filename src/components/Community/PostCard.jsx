@@ -27,7 +27,7 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(item.likeCount || 0);
   const likeIcon = isLiked ? heartLineIcon : heartRedIcon;
-  const [commentCount, setCommentCount] = useState(0);
+  const [commentCount, setCommentCount] = useState(item.commentCount || 0);
   const [isLikeProcessing, setIsLikeProcessing] = useState(false);
   const colors = ['tomato', 'thistle', 'skyblue', 'teal'];
 
@@ -37,7 +37,6 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
     });
 
     fetchPostUserData();
-    fetchCommentCount();
     return () => unsubscribe();
   }, []);
 
@@ -58,26 +57,36 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
 
           if (!likeDoc.empty) {
             setIsLiked(true);
+          } else {
+            setIsLiked(false);
           }
         }
       };
-
-      // 좋아요 카운팅 업데이트
-      const updateLikeCount = async () => {
-        const postDoc = await firestore()
-          .collection('posts')
-          .doc(item.id)
-          .get();
-        if (postDoc.exists) {
-          const postData = postDoc.data();
-          setLikeCount(postData.likeCount || 0);
-        }
-      };
-
       checkLikeStatus();
       updateLikeCount();
+      updateCommentCount();
     }, [currentUser, item.id]),
   );
+  // 좋아요 카운팅 업데이트
+  const updateLikeCount = async () => {
+    const postDoc = await firestore().collection('posts').doc(item.id).get();
+    if (postDoc.exists) {
+      const postData = postDoc.data();
+      setLikeCount(postData.likeCount || 0);
+    }
+  };
+
+  const updateCommentCount = async () => {
+    try {
+      const postDoc = await firestore().collection('posts').doc(item.id).get();
+      if (postDoc.exists) {
+        const postData = postDoc.data();
+        setCommentCount(postData.commentCount || 0);
+      }
+    } catch (error) {
+      console.log('댓글 개수를 가져오는 중에 오류가 발생했습니다:', error);
+    }
+  };
 
   // 게시글 작성자 정보 가져오기
   const fetchPostUserData = async () => {
@@ -95,23 +104,6 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
       }
     } catch (error) {
       console.log('사용자 데이터를 가져오는 중에 오류가 발생했습니다:', error);
-    }
-  };
-
-  const fetchCommentCount = async () => {
-    try {
-      //개수 새로이 로딩하는 거 개선 필요
-      //그냥 개수 카운팅 별도로 하는 게 나을지도
-      const querySnapshot = await firestore()
-        .collection('comments')
-        .where('postId', '==', item.id)
-        .get();
-
-      const count = querySnapshot.size;
-      setCommentCount(count);
-    } catch (error) {
-      //나중에 경고문으로 우회적 표현하는 게 좋음
-      console.log('댓글 수를 가져오는 중에 오류가 발생했습니다:', error);
     }
   };
 
@@ -236,14 +228,12 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
             data={item.post_files}
             style={styles.postSwiperFlatList}
             renderItem={({item}) => (
-              (
-                <Image
-                  style={styles.postImage}
-                  source={{uri: item}}
-                  resizeMode="cover"
-                  defaultSource={defaultPostImg}
-                />
-              )
+              <Image
+                style={styles.postImage}
+                source={{uri: item}}
+                resizeMode="cover"
+                defaultSource={defaultPostImg}
+              />
             )}
           />
         </View>
@@ -285,27 +275,27 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
       </View>
       {/*모달 빼내기*/}
       <BottomSheetModal isVisible={isModalVisible} onClose={toggleModal}>
-  <View style={styles.modalContent}>
-    <TouchableOpacity
-      style={styles.modalButton}
-      onPress={() => {
-        onEdit(item.id);
-        toggleModal();
-      }}>
-      <Image source={pencilIcon} style={{width: 24, height: 24}} />
-      <Text style={styles.modalButtonText}>게시글 수정</Text>
-    </TouchableOpacity>
-    <TouchableOpacity
-      style={styles.modalButton}
-      onPress={() => {
-        onDelete(item.id);
-        toggleModal();
-      }}>
-      <Image source={deleteIcon} style={{width: 24, height: 24}} />
-      <Text style={styles.modalButtonText}>게시글 삭제</Text>
-    </TouchableOpacity>
-  </View>
-</BottomSheetModal>
+        <View style={styles.modalContent}>
+          <TouchableOpacity
+            style={styles.modalButton}
+            onPress={() => {
+              onEdit(item.id);
+              toggleModal();
+            }}>
+            <Image source={pencilIcon} style={{width: 24, height: 24}} />
+            <Text style={styles.modalButtonText}>게시글 수정</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.modalButton}
+            onPress={() => {
+              onDelete(item.id);
+              toggleModal();
+            }}>
+            <Image source={deleteIcon} style={{width: 24, height: 24}} />
+            <Text style={styles.modalButtonText}>게시글 삭제</Text>
+          </TouchableOpacity>
+        </View>
+      </BottomSheetModal>
     </View>
   );
 };

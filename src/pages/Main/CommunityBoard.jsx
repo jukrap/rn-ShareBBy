@@ -58,6 +58,7 @@ const CommunityBoard = ({navigation}) => {
           post_created,
           post_actflag,
           likeCount,
+          commentCount,
         } = doc.data();
         list.push({
           id: doc.id,
@@ -67,6 +68,7 @@ const CommunityBoard = ({navigation}) => {
           post_created,
           post_actflag,
           likeCount,
+          commentCount,
         });
       });
 
@@ -87,6 +89,7 @@ const CommunityBoard = ({navigation}) => {
 
   useFocusEffect(
     React.useCallback(() => {
+      setPost(prevPosts => [...prevPosts]);
       fetchPost();
     }, []),
   );
