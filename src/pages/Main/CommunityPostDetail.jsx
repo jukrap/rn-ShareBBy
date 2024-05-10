@@ -21,7 +21,7 @@ import CommentCard from '../../components/Community/CommentCard';
 import {formatDistanceToNow} from 'date-fns';
 import {ko} from 'date-fns/locale';
 import Modal from 'react-native-modal';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import {SwiperFlatList} from 'react-native-swiper-flatlist';
 import BottomSheetModal from '../../components/Community/BottomSheetModal';
 
@@ -41,6 +41,7 @@ const CommunityPostDetail = ({route}) => {
   const [likeCount, setLikeCount] = useState(0);
   const [commentCount, setCommentCount] = useState(0);
   const [isLikeProcessing, setIsLikeProcessing] = useState(false);
+  const [editingCommentId, setEditingCommentId] = useState(null);
 
   const maxCommentContentLength = 200;
 
@@ -207,12 +208,16 @@ const CommunityPostDetail = ({route}) => {
   };
 
   const handleCommentSubmit = useCallback(() => {
-    if (commentContent && commentContent.trim() !== '') {
-      submitComment();
+    if (editingCommentId) {
+      updateComment();
     } else {
-      Alert.alert('댓글 내용을 입력해주세요.');
+      if (commentContent && commentContent.trim() !== '') {
+        submitComment();
+      } else {
+        Alert.alert('댓글 내용을 입력해주세요.');
+      }
     }
-  }, [commentContent, submitComment]);
+  }, [commentContent, editingCommentId, submitComment, updateComment]);
 
   const handleCommentContentChange = text => {
     if (text.length <= maxCommentContentLength) {
@@ -396,7 +401,10 @@ const CommunityPostDetail = ({route}) => {
             },
             {
               text: '네',
-              onPress: () => editComment(commentId),
+              onPress: () => {
+                setEditingCommentId(commentId);
+                setCommentContent(selectedComment.comment_content);
+              },
             },
           ],
           {cancelable: false},
@@ -404,6 +412,27 @@ const CommunityPostDetail = ({route}) => {
       } else {
         Alert.alert('권한 없음', '댓글 작성자만 수정할 수 있습니다.');
       }
+    }
+  };
+
+  const updateComment = async () => {
+    if (!commentContent || commentContent.trim() === '') {
+      Alert.alert('댓글 내용을 입력해주세요.');
+      return;
+    }
+
+    try {
+      await firestore().collection('comments').doc(editingCommentId).update({
+        comment_content: commentContent,
+      });
+
+      console.log('댓글 수정 완료!');
+      Alert.alert('댓글 수정!', '성공적으로 댓글이 수정되었습니다!');
+      setCommentContent('');
+      setEditingCommentId(null);
+      fetchComments();
+    } catch (error) {
+      console.log('댓글을 수정하는 중에 오류가 발생했습니다.', error);
     }
   };
 
@@ -546,7 +575,7 @@ const CommunityPostDetail = ({route}) => {
         <View style={styles.commentInputContainer}>
           <TextInput
             style={styles.commentInput}
-            placeholder="댓글 입력"
+            placeholder={editingCommentId ? '댓글 수정' : '댓글 입력'}
             multiline={true}
             value={commentContent}
             onChangeText={handleCommentContentChange}
@@ -557,10 +586,9 @@ const CommunityPostDetail = ({route}) => {
             <Image
               style={[styles.commentSubmitIcon, styles.frameItemLayout]}
               resizeMode="cover"
-              source={require('../../assets/icons/planeMessageIcon.png')} //밑에 분리하기
+              source={require('../../assets/icons/planeMessageIcon.png')}
             />
           </TouchableOpacity>
-
           <BottomSheetModal isVisible={isModalVisible} onClose={toggleModal}>
             <View style={styles.modalContent}>
               <TouchableOpacity
