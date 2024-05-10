@@ -217,7 +217,6 @@ const styles = StyleSheet.create({
     borderColor: '#07AC7D',
     marginHorizontal: 16,
     paddingBottom: 8,
-    marginBottom: 290,
     fontSize: 16,
     fontWeight: 'bold',
   },

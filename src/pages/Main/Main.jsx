@@ -13,6 +13,7 @@ import {
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import useStore from '../../lib/useStore';
+import storage from '@react-native-firebase/storage';
 
 import { getHobbiesDetail } from '../../lib/hobby';
 
@@ -21,52 +22,88 @@ const {width, height} = Dimensions.get('window');
 const Main = ({navigation, route}) => {
   const [optionClick, setOptionClick] = useState(null);
   const [currUserData, setCurrUserData] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(0); // 현재 배너 인덱스 상태 추가
-  const bannerRef = useRef(null); // 배너 FlatList에 대한 ref
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [imageUrl, setImageUrl] = useState('');
+  const [eventBanner, setEventBanner] = useState([]);
 
-  const userToken = useStore(state => state.userToken); // 상태 가져오기
+  const bannerRef = useRef(null);
+
+  const userToken = useStore(state => state.userToken);
 
   useEffect(() => {
-    // console.log('User token:', userToken); // 콘솔에 토큰 출력
-    async function fetchAndProcessHobbies() {
-      const hobbydataList = await getHobbiesDetail();
-      const processedData = hobbydataList.map(item => item.data);
-      console.log(processedData);
-  }
-    fetchAndProcessHobbies();
+    console.log('User token:', userToken);
   }, [userToken]);
 
   useEffect(() => {
-    // 배너 자동 스크롤링
-    const scrollInterval = setInterval(() => {
-      if (bannerRef.current) {
-        const nextIndex = (currentIndex + 1) % eventBanner.length;
-        bannerRef.current.scrollToIndex({
-          index: nextIndex,
-          animated: true,
-        });
-        setCurrentIndex(nextIndex); // 다음 인덱스로 업데이트
+    const fetchEventBannerImages = async () => {
+      try {
+        const listRef = storage().ref('로그인');
+        const imageRefs = await listRef.listAll();
+        const updatedEventBanner = await Promise.all(
+          imageRefs.items.map(async itemRef => {
+            const url = await itemRef.getDownloadURL();
+            console.log('이미지 URL:', url);
+            return {bgImg: {uri: url}};
+          }),
+        );
+
+        const beforeSlide = updatedEventBanner[updatedEventBanner.length - 1];
+        const afterSlide = updatedEventBanner[0];
+        setEventBanner([beforeSlide, ...updatedEventBanner, afterSlide]);
+      } catch (error) {
+        console.error('이벤트 배너를 가져오는 중 오류 발생:', error);
       }
-    }, 3000); // 3초마다 스크롤
+    };
 
-    return () => clearInterval(scrollInterval); // 컴포넌트가 언마운트될 때 interval 정리
-  }, [currentIndex]); // 현재 인덱스가 변경될 때마다 useEffect 다시 실행
-
-  useEffect(() => {
-    currUserInfo();
+    fetchEventBannerImages();
   }, []);
 
-  const currUserInfo = async () => {
-    const user = auth().currentUser;
-    if (user) {
-      const userCollection = firestore().collection('users');
-      const currUser = await userCollection.doc(user.uid).get();
-      const currUserData = currUser.data();
-      setCurrUserData(currUserData);
-    } else {
-      console.log('불러오지 못함!');
-    }
-  };
+  useEffect(() => {
+    const scrollInterval = setInterval(() => {
+      if (eventBanner.length > 1 && bannerRef.current) {
+        let nextIndex;
+        if (currentIndex === eventBanner.length - 1) {
+          nextIndex = 1;
+          bannerRef.current.scrollToIndex({
+            index: nextIndex,
+            animated: false,
+          });
+        } else {
+          nextIndex = currentIndex + 1;
+          bannerRef.current.scrollToIndex({
+            index: nextIndex,
+            animated: true,
+          });
+        }
+        setCurrentIndex(nextIndex);
+      }
+    }, 3000);
+
+    return () => {
+      clearInterval(scrollInterval);
+    };
+  }, [currentIndex, eventBanner.length]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const user = auth().currentUser;
+        if (user) {
+          const userCollection = firestore().collection('users');
+          const currUser = await userCollection.doc(user.uid).get();
+          const userData = currUser.data();
+          setCurrUserData(userData);
+          setImageUrl(userData.profileImage);
+        } else {
+          console.log('사용자를 찾을 수 없음');
+        }
+      } catch (error) {
+        console.error('데이터를 가져오는 중 오류 발생:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleOptionClick = id => {
     setOptionClick(id);
@@ -74,22 +111,7 @@ const Main = ({navigation, route}) => {
 
   const renderItem = ({item}) => {
     return (
-      <View>
-        <Image source={item.bgImg} opacity={0.6} style={{width: width}} />
-        <Text
-          style={{
-            width: 260,
-            left: 50,
-            top: 120,
-            position: 'absolute',
-            zIndex: 2,
-            fontSize: 28,
-            fontWeight: 600,
-            color: '#fff',
-          }}>
-          {item.content}
-        </Text>
-      </View>
+      <Image source={item.bgImg} style={{width: width, height: height / 4}} />
     );
   };
 
@@ -115,7 +137,7 @@ const Main = ({navigation, route}) => {
   };
 
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <SafeAreaView style={{flex: 1, backgroundColor: '#fff'}}>
       <View style={styles.topbarView}>
         <Text style={{fontSize: 24, fontWeight: 700, color: '#07AC7D'}}>
           ShareBBy
@@ -139,10 +161,10 @@ const Main = ({navigation, route}) => {
       <ScrollView style={{height: '50%'}}>
         <View>
           <FlatList
-            ref={bannerRef} // 배너 FlatList에 ref 연결
             data={eventBanner}
+            ref={bannerRef}
             renderItem={renderItem}
-            keyExtractor={item => item.id.toString()}
+            keyExtractor={(_, index) => index.toString()}
             horizontal={true}
             showsHorizontalScrollIndicator={false}
             automaticallyAdjustContentInsets={false}
@@ -155,13 +177,27 @@ const Main = ({navigation, route}) => {
         <View style={styles.divisionView} />
         <View style={{marginBottom: 20, paddingHorizontal: 16, gap: 6}}>
           <View style={styles.hobbyNameView}>
-            <Image source={dummyProfileIcon} style={{width: 20, height: 20}} />
-            <Text style={[styles.nomalText, {fontSize: 16, color: '#07AC7D'}]}>
-              {currUserData.nickname}
-              <Text style={[styles.nomalText, {fontWeight: '500'}]}>
-                {' '}
-                님, 취미활동 하러 가보실까요?
+            <TouchableOpacity
+              style={{flexDirection: 'row', alignItems: 'center', gap: 8}}
+              onPress={() => navigation.navigate('Profile')}>
+              <Image
+                source={{uri: imageUrl}}
+                style={{
+                  borderWidth: 1,
+                  borderRadius: 10,
+                  width: 20,
+                  height: 20,
+                  bottom: 1,
+                }}
+              />
+              <Text
+                style={[styles.nomalText, {fontSize: 16, color: '#07AC7D'}]}>
+                {currUserData.nickname}
               </Text>
+            </TouchableOpacity>
+
+            <Text style={[styles.nomalText, {fontWeight: '500'}]}>
+              님, 취미활동 하러 가보실까요?
             </Text>
           </View>
           <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
@@ -187,6 +223,7 @@ const Main = ({navigation, route}) => {
           </View>
         </View>
         <View style={styles.divisionView} />
+
         <View style={styles.joinBox}>
           <Text style={[styles.nomalText, {fontSize: 16, fontWeight: '600'}]}>
             이달의 참여왕은? 🔥
@@ -261,45 +298,16 @@ const Main = ({navigation, route}) => {
             </View>
           </View>
         </View>
-        <View style={styles.divisionView} />
       </ScrollView>
     </SafeAreaView>
   );
 };
 
-const dropDownIcon = require('../../assets/icons/dropDownIcon.png');
 const goJoin = require('../../assets/images/goJoin.png');
 const goRecruit = require('../../assets/images/goRecruit.png');
 const tennisBg = require('../../assets/images/tennisBg.png');
 const dummyProfileIcon = require('../../assets/icons/dummyProfileIcon.png');
 
-const eventBanner = [
-  {
-    id: 0,
-    bgImg: tennisBg,
-    content: '성수동에 테니스 카페 착륙!',
-  },
-  {
-    id: 1,
-    bgImg: tennisBg,
-    content: '성수동에 테니스 카페 착륙!',
-  },
-  {
-    id: 2,
-    bgImg: tennisBg,
-    content: '성수동에 테니스 카페 착륙!',
-  },
-  {
-    id: 3,
-    bgImg: tennisBg,
-    content: '성수동에 테니스 카페 착륙!',
-  },
-  {
-    id: 4,
-    bgImg: tennisBg,
-    content: '성수동에 테니스 카페 착륙!',
-  },
-];
 const topOption = [
   {
     id: 0,
@@ -329,6 +337,7 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     borderBottomWidth: 1,
     borderBottomColor: '#DBDBDB',
+    backgroundColor: '#fff',
   },
   searchView: {
     width: width,
@@ -361,7 +370,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     ustifyContent: 'flex-start',
     paddingVertical: 15,
-    gap: 10,
+    gap: 8,
   },
   hobbyBox: {
     width: 176,
@@ -418,8 +427,8 @@ const styles = StyleSheet.create({
   },
   divisionView: {
     width: width,
-    height: 10,
-    backgroundColor: '#E6E6E6',
+    borderWidth: 1,
+    borderColor: '#DBDBDB',
   },
   pressLocaView: {
     marginHorizontal: 30,

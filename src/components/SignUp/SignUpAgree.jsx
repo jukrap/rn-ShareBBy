@@ -10,7 +10,7 @@ import {
 
 import CheckBox from './CheckBox';
 
-const SignUpAgree = ({onNextStep}) => {
+const SignUpAgree = ({onNextStep, navigation}) => {
   const {width, height} = Dimensions.get('window');
   const [isNextEnabled, setIsNextEnabled] = useState(false);
   const [checkboxState, setCheckboxState] = useState({});
@@ -39,7 +39,7 @@ const SignUpAgree = ({onNextStep}) => {
           </View>
 
           <View style={styles.checkboxContainer}>
-            <CheckBox onChange={handleCheckBoxChange} />
+            <CheckBox navigation={navigation} onChange={handleCheckBoxChange} />
           </View>
         </View>
 
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: '#07AC7D',
     alignItems: 'center',
-    justifyContent:'center',
+    justifyContent: 'center',
     marginHorizontal: 16,
     marginTop: 16,
     paddingVertical: 16,
@@ -101,7 +101,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
-    
   },
 });
 
