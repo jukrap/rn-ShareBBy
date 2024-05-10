@@ -11,24 +11,27 @@ import {
 } from 'react-native';
 
 import firestore from '@react-native-firebase/firestore';
-import auth from '@react-native-firebase/auth';
 import {useNavigation} from '@react-navigation/native';
+import useStore from '../../lib/useStore';
 import dayjs from 'dayjs';
-import 'dayjs/locale/ko';
+
+import ChatListTime from '../../components/Chat/ChatListTime';
+
+import {BackIcon} from '../../assets/assets';
+import {DefaultProfileIcon} from '../../assets/assets';
 
 const {width, height} = Dimensions.get('window');
 
 const Chat = () => {
   const [chatRooms, setChatRooms] = useState([]);
-  const [currentUserUID, setCurrentUserUID] = useState(null);
-  const [lastChats, setLastChats] = useState({});
+  const [lastChat, setLastChat] = useState({});
+
   const navigation = useNavigation();
+  const userToken = useStore(state => state.userToken);
 
   useEffect(() => {
     const fetchData = async () => {
-      await fetchCurrentUser();
-      await fetchChatRooms();
-      await fetchLatestMessages();
+      await fetchRoomData();
     };
 
     fetchData();
@@ -40,9 +43,9 @@ const Chat = () => {
     return () => {
       unsubscribe();
     };
-  }, [navigation, currentUserUID]);
+  }, []);
 
-  const fetchChatRooms = async () => {
+  const fetchRoomData = async () => {
     try {
       const chatRoomsSnapshot = await firestore().collection('chatRooms').get();
       const chatRoomList = chatRoomsSnapshot.docs
@@ -50,17 +53,10 @@ const Chat = () => {
           id: doc.id,
           ...doc.data(),
         }))
-        .filter(room => room.members.includes(currentUserUID));
-      setChatRooms(chatRoomList);
-    } catch (error) {
-      console.error('채팅방 가져오기 오류: ', error);
-    }
-  };
+        .filter(room => room.members.includes(userToken)); //합쳐보기. 방법 고민 필요
 
-  const fetchLatestMessages = async () => {
-    const latestChats = {};
-    try {
-      for (const room of chatRooms) {
+      const latestChats = {};
+      for (const room of chatRoomList) {
         const messageSnapshot = await firestore()
           .collection('chatRooms')
           .doc(room.id)
@@ -77,43 +73,49 @@ const Chat = () => {
           };
         }
       }
-      setLastChats(latestChats);
+
+      setChatRooms(chatRoomList);
+      setLastChat(latestChats);
     } catch (error) {
-      console.error('오류 발생: ', error);
+      console.error('Error fetching chat rooms: ', error);
     }
   };
 
   const formatMessageTime = timestamp => {
-    dayjs.locale('ko');
     const date = dayjs(timestamp);
     const today = dayjs().startOf('day');
     const yesterday = dayjs().subtract(1, 'day').startOf('day');
 
-    if (date.isSame(today, 'day')) {
-      return {
-        type: 'timeOnly',
-        time: date.format('A hh:mm'),
-      };
-    } else if (date.isSame(yesterday, 'day')) {
-      return {
-        type: 'yesterday',
-      };
-    } else {
-      return {
-        type: 'monthAndDay',
-        month: date.format('MM'),
-        day: date.format('DD'),
-      };
+    switch (true) {
+      case date.isSame(today, 'day'):
+        return {type: 'timeOnly', time: date.format('A hh:mm')};
+      case date.isSame(yesterday, 'day'):
+        return {type: 'yesterday'};
+      default:
+        return {
+          type: 'monthAndDay',
+          month: date.format('MM'),
+          day: date.format('DD'),
+        };
     }
   };
 
-  const sortChatRoomsByLatestMessage = () => {
+  const sortLast = () => {
     return chatRooms.sort((roomA, roomB) => {
-      const latestChatA = lastChats[roomA.id];
-      const latestChatB = lastChats[roomB.id];
-      return latestChatB.timestamp - latestChatA.timestamp;
+      const latestChatA = lastChat[roomA.id];
+      const latestChatB = lastChat[roomB.id];
+
+      if (!latestChatA && !latestChatB) {
+        return 0;
+      } else if (!latestChatA) {
+        return 1;
+      } else if (!latestChatB) {
+        return -1;
+      } else {
+        return latestChatB.timestamp - latestChatA.timestamp;
+      }
     });
-  };
+  }; //콜백지옥 어떻게 수정?
 
   const renderGroups = ({item}) => {
     const goToChatRoom = () => {
@@ -123,10 +125,10 @@ const Chat = () => {
       });
     };
 
-    const latestChat = lastChats[item.id];
+    const latestChat = lastChat[item.id];
     const formattedTime = latestChat
       ? formatMessageTime(latestChat.timestamp)
-      : {};
+      : {type: 'none'};
 
     return (
       <TouchableOpacity onPress={goToChatRoom} style={styles.chatRoomItem}>
@@ -138,10 +140,9 @@ const Chat = () => {
           }}>
           <Image
             style={{width: 48, height: 48, borderRadius: 8}}
-            source={require('../../assets/images/defaultProfileImg.jpeg')}
+            source={DefaultProfileIcon}
           />
         </View>
-
         <View
           style={{
             flex: 3.5,
@@ -167,34 +168,19 @@ const Chat = () => {
               paddingBottom: 8,
               fontSize: 10,
             }}>
-            <Text
-              style={{color: '##BBB4C5', fontSize: 13}}
-              numberOfLines={1}
-              ellipsizeMode="tail">
-              {latestChat ? latestChat.text : ''}
-            </Text>
+            {latestChat && (
+              <Text style={{color: '#A7A7A7', fontSize: 13}}>
+                {latestChat.text}
+              </Text>
+            )}
           </View>
         </View>
-
-        <View
-          style={{
-            justifyContent: 'flex-end',
-            paddingBottom: 4,
-          }}>
-          {formattedTime.type === 'timeOnly' && (
-            <Text style={{fontSize: 10, color: '#AEA6B9'}}>
-              {formattedTime.time}
-            </Text>
-          )}
-          {formattedTime.type === 'yesterday' && (
-            <Text style={{fontSize: 10, color: '#AEA6B9'}}>어제</Text>
-          )}
-          {formattedTime.type === 'monthAndDay' && (
-            <Text style={{fontSize: 10, color: '#AEA6B9'}}>
-              {`${formattedTime.month}월 ${formattedTime.day}일`}
-            </Text>
-          )}
-        </View>
+        <ChatListTime
+          type={formattedTime.type}
+          month={formattedTime.month}
+          day={formattedTime.day}
+          time={formattedTime.time}
+        />
       </TouchableOpacity>
     );
   };
@@ -211,19 +197,16 @@ const Chat = () => {
           marginBottom: 32,
         }}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Image
-            source={require('../../assets/newIcons/backIcon.png')}
-            style={{width: 24, height: 24}}
-          />
+          <Image source={BackIcon} style={{width: 24, height: 24}} />
         </TouchableOpacity>
         <Text style={{fontSize: 24, fontWeight: '700'}}>채팅목록</Text>
         <View />
       </View>
       <View style={{flex: 1, alignItems: 'center'}}>
         <FlatList
-          data={sortChatRoomsByLatestMessage()}
+          data={sortLast()}
           renderItem={renderGroups}
-          keyExtractor={(item, index) => index.toString()}
+          keyExtractor={item => item.id}
         />
       </View>
     </SafeAreaView>

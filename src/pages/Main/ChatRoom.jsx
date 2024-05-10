@@ -25,23 +25,49 @@ import PlusModal from '../../components/Chat/Modal/PlusModal';
 import PhotoList from '../../components/Chat/PhotoList';
 import ChatMemberList from '../../components/Chat/ChatMemberList';
 
+import {
+  BackIcon,
+  ExitIcon,
+  HamburgerIcon,
+  PlusIcon,
+  RightIcon,
+} from '../../assets/assets';
+
 const ChatRoom = ({route, navigation}) => {
   const {chatRoomId, chatRoomName} = route.params;
 
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
-  const [isHamburgerModalVisible, setIsHamburgerModalVisible] = useState(false);
-  const [isPlusModalVisible, setIsPlusModalVisible] = useState(false);
+  const [slideModalVisible, setSlideModalVisible] = useState(false);
+  const [plusModalVisible, setPlusModalVisible] = useState(false);
   const [chatOutModalVisible, setChatOutModalVisible] = useState(false);
-  const [chatRoomNameChangeModalVisible, setChatRoomNameChangeModalVisible] =
-    useState(false); //이름 수정 너무 김.
+  const [roomNameChangeModal, setRoomNameChangeModal] = useState(false);
   const [chatMembers, setChatMembers] = useState([]);
   const [isVisible, setIsVisible] = useState(false);
   const [imageUri, setImageUri] = useState('');
 
-  //useEffect는 순서 지키는 것이 좋음. 맨위로, 그 밑에는 외부에서 오는 데이터 관련 함수들
+  useEffect(() => {
+    const messageListener = firestore()
+      .collection('chatRooms')
+      .doc(chatRoomId)
+      .collection('messages')
+      .orderBy('timestamp', 'desc')
+      .onSnapshot(querySnapshot => {
+        if (querySnapshot) {
+          const newMessages = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          setMessages(newMessages);
+        }
+      });
+    return () => messageListener();
+  }, [chatRoomId]);
 
-  //이미지 업로드
+  useEffect(() => {
+    getChatRoomMembers();
+  }, []);
+
   const uploadImage = async (localImagePath, chatRoomId) => {
     try {
       const fileName = localImagePath.substring(
@@ -108,15 +134,15 @@ const ChatRoom = ({route, navigation}) => {
   const goToShowAllImages = () => {
     //이름 바꾸기,
     navigation.navigate('ShowAllImages', {messages: messages});
-    setIsHamburgerModalVisible(false);
+    setSlideModalVisible(false);
   };
 
   const toggleHamburgerModal = () => {
-    setIsHamburgerModalVisible(!isHamburgerModalVisible);
+    setSlideModalVisible(!slideModalVisible);
   };
 
   const togglePlusModal = () => {
-    setIsPlusModalVisible(!isPlusModalVisible);
+    setPlusModalVisible(!plusModalVisible);
   };
 
   const toggleModal = imageUri => {
@@ -129,27 +155,8 @@ const ChatRoom = ({route, navigation}) => {
   };
 
   const toggleChatRoomNameChangeModal = () => {
-    setChatRoomNameChangeModalVisible(!chatRoomNameChangeModalVisible);
+    setRoomNameChangeModal(!roomNameChangeModal);
   };
-
-  useEffect(() => {
-    // 위로 빼기
-    const messageListener = firestore()
-      .collection('chatRooms')
-      .doc(chatRoomId)
-      .collection('messages')
-      .orderBy('timestamp', 'desc')
-      .onSnapshot(querySnapshot => {
-        if (querySnapshot) {
-          const newMessages = querySnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
-          setMessages(newMessages);
-        }
-      });
-    return () => messageListener();
-  }, [chatRoomId]);
 
   const getChatRoomMembers = async () => {
     try {
@@ -176,11 +183,6 @@ const ChatRoom = ({route, navigation}) => {
       console.error('Error fetching chat room members:', error);
     }
   };
-
-  useEffect(() => {
-    // 위로 올리기
-    getChatRoomMembers();
-  }, []);
 
   const sendMessage = async () => {
     try {
@@ -291,21 +293,37 @@ const ChatRoom = ({route, navigation}) => {
       !dayjs(item.timestamp?.toDate() || new Date()).isSame(
         dayjs(prevItem.timestamp?.toDate() || new Date()),
         'day',
-      ); //
+      );
 
     const showDateSeparator = isFirstMessage || isDifferentDay;
 
-    const showTime =
-      index === 0 ||
-      item.senderId !== messages[index - 1]?.senderId ||
-      isDifferentDay ||
-      (index > 0 &&
+    switch (true) {
+      case index === 0:
+        showTime = true;
+        break;
+
+      case item.senderId !== messages[index - 1]?.senderId:
+        showTime = true;
+        break;
+
+      case isDifferentDay:
+        showTime = true;
+        break;
+
+      case index > 0 &&
         item.timestamp &&
         messages[index - 1]?.timestamp &&
         !dayjs(item.timestamp.toDate()).isSame(
           dayjs(messages[index - 1].timestamp.toDate()),
           'minute',
-        )); //
+        ):
+        showTime = true;
+        break;
+
+      default:
+        showTime = false;
+        break;
+    }
 
     const showProfileInfo =
       ((showDateSeparator && item.senderId !== auth().currentUser?.uid) ||
@@ -397,36 +415,28 @@ const ChatRoom = ({route, navigation}) => {
     <SafeAreaView style={styles.container}>
       <View style={styles.topBar}>
         <TouchableOpacity onPress={handleGoBack}>
-          <Image
-            source={require('../../assets/newIcons/backIcon.png')}
-            style={{width: 24, height: 24}}
-          />
+          <Image source={BackIcon} style={{width: 24, height: 24}} />
         </TouchableOpacity>
         <Text style={styles.roomName}>{chatRoomName}</Text>
         <TouchableOpacity onPress={toggleHamburgerModal}>
-          <Image
-            style={{width: 24, height: 24}}
-            source={require('../../assets/newIcons/hamburgerIcon.png')}
-          />
+          <Image style={{width: 24, height: 24}} source={HamburgerIcon} />
         </TouchableOpacity>
       </View>
       <FlatList
         data={messages}
         renderItem={renderItem}
-        keyExtractor={(item, index) => index.toString()} // item.id 로
+        keyExtractor={item => item.id}
         inverted
       />
+
       <KeyboardAvoidingView
         behavior="padding"
         keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0}
         style={styles.inputContainer}>
         <TouchableOpacity onPress={togglePlusModal}>
-          <Image
-            style={{width: 24, height: 24}}
-            source={require('../../assets/icons/plus.png')}
-          />
+          <Image style={{width: 18, height: 18}} source={PlusIcon} />
         </TouchableOpacity>
-        <TextInput //키보드 타입 고민
+        <TextInput
           style={styles.textInput}
           placeholder="메시지를 입력하세요"
           maxLength={500}
@@ -438,15 +448,12 @@ const ChatRoom = ({route, navigation}) => {
           multiline={true}
         />
         <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
-          <Image
-            style={{width: 25, height: 25}}
-            source={require('../../assets/icons/right-arrow.png')}
-          />
+          <Image style={{width: 20, height: 20}} source={RightIcon} />
         </TouchableOpacity>
       </KeyboardAvoidingView>
 
-      <Modal //duration 설정
-        isVisible={isHamburgerModalVisible}
+      <Modal
+        isVisible={slideModalVisible}
         animationIn="slideInRight"
         animationOut="slideOutRight"
         backdropOpacity={0.2}
@@ -461,7 +468,8 @@ const ChatRoom = ({route, navigation}) => {
           <View style={{flex: 0.25}}></View>
           <View
             style={{
-              width: '100%', //디멘션, flex box
+              backgroundColor: 'red',
+              width: '100%',
               flex: 0.6,
               paddingHorizontal: 12,
               paddingVertical: 8,
@@ -479,10 +487,7 @@ const ChatRoom = ({route, navigation}) => {
                 paddingTop: 8,
               }}>
               <Text style={{fontSize: 16, fontWeight: '700'}}>사진</Text>
-              <Image
-                source={require('../../assets/icons/right-arrow.png')}
-                style={{width: 16, height: 16}}
-              />
+              <Image source={RightIcon} style={{width: 16, height: 16}} />
             </TouchableOpacity>
 
             <View
@@ -527,7 +532,7 @@ const ChatRoom = ({route, navigation}) => {
               <Text>채팅방 이름 변경</Text>
             </TouchableOpacity>
             <ChatRoomNameChangeModal
-              isVisible={chatRoomNameChangeModalVisible}
+              isVisible={roomNameChangeModal}
               toggleChatRoomNameChangeModal={toggleChatRoomNameChangeModal}
               updateChatRoomName={updateChatRoomName}
             />
@@ -559,14 +564,11 @@ const ChatRoom = ({route, navigation}) => {
             }}>
             <TouchableOpacity
               onPress={() => setChatOutModalVisible(!chatOutModalVisible)}>
-              <Image
-                style={{width: 18, height: 18}}
-                source={require('../../assets/newIcons/exitIcon.png')}
-              />
+              <Image style={{width: 18, height: 18}} source={ExitIcon} />
             </TouchableOpacity>
           </View>
 
-          <Modal // 모달들 맨 밑으로, 컴포넌트처리
+          <Modal
             isVisible={chatOutModalVisible}
             animationIn={'bounceIn'}
             animationOut={'bounceOut'}
@@ -610,7 +612,7 @@ const ChatRoom = ({route, navigation}) => {
       </Modal>
 
       <PlusModal
-        isVisible={isPlusModalVisible}
+        isVisible={plusModalVisible}
         toggleModal={togglePlusModal}
         getPhotos={getPhotos}
       />

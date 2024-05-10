@@ -58,6 +58,15 @@ const Profile = ({navigation, route}) => {
     }
     console.log('call user uid', userUid);
   };
+  const fetchUserData = async () => {
+    try {
+      const querySnapshot = (await usersCollection.doc(userUid).get()).data();
+      // console.log(querySnapshot);
+      setUsers(querySnapshot); // 사용자 데이터 상태 설정
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
   useFocusEffect(
     useCallback(() => {
       fetchUserUid();
@@ -66,17 +75,6 @@ const Profile = ({navigation, route}) => {
   useEffect(() => {
     if (userUid) {
       // userUid가 설정된 후에 fetchUserData 호출
-      const fetchUserData = async () => {
-        try {
-          const querySnapshot = (
-            await usersCollection.doc(userUid).get()
-          ).data();
-          // console.log(querySnapshot);
-          setUsers(querySnapshot); // 사용자 데이터 상태 설정
-        } catch (error) {
-          console.log(error.message);
-        }
-      };
 
       fetchUserData();
     }
@@ -125,16 +123,22 @@ const Profile = ({navigation, route}) => {
             </View>
           </View>
           <View style={styles.infoStyle}>
-            <View style={styles.myList}>
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate('MyPosts', {
+                  uuid: userUid,
+                })
+              }
+              style={styles.myList}>
               <Image source={pencil} style={styles.icon} />
               <Text
                 //hobbies
-                // onPress={() => navigation.navigate('Home')}
+
                 style={styles.listStyle}>
                 내가 쓴 글
               </Text>
-            </View>
-            <View style={styles.myList}>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.myList}>
               <Image source={heart} style={styles.icon} />
               <Text
                 //likes
@@ -142,15 +146,15 @@ const Profile = ({navigation, route}) => {
                 style={styles.listStyle}>
                 찜한 글
               </Text>
-            </View>
-            <View style={styles.myList}>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.myList}>
               <Image source={marker} style={styles.icon} />
               <Text
                 // onPress={() => navigation.navigate('Home')}
                 style={styles.listStyle}>
                 참여한 취미 목록
               </Text>
-            </View>
+            </TouchableOpacity>
           </View>
           <View style={styles.additionalInfo}>
             <Text style={styles.info}>기타</Text>
@@ -161,7 +165,7 @@ const Profile = ({navigation, route}) => {
               <Image style={styles.arrow} source={rightArrow} />
             </TouchableOpacity>
             <TouchableOpacity
-              // onPress={() => getPhotos()}
+              onPress={() => navigation.navigate('SynthesisAgree')}
               style={styles.noticeWrapper}>
               <Text style={styles.noticeStyle}>약관 및 개인정보 처리 방침</Text>
               <Image style={styles.arrow} source={rightArrow} />

@@ -1,9 +1,9 @@
 // Router.js
-import React, { useEffect } from 'react';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { useNavigation } from '@react-navigation/native';
+import React, {useEffect} from 'react';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import useStore  from '../lib/useStore'; // Zustand 스토어 import
+import useStore from '../lib/useStore'; // Zustand 스토어 import
 
 import BottomTab from '../routers/BottomTab';
 import LoginTab from '../routers/LoginTab';
@@ -20,7 +20,7 @@ const Router = () => {
         const userToken = await AsyncStorage.getItem('userToken');
         if (userToken) {
           // Zustand 스토어에 사용자 토큰 설정
-          useStore.setState({ userToken: userToken });
+          useStore.setState({userToken: userToken});
           navigation.navigate('BottomTab');
         } else {
           navigation.navigate('LoginTab');
@@ -34,7 +34,7 @@ const Router = () => {
   }, []);
 
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name="LoginTab" component={LoginTab} />
       <Stack.Screen name="BottomTab" component={BottomTab} />
       <Stack.Screen name="Show" component={Show} />
