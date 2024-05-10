@@ -45,29 +45,29 @@ const CommunityAddPost = () => {
   useEffect(() => {
     if (route.params?.action === 'submitPost') {
       if (postContent && postContent.trim() !== '') {
-        submitPost(navigation);
+        submitPost(selectedImages);
       } else {
         Alert.alert('게시글 내용을 입력해주세요.');
         navigation.setParams({action: ''});
       }
     }
-  }, [route.params, postContent, submitPost, navigation]);
+  }, [route.params, postContent, selectedImages, submitPost, navigation]);
 
   useEffect(() => {
-    console.log('selectedImages updated:', selectedImages);
+    console.log('useEffect selectedImages updated:', selectedImages);
   }, [selectedImages]);
 
   // 게시글 제출 핸들러
   const handlePostSubmit = useCallback(() => {
     if (postContent && postContent.trim() !== '') {
-      submitPost();
+      submitPost(selectedImages);
     } else {
       Alert.alert('게시글 내용을 입력해주세요.');
     }
-  }, [postContent, submitPost]);
+  }, [postContent, selectedImages, submitPost]);
 
   // 게시글 제출 함수
-  const submitPost = async () => {
+  const submitPost = async images => {
     if (!postContent || postContent.trim() === '') {
       Alert.alert('게시글 내용을 입력해주세요.');
       return;
@@ -82,7 +82,7 @@ const CommunityAddPost = () => {
     try {
       // 선택된 이미지들 업로드 및 URL 배열 반환
       const imageUrls = await Promise.all(
-        selectedImages.map(image => uploadImage(image)),
+        images.map(image => uploadImage(image)),
       );
 
       console.log('selectedImages: ', selectedImages);
@@ -223,7 +223,7 @@ const CommunityAddPost = () => {
         const imageUri = Platform.OS === 'ios' ? image.sourceURL : image.path;
         console.log('imageUri1 = ', imageUri);
         setSelectedImages(prevSelectedImages => [
-          ...prevSelectedImages,
+          ...JSON.parse(JSON.stringify(prevSelectedImages)),
           imageUri,
         ]);
         //TODO: 깊은 복사로 바꾸기
