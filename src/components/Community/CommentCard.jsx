@@ -2,17 +2,19 @@ import React, {useEffect, useState} from 'react';
 import {
   View,
   Image,
+  Alert,
   Text,
   StyleSheet,
   TouchableOpacity,
-  Modal,
 } from 'react-native';
 import {formatDistanceToNow, format} from 'date-fns';
 import {ko} from 'date-fns/locale';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
+import Modal from 'react-native-modal';
+import BottomSheetModal from './BottomSheetModal';
 
-const CommentCard = ({item}) => {
+const CommentCard = ({item, onDelete, onEdit}) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [commentUserData, setCommentUserData] = useState(null);
@@ -22,11 +24,8 @@ const CommentCard = ({item}) => {
       setCurrentUser(user);
     });
 
-    return () => unsubscribe();
-  }, []);
-
-  useEffect(() => {
     fetchCommentUserData();
+    return () => unsubscribe();
   }, []);
 
   const toggleModal = () => {
@@ -88,37 +87,32 @@ const CommentCard = ({item}) => {
                 locale: ko,
               })}
             </Text>
-              <View style={styles.separator} />
+            <View style={styles.separator} />
           </View>
         </View>
       </View>
-      <Modal visible={isModalVisible} animationType="slide" transparent={true}>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <TouchableOpacity
-              style={styles.modalButton}
-              onPress={() => {
-                toggleModal();
-              }}>
-              <Image source={pencilIcon} style={{width: 24, height: 24}} />
-              <Text style={styles.modalButtonText}>댓글 수정</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.modalButton}
-              onPress={() => {
-                toggleModal();
-              }}>
-              <Image source={deleteIcon} style={{width: 24, height: 24}} />
-              <Text style={styles.modalButtonText}>댓글 삭제</Text>
-            </TouchableOpacity>
-          </View>
+      <BottomSheetModal isVisible={isModalVisible} onClose={toggleModal}>
+        <View style={styles.modalContent}>
           <TouchableOpacity
-            style={styles.modalCloseButton}
-            onPress={toggleModal}>
-            <Text style={styles.modalCloseButtonText}>닫기</Text>
+            style={styles.modalButton}
+            onPress={() => {
+              onEdit(item.id);
+              toggleModal();
+            }}>
+            <Image source={pencilIcon} style={{width: 24, height: 24}} />
+            <Text style={styles.modalButtonText}>댓글 수정</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.modalButton}
+            onPress={() => {
+              onDelete(item.id);
+              toggleModal();
+            }}>
+            <Image source={deleteIcon} style={{width: 24, height: 24}} />
+            <Text style={styles.modalButtonText}>댓글 삭제</Text>
           </TouchableOpacity>
         </View>
-      </Modal>
+      </BottomSheetModal>
     </View>
   );
 };

@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   Dimensions,
   StyleSheet,
-  Modal,
   ImageBackground,
 } from 'react-native';
 import ProgressiveImage from './ProgressiveImage';
@@ -15,9 +14,11 @@ import {formatDistanceToNow} from 'date-fns';
 import {ko} from 'date-fns/locale';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
+import Modal from 'react-native-modal';
 import {SwiperFlatList} from 'react-native-swiper-flatlist';
+import BottomSheetModal from './BottomSheetModal';
 
-const { width, height } = Dimensions.get('window');
+const {width, height} = Dimensions.get('window');
 
 const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
   const [postUserData, setPostUserData] = useState(null);
@@ -235,14 +236,13 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
             data={item.post_files}
             style={styles.postSwiperFlatList}
             renderItem={({item}) => (
-              console.log('item.post_files: ' + item.post_files),
               (
-                  <Image
-                    style={styles.postImage}
-                    source={{uri: item}}
-                    resizeMode="cover"
-                    defaultSource={defaultPostImg}
-                  />
+                <Image
+                  style={styles.postImage}
+                  source={{uri: item}}
+                  resizeMode="cover"
+                  defaultSource={defaultPostImg}
+                />
               )
             )}
           />
@@ -284,35 +284,28 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
         </View>
       </View>
       {/*모달 빼내기*/}
-      <Modal visible={isModalVisible} animationType="slide" transparent={true}>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <TouchableOpacity
-              style={styles.modalButton}
-              onPress={() => {
-                onEdit(item.id); // 게시글 수정 기능 호출
-                toggleModal();
-              }}>
-              <Image source={pencilIcon} style={{width: 24, height: 24}} />
-              <Text style={styles.modalButtonText}>게시글 수정</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.modalButton}
-              onPress={() => {
-                onDelete(item.id); // 게시글 삭제 기능 호출
-                toggleModal();
-              }}>
-              <Image source={deleteIcon} style={{width: 24, height: 24}} />
-              <Text style={styles.modalButtonText}>게시글 삭제</Text>
-            </TouchableOpacity>
-          </View>
-          <TouchableOpacity
-            style={styles.modalCloseButton}
-            onPress={toggleModal}>
-            <Text style={styles.modalCloseButtonText}>닫기</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
+      <BottomSheetModal isVisible={isModalVisible} onClose={toggleModal}>
+  <View style={styles.modalContent}>
+    <TouchableOpacity
+      style={styles.modalButton}
+      onPress={() => {
+        onEdit(item.id);
+        toggleModal();
+      }}>
+      <Image source={pencilIcon} style={{width: 24, height: 24}} />
+      <Text style={styles.modalButtonText}>게시글 수정</Text>
+    </TouchableOpacity>
+    <TouchableOpacity
+      style={styles.modalButton}
+      onPress={() => {
+        onDelete(item.id);
+        toggleModal();
+      }}>
+      <Image source={deleteIcon} style={{width: 24, height: 24}} />
+      <Text style={styles.modalButtonText}>게시글 삭제</Text>
+    </TouchableOpacity>
+  </View>
+</BottomSheetModal>
     </View>
   );
 };
@@ -405,8 +398,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 24,
   },
-  postSwiperFlatList: {
-  },
+  postSwiperFlatList: {},
   postImage: {
     height: height * 0.3,
     width,
@@ -464,15 +456,17 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
   },
   modalContainer: {
-    flex: 1,
     justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    margin: 0,
+  },
+  modalViewContainer: {
+    backgroundColor: 'white',
+    paddingTop: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
   },
   modalContent: {
-    backgroundColor: '#FEFFFE',
     padding: 16,
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
   },
   modalButton: {
     flexDirection: 'row',

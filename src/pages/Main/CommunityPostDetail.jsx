@@ -5,7 +5,6 @@ import {
   Image,
   Alert,
   FlatList,
-  Modal,
   TextInput,
   TouchableOpacity,
   Dimensions,
@@ -21,11 +20,15 @@ import PostDetailHeader from '../../components/Community/PostDetailHeader';
 import CommentCard from '../../components/Community/CommentCard';
 import {formatDistanceToNow} from 'date-fns';
 import {ko} from 'date-fns/locale';
+import Modal from 'react-native-modal';
+import { useNavigation } from '@react-navigation/native';
 import {SwiperFlatList} from 'react-native-swiper-flatlist';
+import BottomSheetModal from '../../components/Community/BottomSheetModal';
 
-const { width, height } = Dimensions.get('window');
+const {width, height} = Dimensions.get('window');
 
 const CommunityPostDetail = ({route}) => {
+  const navigation = useNavigation();
   const [post, setPost] = useState(null);
   const [postUserData, setPostUserData] = useState(null);
   const [comments, setComments] = useState([]);
@@ -100,6 +103,7 @@ const CommunityPostDetail = ({route}) => {
     try {
       const querySnapshot = await firestore()
         .collection('comments')
+        .where('comment_actflag', '==', true)
         .where('postId', '==', postId)
         .orderBy('comment_created', 'asc')
         .get();
@@ -140,6 +144,7 @@ const CommunityPostDetail = ({route}) => {
     try {
       const querySnapshot = await firestore()
         .collection('comments')
+        .where('comment_actflag', '==', true)
         .where('postId', '==', postId)
         .get();
 
@@ -250,6 +255,162 @@ const CommunityPostDetail = ({route}) => {
     }
   };
 
+  const handleDelete = () => {
+    const selectedPost = post;
+    if (
+      selectedPost &&
+      currentUser &&
+      currentUser.uid === selectedPost.userId
+    ) {
+      Alert.alert(
+        '게시글 삭제',
+        '해당 게시글을 삭제하겠습니까?',
+        [
+          {
+            text: '아니오',
+            onPress: () => console.log('아니오를 클릭'),
+            style: 'cancel',
+          },
+          {
+            text: '네',
+            onPress: () => deletePost(),
+          },
+        ],
+        {cancelable: false},
+      );
+    } else {
+      Alert.alert('권한 없음', '게시글 작성자만 삭제할 수 있습니다.');
+    }
+  };
+
+  const deletePost = async () => {
+    firestore()
+      .collection('posts')
+      .doc(postId)
+      .update({
+        post_actflag: false,
+      })
+      .then(() => {
+        Alert.alert('게시글 삭제', '게시글이 성공적으로 삭제되었습니다!');
+        navigation.goBack();
+      })
+      .catch(e => {
+        console.log('게시물을 삭제하는 중에 오류가 발생', e);
+      });
+  };
+
+  const handleEdit = () => {
+    const selectedPost = post;
+    if (
+      selectedPost &&
+      currentUser &&
+      currentUser.uid === selectedPost.userId
+    ) {
+      Alert.alert(
+        '게시글 수정',
+        '해당 게시글을 수정하겠습니까?',
+        [
+          {
+            text: '아니오',
+            onPress: () => console.log('아니오를 클릭'),
+            style: 'cancel',
+          },
+          {
+            text: '네',
+            onPress: () => editPost(),
+          },
+        ],
+        {cancelable: false},
+      );
+    } else {
+      Alert.alert('권한 없음', '게시글 작성자만 수정할 수 있습니다.');
+    }
+  };
+
+  const editPost = () => {
+    navigation.navigate('CommunityEditPost', {postId});
+  };
+
+  const handleCommentDelete = commentId => {
+    if (comments) {
+      const selectedComment = comments.find(item => item.id === commentId);
+      if (
+        selectedComment &&
+        currentUser &&
+        currentUser.uid === selectedComment.userId
+      ) {
+        Alert.alert(
+          '댓글 삭제',
+          '해당 댓글을 삭제하겠습니까?',
+          [
+            {
+              text: '아니오',
+              onPress: () => console.log('아니오를 클릭'),
+              style: 'cancel',
+            },
+            {
+              text: '네',
+              onPress: () => deleteComment(commentId),
+            },
+          ],
+          {cancelable: false},
+        );
+      } else {
+        Alert.alert('권한 없음', '댓글 작성자만 삭제할 수 있습니다.');
+      }
+    }
+  };
+
+  const deleteComment = commentId => {
+    firestore()
+      .collection('comments')
+      .doc(commentId)
+      .update({
+        comment_actflag: false,
+      })
+      .then(() => {
+        Alert.alert('댓글 삭제', '댓글이 성공적으로 삭제되었습니다!');
+        fetchComments();
+      })
+      .catch(e => {
+        console.log('댓글을 삭제하는 중에 오류가 발생', e);
+      });
+  };
+
+  const handleCommentEdit = commentId => {
+    if (comments) {
+      const selectedComment = comments.find(item => item.id === commentId);
+      if (
+        selectedComment &&
+        currentUser &&
+        currentUser.uid === selectedComment.userId
+      ) {
+        Alert.alert(
+          '댓글 수정',
+          '해당 댓글을 수정하겠습니까?',
+          [
+            {
+              text: '아니오',
+              onPress: () => console.log('아니오를 클릭'),
+              style: 'cancel',
+            },
+            {
+              text: '네',
+              onPress: () => editComment(commentId),
+            },
+          ],
+          {cancelable: false},
+        );
+      } else {
+        Alert.alert('권한 없음', '댓글 작성자만 수정할 수 있습니다.');
+      }
+    }
+  };
+
+  const editComment = commentId => {
+    //CommunityPostDetail에 있는 TextInput commentInput 댓글 입력 부분을 이용해서 수정할 수 있게 해야 함
+  };
+
   const toggleModal = () => {
     setIsModalVisible(!isModalVisible);
   };
@@ -294,33 +455,30 @@ const CommunityPostDetail = ({route}) => {
         <Text style={styles.postContentText}>{post.post_content}</Text>
         {post?.post_files?.length > 0 ? (
           <View style={styles.postImageWrapper}>
-          <SwiperFlatList
-          autoplay
-          autoplayDelay={5}
-          autoplayLoop
-          showPagination
-          paginationDefaultColor="#DBDBDB"
-          paginationActiveColor="#07AC7D"
-          paginationStyleItem={styles.paginationStyleItems}
-          paginationStyleItemActive={styles.paginationStyleItemActives}
-          data={post.post_files}
-          style={styles.postSwiperFlatList}
-          renderItem={({item}) => (
-            console.log('item.post_files: ' + item.post_files),
-            (
+            <SwiperFlatList
+              autoplay
+              autoplayDelay={5}
+              autoplayLoop
+              showPagination
+              paginationDefaultColor="#DBDBDB"
+              paginationActiveColor="#07AC7D"
+              paginationStyleItem={styles.paginationStyleItems}
+              paginationStyleItemActive={styles.paginationStyleItemActives}
+              data={post.post_files}
+              style={styles.postSwiperFlatList}
+              renderItem={({item}) => (
                 <Image
                   style={styles.postImage}
                   source={{uri: item}}
                   resizeMode="cover"
                   defaultSource={defaultPostImg}
                 />
-            )
-          )}
-        />
+              )}
+            />
           </View>
-      ) : (
-        <View style={styles.divider} />
-      )}
+        ) : (
+          <View style={styles.divider} />
+        )}
 
         <View style={styles.separatorTop} />
         <View style={styles.interactionContainer}>
@@ -373,7 +531,11 @@ const CommunityPostDetail = ({route}) => {
             item.key === 'postContent' ? (
               renderPostContent()
             ) : (
-              <CommentCard item={item} />
+              <CommentCard
+                item={item}
+                onDelete={() => handleCommentDelete(item.id)}
+                onEdit={() => handleCommentEdit(item.id)}
+              />
             )
           }
           keyExtractor={(item, index) =>
@@ -399,38 +561,28 @@ const CommunityPostDetail = ({route}) => {
             />
           </TouchableOpacity>
 
-          <Modal
-            visible={isModalVisible}
-            animationType="slide"
-            transparent={true}>
-            <View style={styles.modalContainer}>
-              <View style={styles.modalContent}>
-                <TouchableOpacity
-                  style={styles.modalButton}
-                  onPress={() => {
-                    onEdit(postId); // 게시글 수정 기능 호출
-                    toggleModal();
-                  }}>
-                  <Image source={pencilIcon} style={{width: 24, height: 24}} />
-                  <Text style={styles.modalButtonText}>게시글 수정</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.modalButton}
-                  onPress={() => {
-                    onDelete(postId); // 게시글 삭제 기능 호출
-                    toggleModal();
-                  }}>
-                  <Image source={deleteIcon} style={{width: 24, height: 24}} />
-                  <Text style={styles.modalButtonText}>게시글 삭제</Text>
-                </TouchableOpacity>
-              </View>
+          <BottomSheetModal isVisible={isModalVisible} onClose={toggleModal}>
+            <View style={styles.modalContent}>
               <TouchableOpacity
-                style={styles.modalCloseButton}
-                onPress={toggleModal}>
-                <Text style={styles.modalCloseButtonText}>닫기</Text>
+                style={styles.modalButton}
+                onPress={() => {
+                  handleEdit();
+                  toggleModal();
+                }}>
+                <Image source={pencilIcon} style={{width: 24, height: 24}} />
+                <Text style={styles.modalButtonText}>게시글 수정</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={() => {
+                  handleDelete();
+                  toggleModal();
+                }}>
+                <Image source={deleteIcon} style={{width: 24, height: 24}} />
+                <Text style={styles.modalButtonText}>게시글 삭제</Text>
               </TouchableOpacity>
             </View>
-          </Modal>
+          </BottomSheetModal>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -503,8 +655,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 32,
   },
-  postSwiperFlatList: {
-  },
+  postSwiperFlatList: {},
   postImage: {
     height: height * 0.3,
     width,

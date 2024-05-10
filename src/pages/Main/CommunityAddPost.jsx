@@ -9,11 +9,10 @@ import {
   Image,
   SafeAreaView,
   TouchableOpacity,
-  Modal,
 } from 'react-native';
 import ImagePicker from 'react-native-image-crop-picker';
 import {useNavigation, useRoute} from '@react-navigation/native';
-
+import Modal from 'react-native-modal'
 import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
@@ -198,8 +197,8 @@ const CommunityAddPost = () => {
   // 갤러리에서 사진 선택
   const choosePhotoFromLibrary = () => {
     ImagePicker.openPicker({
-      width: 1200,
-      height: 780,
+      width: 900,
+      height: 900,
       cropping: true,
     })
       .then(image => {
@@ -210,6 +209,7 @@ const CommunityAddPost = () => {
           ...prevSelectedImages,
           imageUri,
         ]);
+        //TODO: 깊은 복사로 바꾸기
         //ㅅㅂ 이거 뭐야
         //이 구조로 setSelectedImages에 imageUri이 안들어갈 수 있나?
         //심지어 imageUri에는 파일이 있는데도?

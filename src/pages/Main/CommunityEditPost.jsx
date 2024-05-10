@@ -13,18 +13,15 @@ import {
   Platform,
 } from 'react-native';
 import ImagePicker from 'react-native-image-crop-picker';
-import {useNavigation, useRoute} from '@react-navigation/native';
 
 import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
-
+import { useNavigation } from '@react-navigation/native';
 import PostHeader from '../../components/Community/PostHeader';
 
-const CommunityEditPost = () => {
+const CommunityEditPost = ({route}) => {
   const navigation = useNavigation();
-  const route = useRoute();
-
   const [selectedImages, setSelectedImages] = useState({
     existingImages: [], // 기존 이미지 URL 배열
     newImages: [], // 새로 선택한 이미지 배열
@@ -191,8 +188,8 @@ const CommunityEditPost = () => {
   // 갤러리에서 사진 선택
   const choosePhotoFromLibrary = () => {
     ImagePicker.openPicker({
-      width: 1200,
-      height: 780,
+      width: 900,
+      height: 900,
       cropping: true,
     })
       .then(image => {

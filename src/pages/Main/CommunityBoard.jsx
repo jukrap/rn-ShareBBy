@@ -19,8 +19,12 @@ import {useFocusEffect} from '@react-navigation/native';
 
 import PostCard from '../../components/Community/PostCard';
 import auth from '@react-native-firebase/auth';
+import {Modal} from 'react-native-modal';
+
+import {useNavigation} from '@react-navigation/native';
 
 const {width, height} = Dimensions.get('window');
+
 
 const CommunityBoard = ({navigation}) => {
   const [post, setPost] = useState(null);
@@ -179,7 +183,6 @@ const CommunityBoard = ({navigation}) => {
   const handleProfilePress = userId => {
     navigation.navigate('Profile', {userId});
   };
-
 
   const handlePostDetail = (postId) => {
     navigation.navigate('CommunityPostDetail', { postId });
