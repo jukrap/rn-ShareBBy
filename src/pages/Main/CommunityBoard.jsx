@@ -157,22 +157,7 @@ const CommunityBoard = ({navigation}) => {
         currentUser &&
         currentUser.uid === selectedPost.userId
       ) {
-        Alert.alert(
-          '게시글 수정',
-          '해당 게시글을 수정하겠습니까?',
-          [
-            {
-              text: '아니오',
-              onPress: () => console.log('아니오를 클릭'),
-              style: 'cancel',
-            },
-            {
-              text: '네',
-              onPress: () => editPost(postId),
-            },
-          ],
-          {cancelable: false},
-        );
+          editPost(postId)
       } else {
         Alert.alert('권한 없음', '게시글 작성자만 수정할 수 있습니다.');
       }

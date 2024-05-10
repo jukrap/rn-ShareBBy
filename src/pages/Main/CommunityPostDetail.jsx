@@ -77,7 +77,7 @@ const CommunityPostDetail = ({route}) => {
         setPost(postData);
         fetchPostUserData(postData.userId);
         setLikeCount(postData.likeCount || 0);
-        setCommentCount(postData.commentCount || 0); 
+        setCommentCount(postData.commentCount || 0);
       }
     } catch (error) {
       console.log('게시글을 가져오는 중에 오류가 발생했습니다:', error);
@@ -220,7 +220,7 @@ const CommunityPostDetail = ({route}) => {
       console.log('사용자가 로그인되어 있지 않습니다.');
       return;
     }
-  
+
     try {
       await firestore()
         .collection('comments')
@@ -231,11 +231,11 @@ const CommunityPostDetail = ({route}) => {
           comment_created: firestore.Timestamp.fromDate(new Date()),
           comment_actflag: true,
         });
-  
+
       console.log('댓글 업로드 완료!');
       Alert.alert('댓글 업로드!', '성공적으로 댓글이 업로드됐습니다!');
       setCommentContent('');
-  
+
       // 댓글 개수 업데이트
       await firestore()
         .collection('posts')
@@ -243,11 +243,14 @@ const CommunityPostDetail = ({route}) => {
         .update({
           commentCount: firestore.FieldValue.increment(1),
         });
-  
+
       fetchPost(postId);
       fetchComments();
     } catch (error) {
-      console.log('Firestore에 댓글을 추가하는 중에 문제가 발생했습니다.', error);
+      console.log(
+        'Firestore에 댓글을 추가하는 중에 문제가 발생했습니다.',
+        error,
+      );
     }
   };
 
@@ -302,22 +305,7 @@ const CommunityPostDetail = ({route}) => {
       currentUser &&
       currentUser.uid === selectedPost.userId
     ) {
-      Alert.alert(
-        '게시글 수정',
-        '해당 게시글을 수정하겠습니까?',
-        [
-          {
-            text: '아니오',
-            onPress: () => console.log('아니오를 클릭'),
-            style: 'cancel',
-          },
-          {
-            text: '네',
-            onPress: () => editPost(),
-          },
-        ],
-        {cancelable: false},
-      );
+      editPost();
     } else {
       Alert.alert('권한 없음', '게시글 작성자만 수정할 수 있습니다.');
     }
@@ -357,14 +345,14 @@ const CommunityPostDetail = ({route}) => {
     }
   };
 
-  const deleteComment = async (commentId) => {
+  const deleteComment = async commentId => {
     try {
       await firestore().collection('comments').doc(commentId).update({
         comment_actflag: false,
       });
-  
+
       Alert.alert('댓글 삭제', '댓글이 성공적으로 삭제되었습니다!');
-  
+
       // 댓글 개수 업데이트
       await firestore()
         .collection('posts')
@@ -372,14 +360,13 @@ const CommunityPostDetail = ({route}) => {
         .update({
           commentCount: firestore.FieldValue.increment(-1),
         });
-  
+
       fetchPost(postId);
       fetchComments();
     } catch (error) {
       console.log('댓글을 삭제하는 중에 오류가 발생', error);
     }
   };
-  
 
   const handleCommentEdit = commentId => {
     if (comments) {
