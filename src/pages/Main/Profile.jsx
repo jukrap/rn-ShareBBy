@@ -144,12 +144,20 @@ const Profile = ({navigation, route}) => {
               <Image source={heart} style={styles.icon} />
               <Text style={styles.listStyle}>찜한 글</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.myList}>
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate('MyRecruits', {
+                  uuid: userUid,
+                  nickname: users.nickname,
+                  profileImage: users.profileImage,
+                })
+              }
+              style={styles.myList}>
               <Image source={marker} style={styles.icon} />
               <Text
                 // onPress={() => navigation.navigate('Home')}
                 style={styles.listStyle}>
-                참여한 취미 목록
+                내 모집 공고
               </Text>
             </TouchableOpacity>
           </View>

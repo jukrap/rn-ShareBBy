@@ -16,6 +16,7 @@ import EditProfile from '../pages/Main/EditProfile';
 import SynthesisAgree from '../components/SignUp/AgreeList/SynthesisAgree';
 import MyPosts from '../pages/Main/MyPosts';
 import MyLists from '../pages/Main/MyLists';
+import MyRecruits from '../pages/Main/MyRecruits';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -49,6 +50,7 @@ const AboutProfile = () => {
       <Stack.Screen name="EditProfile" component={EditProfile} />
       <Stack.Screen name="MyPosts" component={MyPosts} />
       <Stack.Screen name="MyLikes" component={MyLists} />
+      <Stack.Screen name="MyRecruits" component={MyRecruits} />
     </Stack.Navigator>
   );
 };
