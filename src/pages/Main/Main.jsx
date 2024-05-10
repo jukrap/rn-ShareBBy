@@ -15,6 +15,8 @@ import firestore from '@react-native-firebase/firestore';
 import useStore from '../../lib/useStore';
 import storage from '@react-native-firebase/storage';
 
+import { getHobbiesDetail } from '../../lib/hobby';
+
 const {width, height} = Dimensions.get('window');
 
 const Main = ({navigation, route}) => {

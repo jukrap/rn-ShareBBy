@@ -3,8 +3,9 @@ import { SafeAreaView, View, Text, TouchableOpacity, StyleSheet, ScrollView, Tex
 import { NaverMapView, NaverMapMarkerOverlay, TrackingMode } from "@mj-studio/react-native-naver-map";
 import Geolocation from "react-native-geolocation-service";
 import dayjs from 'dayjs';
+import firestore from '@react-native-firebase/firestore';
 
-import { getHobbies } from "../../lib/hobby";
+import { getHobbiesDetail } from "../../lib/hobby";
 
 const { width, height } = Dimensions.get('window');
 
@@ -26,8 +27,15 @@ const Join = ({ navigation, route }) => {
         
     useEffect(() => {
         getMyLocation();
-        getHobbiesData();
+        hobbiesList();
     }, []);
+
+    const hobbiesList = async () => {
+        const hobbydataList = await getHobbiesDetail();
+        setHobbiesData(hobbydataList)
+        console.log("####1. hobbydataList", hobbydataList)
+    }
+
 
     const getMyLocation = async () => {
         requestPermission().then(result => {
@@ -53,11 +61,6 @@ const Join = ({ navigation, route }) => {
         });
     }
 
-    const getHobbiesData = async () => {
-        const res = await getHobbies();
-        setHobbiesData(res)
-        // console.log('🔥🔥🔥 아좌좟~ 🔥🔥🔥 ====> ', res); 
-    }
 
     const handleMarkerPress = (markerElements) => {
         navigation.navigate('Show', markerElements);
@@ -75,24 +78,24 @@ const Join = ({ navigation, route }) => {
     const renderMarker = useCallback((marker) => {
         return (
             <NaverMapMarkerOverlay
-                key={marker._data.id} 
-                latitude={marker._data.latitude}
-                longitude={marker._data.longitude}
+                key={marker.id} 
+                latitude={marker.data._data.latitude}
+                longitude={marker.data._data.longitude}
                 onPress={() => handleMarkerPress(marker)}
                 />
         )
     }, []);
 
     const renderItem = ({ item }) => {
-        const diffDays = dayjs(item._data.deadline).diff(now, 'days')
-        const diffHours = dayjs(item._data.deadline).diff(now, 'hours')
-        const diffMins = dayjs(item._data.deadline).diff(now, 'minutes')
+        const diffDays = dayjs(item.data._data.deadline).diff(now, 'days')
+        const diffHours = dayjs(item.data._data.deadline).diff(now, 'hours')
+        const diffMins = dayjs(item.data._data.deadline).diff(now, 'minutes')
 
         const moveMarkerLocation = () => {
             const Region = {
-                latitude: item._data.latitude,
+                latitude: item.data._data.latitude,
                 latitudeDelta: 0,
-                longitude: item._data.longitude,
+                longitude: item.data._data.longitude,
                 longitudeDelta: 0,
             }
             const CameraMoveBaseParams = {
@@ -114,7 +117,7 @@ const Join = ({ navigation, route }) => {
                 style={styles.listView}
                 onPress={moveMarkerLocation}>
                 <View style={{ justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row', paddingTop: 8 }}>
-                    <Text style={styles.listTitle}>{item._data.title}</Text>
+                    <Text style={styles.listTitle}>{item.data._data.title}</Text>
                     {
                         percentFun(item.currP, item.totalP) < 50 ?
                             (
@@ -128,11 +131,11 @@ const Join = ({ navigation, route }) => {
                     }
                 </View>
                 <View style={{ justifyContent: 'space-between', alignItems: 'stretch', flexDirection: 'row' }}>
-                    <Text style={styles.listLocation}>{item._data.address}</Text>
-                    <Text style={[styles.listRcruit, { color: '#4E8FE4' }]}>{joinPeople} \ {item._data.peopleCount} 명</Text>
+                    <Text style={styles.listLocation}>{item.data._data.address}</Text>
+                    <Text style={[styles.listRcruit, { color: '#4E8FE4' }]}>{item.data._data.personNumber} \ {item.data._data.peopleCount} 명</Text>
                 </View>
                 <View>
-                    <Text>{item._data.tag}</Text>
+                    <Text>{item.data._data.tag}</Text>
                 </View>
                 <View style={{ justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row' }}>
                     <Text><Text style={{fontWeight : 700}}>{diffDays}</Text> 일 <Text style={{fontWeight : 700}}>{diffHours%24}</Text> 시간 <Text style={{fontWeight : 700}}>{diffMins%60}</Text> 분 전</Text>
@@ -448,7 +451,7 @@ export default Join;
 
 
 //     const renderItem = ({ item }) => {
-//         const deadTime = new Date(currTime - item._data.deadline);
+//         const deadTime = new Date(currTime - item.deadline);
 //         // console.log(deadTime)
 //         // const DAY = deadTime.getDate();
 //         // const HOUR = deadTime.getHours();
@@ -457,7 +460,7 @@ export default Join;
 //         return (
 //             <View style={styles.listView}>
 //                 <View style={{ justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row', paddingTop: 8 }}>
-//                     <Text style={styles.listTitle}>{item._data.title}</Text>
+//                     <Text style={styles.listTitle}>{item.title}</Text>
 //                     {
 //                         percentFun(item.currP, item.totalP) < 50 ?
 //                             (
@@ -471,11 +474,11 @@ export default Join;
 //                     }
 //                 </View>
 //                 <View style={{ justifyContent: 'space-between', alignItems: 'stretch', flexDirection: 'row' }}>
-//                     <Text style={styles.listLocation}>{item._data.address}</Text>
-//                     <Text style={[styles.listRcruit, { color: '#4E8FE4' }]}>{item.currP} \ {item._data.peopleCount} 명</Text>
+//                     <Text style={styles.listLocation}>{item.address}</Text>
+//                     <Text style={[styles.listRcruit, { color: '#4E8FE4' }]}>{item.currP} \ {item.peopleCount} 명</Text>
 //                 </View>
 //                 <View>
-//                     <Text>{item._data.tag}</Text>
+//                     <Text>{item.tag}</Text>
 //                 </View>
 //                 <View style={{ justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row' }}>
 //                     {/* <Text style={{}}>{DAY}일 {HOUR}시간 {MIN}전</Text> */}
@@ -502,14 +505,14 @@ export default Join;
 //     const renderMarker = useCallback((marker) => {
 //         return (
 //             <Marker
-//                 key={marker._data.id}
+//                 key={marker.id}
 //                 title="왜 안됨?"
 //                 description="왜 에러남?"
 //                 image={locationIcon}
 //                 tracksViewChanges={true}
 //                 zIndex={1}
 //                 pinColor="#00c7ae"
-//                 coordinate={{ latitude: marker._data.latitude, longitude: marker._data.longitude }}
+//                 coordinate={{ latitude: marker.latitude, longitude: marker.longitude }}
 //                 onPress={() => handleMarkerPress(marker)}
 //                 />
             
