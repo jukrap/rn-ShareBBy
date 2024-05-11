@@ -11,7 +11,6 @@ import {
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
-// import ImagePicker from 'react-native-image-crop-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import useStore from '../../lib/userStore';
 import {useFocusEffect} from '@react-navigation/native';
@@ -28,7 +27,7 @@ const Profile = ({navigation, route}) => {
   const [users, setUsers] = useState(null);
   const [userUid, setUserUid] = useState(null);
   const usersCollection = firestore().collection('users');
-  const clearUserToken = useStore(state => state.clearUserToken);
+  // const clearUserToken = useStore(state => state.clearUserToken);
   const userToken = useStore(state => state.userToken); // 토큰 상태 추가
 
   // useEffect(() => {
@@ -58,7 +57,7 @@ const Profile = ({navigation, route}) => {
     } catch (error) {
       console.error('Error fetching current user: ', error);
     }
-    console.log('call user uid', userUid);
+    // console.log('call user uid', userUid);
   };
   const fetchUserData = async () => {
     try {
@@ -129,25 +128,23 @@ const Profile = ({navigation, route}) => {
               onPress={() =>
                 navigation.navigate('MyPosts', {
                   uuid: userUid,
+                  nickname: users.nickname,
+                  profileImage: users.profileImage,
                 })
               }
               style={styles.myList}>
               <Image source={pencil} style={styles.icon} />
-              <Text
-                //hobbies
-
-                style={styles.listStyle}>
-                내가 쓴 글
-              </Text>
+              <Text style={styles.listStyle}>내가 쓴 글</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.myList}>
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate('MyLikes', {
+                  uuid: userUid,
+                })
+              }
+              style={styles.myList}>
               <Image source={heart} style={styles.icon} />
-              <Text
-                //likes
-                // onPress={() => navigation.navigate('Home')}
-                style={styles.listStyle}>
-                찜한 글
-              </Text>
+              <Text style={styles.listStyle}>찜한 글</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.myList}>
               <Image source={marker} style={styles.icon} />
