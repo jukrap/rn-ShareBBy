@@ -1,3 +1,4 @@
+// SignUp.js
 import React from 'react';
 import {
   View,
@@ -16,10 +17,11 @@ import SignUpPassword from '../../components/SignUp/SignUpPassword.jsx';
 
 const backIcon = require('../../assets/icons/back.png');
 
-const SignUp = ({navigation}) => {
-  const {step, handleNextStep, handlePreviousStep, userData} =
+const SignUp = ({ navigation }) => {
+  const { step, handleNextStep, handlePreviousStep,  userData } =
     useStepNavigation(navigation);
-  const {checkboxState, email, nickname, password} = userData; // userData에서 email, nickname, password 가져오기
+  const { checkboxState, email, nickname, password } = userData; // userData에서 email, nickname, password 가져오기
+
 
   const stepComponents = {
     1: <SignUpAgree onNextStep={handleNextStep} />,
@@ -49,6 +51,7 @@ const SignUp = ({navigation}) => {
         password={password}
         checkboxState={checkboxState}
         onPreviousStep={handlePreviousStep}
+
       />
     ),
   };
@@ -56,13 +59,13 @@ const SignUp = ({navigation}) => {
   const progressPercentage = step * 20;
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: '#fefffe'}}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#fefffe' }}>
       <TouchableOpacity style={styles.backIcon} onPress={handlePreviousStep}>
         <Image source={backIcon} />
       </TouchableOpacity>
       <ProgressBar percentage={progressPercentage} />
-      <View style={{flex: 1}}>
-        <View style={{flex: 1}}>{stepComponents[step]}</View>
+      <View style={{ flex: 1 }}>
+        <View style={{ flex: 1 }}>{stepComponents[step]}</View>
       </View>
     </SafeAreaView>
   );

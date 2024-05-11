@@ -26,6 +26,7 @@ const AboutMap = ({params}) => {
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name="Main" component={Main} initialParams={params} />
+      <Stack.Screen name="Profile" component={Profile} initialParams={params} />
       <Stack.Screen name="Recruit" component={Recruit} initialParams={params} />
       <Stack.Screen name="Join" component={Join} initialParams={params} />
       <Stack.Screen name="Detail" component={Detail} initialParams={params} />
