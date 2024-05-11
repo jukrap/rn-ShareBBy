@@ -1,3 +1,5 @@
+// CheckBox.js
+
 import React, {useState, useEffect} from 'react';
 import {
   View,
@@ -5,7 +7,9 @@ import {
   Image,
   Text,
   TouchableWithoutFeedback,
+  TouchableOpacity,
 } from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 
 const OnCheckBox = require('../../assets/icons/onCheckBox.png');
 const OffCheckBox = require('../../assets/icons/offCheckBox.png');
@@ -13,6 +17,7 @@ const onCheckIcon = require('../../assets/icons/onCheck.png');
 const offCheckIcon = require('../../assets/icons/offCheck.png');
 
 const CheckBox = ({onChange}) => {
+  const navigation = useNavigation();
   const [checkboxes, setCheckboxes] = useState({
     isChecked1: false,
     isChecked2: false,
@@ -66,6 +71,11 @@ const CheckBox = ({onChange}) => {
             <Image source={offCheckIcon} />
           )}
           <Text style={styles.text2}>[필수] 만 14세 이상</Text>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('TeenagerAgree')}
+            style={{flex: 1, alignItems: 'flex-end'}}>
+            <Text style={{color: '#a7a7a7'}}>청소년 보호정책</Text>
+          </TouchableOpacity>
         </View>
       </TouchableWithoutFeedback>
       <TouchableWithoutFeedback onPress={() => toggleCheckBox('isChecked3')}>
@@ -76,6 +86,11 @@ const CheckBox = ({onChange}) => {
             <Image source={offCheckIcon} />
           )}
           <Text style={styles.text2}>[필수] 이용약관 동의</Text>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('ServiceAgree')}
+            style={{flex: 1, alignItems: 'flex-end'}}>
+            <Text style={{color: '#a7a7a7'}}>보기</Text>
+          </TouchableOpacity>
         </View>
       </TouchableWithoutFeedback>
       <TouchableWithoutFeedback onPress={() => toggleCheckBox('isChecked4')}>
@@ -86,6 +101,11 @@ const CheckBox = ({onChange}) => {
             <Image source={offCheckIcon} />
           )}
           <Text style={styles.text2}>[필수] 개인정보 처리 방침 동의</Text>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('InformationAgree')}
+            style={{flex: 1, alignItems: 'flex-end'}}>
+            <Text style={{color: '#a7a7a7'}}>보기</Text>
+          </TouchableOpacity>
         </View>
       </TouchableWithoutFeedback>
       <TouchableWithoutFeedback onPress={() => toggleCheckBox('isChecked5')}>
@@ -98,6 +118,11 @@ const CheckBox = ({onChange}) => {
           <Text style={styles.text2}>
             [선택] 광고성 정보 수신 및 마케팅 활용 동의
           </Text>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('MarketingAgree')}
+            style={{flex: 1, alignItems: 'flex-end'}}>
+            <Text style={{color: '#a7a7a7'}}>보기</Text>
+          </TouchableOpacity>
         </View>
       </TouchableWithoutFeedback>
     </View>

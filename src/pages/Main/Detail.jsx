@@ -1,29 +1,39 @@
 import React, { useRef, useState } from "react";
 import { SafeAreaView, Text, View, TextInput, TouchableOpacity, Dimensions, StyleSheet, Image, FlatList, ScrollView } from "react-native";
+import dayjs from 'dayjs';
 import DatePicker from 'react-native-date-picker'
 import Modal from "react-native-modal";
+import firestore from '@react-native-firebase/firestore';
 
+import { recruitHobby, getHobbies } from "../../lib/hobby";
 import Tobbar from '../../components/Main/TobTab'
 
 const { width, height } = Dimensions.get('window');
 
 const Detail = ({ route, navigation }) => {
-    const { pickAddress, pickLatitude, pickLongitude } = route.params;
+    const userData = route.params
+    const { pickAddress, pickLatitude, pickLongitude, id, nickname } = userData;
+
+    const writeTime = new Date() // 내가 쓴 모집글 시간을 저장
     const [date, setDate] = useState(new Date())
-    const [writeDate, setWrtieDate] = useState(new Date()) // 내가 쓴 모집글 시간을 저장
     const [isDateModal, setIsDateModal] = useState(false)
     const [isPeopleModal, setIsPeopleModal] = useState(false)
-    const [saveDate, setSaveDate] = useState('');
+    const [selectedUsers, setSelectedUsers] = useState([]);
+
+    // const [saveDate, setSaveDate] = useState(0);
     const [detailContent, setDetailConetent] = useState({
         address: pickAddress,
         latitude: pickLatitude,
         longitude: pickLongitude,
         detailAddress: '',
         showTag: '',
-        deadLine: saveDate,
+        deadLine: date,
         peopleCount: '',
         showTitle: '',
         showContent: '',
+        nickName: nickname,
+        id: id,
+        writeTime: writeTime
     });
     const [currTextlength, setCurrTextlength] = useState(0);
     const [isTextClick, setIsTextClick] = useState({
@@ -35,7 +45,6 @@ const Detail = ({ route, navigation }) => {
         showContent: false,
     });
     const [isModalVisible, setIsModalVisible] = useState(false);
-
 
     const handleInputContent = (name, value) => {
         setDetailConetent({
@@ -61,6 +70,47 @@ const Detail = ({ route, navigation }) => {
             [name]: false
         }))
     }
+
+    const postHobby = async () => {
+        const body = {
+            user_id: id,
+            nickname,
+            latitude: pickLatitude,
+            longitude: pickLongitude,
+            address: pickAddress,
+            detail_address: detailContent.detailAddress,
+            tag: detailContent.showTag,
+            deadline: detailContent.deadLine,
+            peopleCount: detailContent.peopleCount,
+            title: detailContent.showTitle,
+            content: detailContent.showContent,
+            writeTime,
+        }
+        try {
+            const res = await recruitHobby(body)
+            console.log('==============> 🚀 success res : ', res);
+            setSelectedUsers([body.user_id])
+            setIsModalVisible(false)
+            createGroupChat(res)         
+        } catch (e){
+            console.log('error ======> ', e);
+        }
+    }
+
+    const createGroupChat = async (hobbiesId) => {
+        try {
+            const chatRoomRef = await firestore().collection('chatRooms').add({
+                name: detailContent.showTitle,
+                members: [id],
+                hobbiesId : hobbiesId 
+        });
+            setSelectedUsers([]);
+            console.log('채팅방 생성됨');
+            navigation.navigate('BottomTab', {screen : '채팅'});
+        } catch (error) {
+            console.error('Error: ', error);
+        }
+    };
 
 
     const renderItem = ({ item }) => {
@@ -121,12 +171,12 @@ const Detail = ({ route, navigation }) => {
                             onFocus={() => handleFocus('showTag')}
                             onBlur={() => handleBlur('showTag')} />
                     </View>
-                    <TouchableOpacity 
+                    <TouchableOpacity
                         style={styles.detailOption}
                         onPress={() => {
                             setIsDateModal(true)
-                            handleFocus('deadLine')}}
-                        
+                            handleFocus('deadLine')
+                        }}
                     >
                         <View style={styles.detailIndex}>
                             <Text style={[styles.commonText, isTextClick.deadLine ? { color: '#07AC7D' } : { color: '#A7A7A7' }]}>모집시간</Text>
@@ -142,27 +192,29 @@ const Detail = ({ route, navigation }) => {
                                 confirmText="확인"
                                 cancelText="취소"
                                 minuteInterval={5}
+                                minimumDate={writeTime}
                                 modal
                                 open={isDateModal}
                                 date={date}
                                 onConfirm={(date) => {
                                     setIsDateModal(false)
+                                    const postDate = dayjs(date).locale('ko').format()
                                     setDate(date)
-                                    handleInputContent('deadLine', `${date.getMonth() + 1} 월 ${date.getDate()} 일 ${date.getHours()} 시 ${date.getMinutes()} 분 까지`)
+                                    handleInputContent('deadLine', postDate)
                                     handleBlur('deadLine')
+                                    
                                 }}
                                 onCancel={() => {
                                     setIsDateModal(false)
                                     handleBlur('deadLine')
-
                                 }}
                             />
                         </View>
                     </TouchableOpacity>
-                    <TouchableOpacity 
+                    <TouchableOpacity
                         style={styles.detailOption}
                         onPress={() => {
-                            setIsPeopleModal(true)
+                            setIsPeopleModal(true) 
                             handleFocus('peopleCount')
                         }}>
                         <View style={styles.detailIndex}>
@@ -171,7 +223,7 @@ const Detail = ({ route, navigation }) => {
                         <View style={[styles.datePickView, isTextClick.peopleCount ? { borderColor: '#07AC7D' } : { borderColor: '#A7A7A7' }]}>
                             <Text style={[styles.commonText, { paddingTop: 10, color: '#A7A7A7' }]}>{detailContent.peopleCount} 명</Text>
                             <View style={{ marginLeft: 'auto', justifyContent: 'center' }}>
-                            <Image source={isTextClick.peopleCount ? dropDownOnIcon : dropDownOffIcon} style={{ width: 30, height: 30 }} />
+                                <Image source={isTextClick.peopleCount ? dropDownOnIcon : dropDownOffIcon} style={{ width: 30, height: 30 }} />
                             </View>
                         </View>
                     </TouchableOpacity>
@@ -211,12 +263,13 @@ const Detail = ({ route, navigation }) => {
                 animationIn={"slideInUp"}
                 animationOut={"slideOutDown"}
                 isVisible={isPeopleModal}
-                backdropOpacity={0.8}
+                backdropOpacity={0.3}
                 backdropColor="#000"
                 style={{ justifyContent: 'flex-end', margin: 0 }}
-                onBackdropPress={() => { 
+                onBackdropPress={() => {
                     setIsPeopleModal(!isPeopleModal)
-                    handleBlur('peopleCount')}}
+                    handleBlur('peopleCount')
+                }}
             >
                 <View style={{ height: width / 1.3, borderRadius: 10, backgroundColor: '#fff', marginHorizontal: 8, marginBottom: 8 }}>
                     <View style={{ height: 54, justifyContent: 'center', alignItems: 'center' }}>
@@ -232,7 +285,8 @@ const Detail = ({ route, navigation }) => {
                         style={{ height: 54, justifyContent: 'center', alignItems: 'center', borderTopWidth: 1, borderTopColor: '#DBE0DD' }}
                         onPress={() => {
                             setIsPeopleModal(false)
-                            handleBlur('peopleCount')}}>
+                            handleBlur('peopleCount')
+                        }}>
                         <Text style={{ fontSize: 18, fontWeight: 700, color: '#1D83FA' }}>확인</Text>
                     </TouchableOpacity>
                 </View>
@@ -240,7 +294,8 @@ const Detail = ({ route, navigation }) => {
                     style={{ height: 54, borderRadius: 10, backgroundColor: '#fff', marginHorizontal: 8, marginBottom: 38, justifyContent: 'center', alignItems: 'center' }}
                     onPress={() => {
                         setIsPeopleModal(false)
-                        handleBlur('peopleCount')}}>
+                        handleBlur('peopleCount')
+                    }}>
                     <Text style={{ fontSize: 18, fontWeight: 700, color: '#1D83FA' }}>취소</Text>
                 </TouchableOpacity>
             </Modal>
@@ -258,7 +313,7 @@ const Detail = ({ route, navigation }) => {
                             <Text style={[styles.contentText,]}>주소 : {detailContent.address}</Text>
                             <Text style={[styles.contentText,]}>상세 주소 : {detailContent.detailAddress}</Text>
                             <Text style={[styles.contentText,]}>태그 : {detailContent.showTag}</Text>
-                            <Text style={[styles.contentText,]}>모집 기간 : {detailContent.deadLine}</Text>
+                            <Text style={[styles.contentText,]}>모집 기간 : {dayjs(detailContent.deadLine).format('YYYY년 MM월 DD일 (ddd) HH:mm')} 까지</Text>
                             <Text style={[styles.contentText,]}>모집 인원 : {detailContent.peopleCount} 명</Text>
                             <Text style={[styles.contentText, { textAlign: 'center', paddingTop: 16, fontWeight: 600 }]}>제목, 본문 확인하셨나요?</Text>
                         </View>
@@ -273,8 +328,8 @@ const Detail = ({ route, navigation }) => {
                                 activeOpacity={0.6}
                                 style={[styles.pressOptionBtn, { backgroundColor: '#07AC7D' }]}
                                 onPress={() => {
-                                    navigation.navigate('Join', detailContent)
-                                    setIsModalVisible(false)}}>
+                                    postHobby() 
+                                }}>
                                 <Text style={styles.pressOptionText}>예</Text>
                             </TouchableOpacity>
                         </View>
@@ -382,7 +437,7 @@ const styles = StyleSheet.create({
         left: 20,
         alignItems: 'center',
         paddingHorizontal: 8,
-        position: 'absolute',   
+        position: 'absolute',
         zIndex: 2,
         backgroundColor: '#fff'
     },
@@ -403,7 +458,7 @@ const styles = StyleSheet.create({
     },
     pressTextView: {
         marginBottom: 'auto',
-        padding : 12,
+        padding: 12,
 
     },
     pressOptionView: {
@@ -419,7 +474,7 @@ const styles = StyleSheet.create({
     },
     pressOptionText: {
         fontSize: 16,
-        fontWeight : 'bold',
+        fontWeight: 'bold',
         color: '#FFF'
     },
     contentText: {

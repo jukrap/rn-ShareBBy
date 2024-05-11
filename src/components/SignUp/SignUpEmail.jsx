@@ -3,14 +3,13 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   TouchableOpacity,
   TextInput,
   Alert,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import firestore from '@react-native-firebase/firestore'; // firestore import 추가
+import firestore from '@react-native-firebase/firestore';
 
 const SignUpEmail = ({onNextStep}) => {
   const [email, setEmail] = useState('');
@@ -119,6 +118,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: '#07AC7D',
     alignItems: 'center',
+    justifyContent:'center',
     marginHorizontal: 16,
     marginTop: 16,
     paddingVertical: 16,

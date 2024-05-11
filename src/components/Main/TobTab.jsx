@@ -3,9 +3,7 @@ import { SafeAreaView, View, Text, TouchableOpacity, StyleSheet, Dimensions, Ima
 
 const { width, height } = Dimensions.get('window');
 
-const Tobbar = ({ navigation, route, leftFunc, rightFunc, onPressRight }) => {
-    const { address, detailAddress, showTag, deadLine, latitude, longitude, peopleCount } = route
-    // const allInfo = route;
+const TopTab = ({ navigation, leftFunc, rightFunc, onPressRight, title }) => {
 
     return (
         <SafeAreaView style={{ backgroundColor: '#FEFFFE' }}>
@@ -13,17 +11,22 @@ const Tobbar = ({ navigation, route, leftFunc, rightFunc, onPressRight }) => {
                 <View style={styles.commonRate}>
                     <TouchableOpacity
                         onPress={() => { navigation.goBack() }}
-                        style={[styles.commonRate, { gap: 10 }]}>
+                        style={styles.commonRate}>
                         {
                             leftFunc ? (<Text style={styles.topText}>{leftFunc}</Text>) : 
-                            (<Image source={backIcon} style={{ width: 28, height: 28 }} />)
+                            (<Image source={backIcon} style={{ width: 20, height: 20 }} />)
                         }
                         
                     </TouchableOpacity>
+                    <Text style={{fontWeight : '700', fontSize : 16}}>{title}</Text>
                     <TouchableOpacity
                         onPress={onPressRight}
                         style={[styles.commonRate, { gap: 10 }]}>
-                        <Text style={styles.topText}>{rightFunc}</Text>
+                        {
+                            rightFunc ? ( <Text style={styles.topText}>{rightFunc}</Text>) : (
+                                <View style={{width : 20}} />
+                            )
+                        }
                     </TouchableOpacity>
                 </View>
             </View>
@@ -41,7 +44,7 @@ const styles = StyleSheet.create({
     },
     topbarView: {
         height: 44,
-        paddingHorizontal: 24,
+        paddingHorizontal: 16,
         paddingVertical: 5,
         borderBottomWidth: 1,
         borderBottomColor: '#DBDBDB',
@@ -54,4 +57,4 @@ const styles = StyleSheet.create({
     },
 })
 
-export default Tobbar;
+export default TopTab;

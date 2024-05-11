@@ -24,3 +24,5 @@ export async function getUser(id) {
   const doc = await userCollection.doc(id).get();
   return doc.data();
 }
+
+
