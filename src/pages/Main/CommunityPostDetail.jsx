@@ -31,7 +31,7 @@ const {width, height} = Dimensions.get('window');
 
 const CommunityPostDetail = ({route}) => {
   const navigation = useNavigation();
-  const [post, setPost] = useState(null);
+  const [posts, setPosts] = useState(null);
   const [postUserData, setPostUserData] = useState(null);
   const [comments, setComments] = useState([]);
   const [commentContent, setCommentContent] = useState('');
@@ -58,6 +58,15 @@ const CommunityPostDetail = ({route}) => {
 
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      // CommunityPostDetail로 돌아올 때마다 실행
+      fetchPost(postId);
+    });
+
+    return unsubscribe;
+  }, [navigation, postId]);
 
   useEffect(() => {
     const {postId} = route.params;
@@ -101,7 +110,7 @@ const CommunityPostDetail = ({route}) => {
 
       if (documentSnapshot.exists) {
         const postData = documentSnapshot.data();
-        setPost(postData);
+        setPosts(postData);
         fetchPostUserData(postData.userId);
         setLikeCount(postData.likeCount || 0);
         setCommentCount(postData.commentCount || 0);
@@ -304,7 +313,7 @@ const CommunityPostDetail = ({route}) => {
   };
 
   const handleDelete = () => {
-    const selectedPost = post;
+    const selectedPost = posts;
     if (
       selectedPost &&
       currentUser &&
@@ -348,7 +357,7 @@ const CommunityPostDetail = ({route}) => {
   };
 
   const handleEdit = () => {
-    const selectedPost = post;
+    const selectedPost = posts;
     if (
       selectedPost &&
       currentUser &&
@@ -458,7 +467,7 @@ const CommunityPostDetail = ({route}) => {
     setIsModalVisible(!isModalVisible);
   };
 
-  if (!post || !postUserData) {
+  if (!posts || !postUserData) {
     return null;
   }
 
@@ -478,7 +487,7 @@ const CommunityPostDetail = ({route}) => {
             <View style={styles.userInfoTextContainer}>
               <Text style={styles.userNameText}>{postUserData.nickname}</Text>
               <Text style={styles.postTimeText}>
-                {formatDistanceToNow(post.post_created.toDate(), {
+                {formatDistanceToNow(posts.post_created.toDate(), {
                   addSuffix: true,
                   locale: ko,
                 })}
@@ -495,8 +504,8 @@ const CommunityPostDetail = ({route}) => {
             </TouchableOpacity>
           </View>
         </View>
-        <Text style={styles.postContentText}>{post.post_content}</Text>
-        {post?.post_files?.length > 0 ? (
+        <Text style={styles.postContentText}>{posts.post_content}</Text>
+        {posts?.post_files?.length > 0 ? (
           <View style={styles.postImageWrapper}>
             <SwiperFlatList
               autoplay
@@ -507,7 +516,7 @@ const CommunityPostDetail = ({route}) => {
               paginationActiveColor="#07AC7D"
               paginationStyleItem={styles.paginationStyleItems}
               paginationStyleItemActive={styles.paginationStyleItemActives}
-              data={post.post_files}
+              data={posts.post_files}
               style={styles.postSwiperFlatList}
               renderItem={({item, index}) => (
                 <TouchableOpacity
@@ -565,7 +574,7 @@ const CommunityPostDetail = ({route}) => {
       <View style={styles.separatorBottom} />
       {isImageModalVisible && (
         <ImageDetailModal
-          images={post.post_files}
+          images={posts.post_files}
           currentIndex={currentImageIndex}
           isVisible={isImageModalVisible}
           onClose={() => setIsImageModalVisible(false)}

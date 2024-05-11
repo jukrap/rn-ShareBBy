@@ -30,8 +30,6 @@ const {width, height} = Dimensions.get('window');
 const CommunityBoard = ({navigation}) => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [lastVisible, setLastVisible] = useState(null);
-  const [refreshing, setRefreshing] = useState(false);
   const [oldestVisible, setOldestVisible] = useState(null);
   const [newestVisible, setNewestVisible] = useState(null);
   const [refreshingOlder, setRefreshingOlder] = useState(false);
@@ -55,12 +53,6 @@ const CommunityBoard = ({navigation}) => {
       fetchInitialPosts();
     }, []),
   );
-  /*
-  useEffect(() => {
-    fetchPost();
-    setDeleted(false);
-  }, [deleted]);
-  */
 
   const fetchInitialPosts = async () => {
     setLoading(true);
@@ -144,62 +136,9 @@ const CommunityBoard = ({navigation}) => {
     }
   };
 
-  const fetchPosts = async () => {
-    setLoading(true);
-
-    try {
-      const querySnapshot = await firestore()
-        .collection('posts')
-        .where('post_actflag', '==', true)
-        .orderBy('post_created', 'desc')
-        .limit(10)
-        .get();
-
-      const newPosts = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-
-      setPosts(newPosts);
-      setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1]);
-      setLoading(false);
-    } catch (e) {
-      console.log(e);
-      setLoading(false);
-    }
-  };
-
-  const fetchMorePosts = async () => {
-    if (lastVisible) {
-      setRefreshing(true);
-
-      try {
-        const querySnapshot = await firestore()
-          .collection('posts')
-          .where('post_actflag', '==', true)
-          .orderBy('post_created', 'desc')
-          .startAfter(lastVisible)
-          .limit(10)
-          .get();
-
-        const newPosts = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-
-        setPosts([...posts, ...newPosts]);
-        setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1]);
-        setRefreshing(false);
-      } catch (e) {
-        console.log(e);
-        setRefreshing(false);
-      }
-    }
-  };
-
   const handleDelete = postId => {
-    if (post) {
-      const selectedPost = post.find(item => item.id === postId);
+    if (posts) {
+      const selectedPost = posts.find(item => item.id === postId);
 
       if (
         selectedPost &&
@@ -245,8 +184,8 @@ const CommunityBoard = ({navigation}) => {
   };
 
   const handleEdit = postId => {
-    if (post) {
-      const selectedPost = post.find(item => item.id === postId);
+    if (posts) {
+      const selectedPost = posts.find(item => item.id === postId);
 
       if (
         selectedPost &&
