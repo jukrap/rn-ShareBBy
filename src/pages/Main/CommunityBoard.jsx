@@ -22,9 +22,9 @@ import auth from '@react-native-firebase/auth';
 import {Modal} from 'react-native-modal';
 
 import {useNavigation} from '@react-navigation/native';
+import CommunityHeader from '../../components/Community/CommunityHeader';
 
 const {width, height} = Dimensions.get('window');
-
 
 const CommunityBoard = ({navigation}) => {
   const [post, setPost] = useState([]);
@@ -77,7 +77,6 @@ const CommunityBoard = ({navigation}) => {
       if (loading) {
         setLoading(false);
       }
-
     } catch (e) {
       console.log(e);
     }
@@ -157,7 +156,7 @@ const CommunityBoard = ({navigation}) => {
         currentUser &&
         currentUser.uid === selectedPost.userId
       ) {
-          editPost(postId)
+        editPost(postId);
       } else {
         Alert.alert('권한 없음', '게시글 작성자만 수정할 수 있습니다.');
       }
@@ -172,8 +171,8 @@ const CommunityBoard = ({navigation}) => {
     navigation.navigate('Profile', {userId});
   };
 
-  const handlePostDetail = (postId) => {
-    navigation.navigate('CommunityPostDetail', { postId });
+  const handlePostDetail = postId => {
+    navigation.navigate('CommunityPostDetail', {postId});
   };
 
   const ListHeader = () => {
@@ -184,33 +183,15 @@ const CommunityBoard = ({navigation}) => {
       {loading ? (
         <ScrollView
           style={{flex: 1}}
-          contentContainerStyle={{alignItems: 'center'}}>
-        </ScrollView>
+          contentContainerStyle={{alignItems: 'center'}}></ScrollView>
       ) : (
         <View style={{flex: 1, backgroundColor: '#FEFFFE'}}>
-          <View style={styles.topView}>
-            <View style={styles.searchAndWriteContainer}>
-              <View style={styles.searchGroup}>
-                <View />
-                <Image source={searchIcon} style={{width: 24, height: 24}} />
-                <TextInput
-                  placeholder="검색"
-                  placeholderTextColor="#898989"
-                  style={{flex: 1, fontSize: 12, fontFamily: 'Pretendard'}}
-                />
-              </View>
-
-              <TouchableOpacity
-                style={styles.postWriteButton}
-                onPress={() => navigation.navigate('CommunityAddPost')}>
-                <Image
-                  style={styles.pencilIcon}
-                  resizeMode="cover"
-                  source={pencilIcon}
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
+          <CommunityHeader
+            showBackButton={false}
+            rightIcon={pencilIcon}
+            title={'실시간 게시판'}
+            onPressRightIcon={() => navigation.navigate('CommunityAddPost')}
+          />
           <View style={styles.Container}>
             <FlatList
               data={post}
@@ -227,7 +208,7 @@ const CommunityBoard = ({navigation}) => {
               keyExtractor={item => item.id}
               ListHeaderComponent={() => (
                 <View style={styles.realtimeTextContainer}>
-                  <Text style={styles.realtimeText}>실시간</Text>
+                  <Text style={styles.realtimeText}>게시글</Text>
                 </View>
               )}
               ListFooterComponent={ListHeader}
@@ -247,10 +228,8 @@ const pencilIcon = require('../../assets/icons/pencilIcon.png');
 
 const styles = StyleSheet.create({
   Container: {
-    flex: 1,
     alignItems: 'center',
     backgroundColor: '#FEFFFE',
-    padding: 20,
   },
   topView: {
     width: '100%',
@@ -307,7 +286,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 1,
   },
   realtimeTextContainer: {
-    marginTop: 56,
+    marginTop: 8,
     marginBottom: 16,
     marginLeft: 4,
   },

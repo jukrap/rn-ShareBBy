@@ -19,7 +19,7 @@ import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import {useNavigation} from '@react-navigation/native';
-import PostHeader from '../../components/Community/PostHeader';
+import CommunityHeader from '../../components/Community/CommunityHeader';
 import BottomSheetModal from '../../components/Community/BottomSheetModal';
 
 const CommunityEditPost = ({route}) => {
@@ -224,8 +224,8 @@ const CommunityEditPost = ({route}) => {
 
   return (
     <SafeAreaView style={{flex: 1}}>
+    <CommunityHeader onPressRightText = {handlePostUpdate} rightText= {"등록"} title={"기존 게시글"}/>
       <View style={styles.container}>
-        <PostHeader onSubmit={handlePostUpdate} />
         <View style={styles.contentWrapper}>
           <View style={styles.postInputContainer}>
             <Text style={styles.postInputLabel}>내용</Text>

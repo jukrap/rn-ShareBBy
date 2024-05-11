@@ -18,7 +18,7 @@ import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 
-import PostHeader from '../../components/Community/PostHeader';
+import CommunityHeader from '../../components/Community/CommunityHeader';
 import BottomSheetModal from '../../components/Community/BottomSheetModal';
 
 const CommunityAddPost = () => {
@@ -242,8 +242,8 @@ const CommunityAddPost = () => {
 
   return (
     <SafeAreaView style={{flex: 1}}>
+    <CommunityHeader onPressRightText = {handlePostSubmit} rightText= {"등록"} title={"새로운 게시글"}/>
       <View style={styles.container}>
-        <PostHeader onSubmit={handlePostSubmit} />
         <View style={styles.contentWrapper}>
           <View style={styles.postInputContainer}>
             <Text style={styles.postInputLabel}>내용</Text>
