@@ -32,6 +32,10 @@ const CommunityBoard = ({navigation}) => {
   const [loading, setLoading] = useState(true);
   const [lastVisible, setLastVisible] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [oldestVisible, setOldestVisible] = useState(null);
+  const [newestVisible, setNewestVisible] = useState(null);
+  const [refreshingOlder, setRefreshingOlder] = useState(false);
+  const [refreshingNewer, setRefreshingNewer] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
@@ -41,6 +45,104 @@ const CommunityBoard = ({navigation}) => {
 
     return unsubscribe;
   }, []);
+
+  useEffect(() => {
+    fetchInitialPosts();
+  }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchInitialPosts();
+    }, []),
+  );
+  /*
+  useEffect(() => {
+    fetchPost();
+    setDeleted(false);
+  }, [deleted]);
+  */
+
+  const fetchInitialPosts = async () => {
+    setLoading(true);
+
+    try {
+      const querySnapshot = await firestore()
+        .collection('posts')
+        .where('post_actflag', '==', true)
+        .orderBy('post_created', 'desc')
+        .limit(10)
+        .get();
+
+      const initialPosts = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setPosts(initialPosts);
+      setOldestVisible(querySnapshot.docs[querySnapshot.docs.length - 1]);
+      setNewestVisible(querySnapshot.docs[0]);
+      setLoading(false);
+    } catch (e) {
+      console.log(e);
+      setLoading(false);
+    }
+  };
+
+  const fetchOlderPosts = async () => {
+    if (oldestVisible) {
+      setRefreshingOlder(true);
+
+      try {
+        const querySnapshot = await firestore()
+          .collection('posts')
+          .where('post_actflag', '==', true)
+          .orderBy('post_created', 'desc')
+          .startAfter(oldestVisible)
+          .limit(10)
+          .get();
+
+        const olderPosts = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        setPosts([...posts, ...olderPosts]);
+        setOldestVisible(querySnapshot.docs[querySnapshot.docs.length - 1]);
+        setRefreshingOlder(false);
+      } catch (e) {
+        console.log(e);
+        setRefreshingOlder(false);
+      }
+    }
+  };
+
+  const fetchNewerPosts = async () => {
+    if (newestVisible) {
+      setRefreshingNewer(true);
+
+      try {
+        const querySnapshot = await firestore()
+          .collection('posts')
+          .where('post_actflag', '==', true)
+          .orderBy('post_created', 'desc')
+          .endBefore(newestVisible)
+          .limit(10)
+          .get();
+
+        const newerPosts = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        setPosts([...newerPosts, ...posts]);
+        setNewestVisible(querySnapshot.docs[0]);
+        setRefreshingNewer(false);
+      } catch (e) {
+        console.log(e);
+        setRefreshingNewer(false);
+      }
+    }
+  };
 
   const fetchPosts = async () => {
     setLoading(true);
@@ -94,22 +196,6 @@ const CommunityBoard = ({navigation}) => {
       }
     }
   };
-
-  useEffect(() => {
-    fetchPosts();
-  }, []);
-
-  useFocusEffect(
-    React.useCallback(() => {
-      fetchPosts();
-    }, []),
-  );
-  /*
-  useEffect(() => {
-    fetchPost();
-    setDeleted(false);
-  }, [deleted]);
-  */
 
   const handleDelete = postId => {
     if (post) {
@@ -191,7 +277,7 @@ const CommunityBoard = ({navigation}) => {
   };
 
   const renderFooter = () => {
-    if (!refreshing) return null;
+    if (!refreshingOlder) return null;
 
     return (
       <ActivityIndicator
@@ -199,6 +285,24 @@ const CommunityBoard = ({navigation}) => {
         color="#07AC7D"
         style={{marginVertical: 16, marginBottom: 32}}
       />
+    );
+  };
+
+  const renderHeader = () => {
+    return (
+      <View>
+        {refreshingNewer ? (
+          <ActivityIndicator
+            size="large"
+            color="#07AC7D"
+            style={{marginVertical: 16}}
+          />
+        ) : (
+          <View style={styles.realtimeTextContainer}>
+            <Text style={styles.realtimeText}>게시글</Text>
+          </View>
+        )}
+      </View>
     );
   };
 
@@ -230,14 +334,12 @@ const CommunityBoard = ({navigation}) => {
                 />
               )}
               keyExtractor={item => item.id}
-              ListHeaderComponent={() => (
-                <View style={styles.realtimeTextContainer}>
-                  <Text style={styles.realtimeText}>게시글</Text>
-                </View>
-              )}
-              onEndReached={fetchMorePosts}
-              onEndReachedThreshold={0.5}
+              ListHeaderComponent={renderHeader}
               ListFooterComponent={renderFooter}
+              onEndReached={fetchOlderPosts}
+              onEndReachedThreshold={0.5}
+              refreshing={refreshingNewer}
+              onRefresh={fetchNewerPosts}
               showsVerticalScrollIndicator={false}
             />
           )}

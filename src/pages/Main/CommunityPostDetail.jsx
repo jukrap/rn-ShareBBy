@@ -134,7 +134,7 @@ const CommunityPostDetail = ({route}) => {
         .where('comment_actflag', '==', true)
         .where('postId', '==', postId)
         .orderBy('comment_created', 'asc')
-        .limit(4)
+        .limit(10)
         .get();
 
       const commentData = querySnapshot.docs.map(doc => ({
@@ -160,7 +160,7 @@ const CommunityPostDetail = ({route}) => {
           .where('postId', '==', postId)
           .orderBy('comment_created', 'asc')
           .startAfter(lastVisible)
-          .limit(4)
+          .limit(10)
           .get();
 
         const newComments = querySnapshot.docs.map(doc => ({
