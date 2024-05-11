@@ -7,25 +7,27 @@ import {
   ActivityIndicator,
   TextInput,
   Image,
-  SafeAreaView,
   TouchableOpacity,
+  SafeAreaView,
+  Modal,
+  Platform,
   ScrollView,
 } from 'react-native';
 import ImagePicker from 'react-native-image-crop-picker';
-import {useNavigation, useRoute} from '@react-navigation/native';
-import Modal from 'react-native-modal';
+
 import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
-
+import {useNavigation} from '@react-navigation/native';
 import CommunityHeader from '../../components/Community/CommunityHeader';
 import BottomSheetModal from '../../components/Community/BottomSheetModal';
 
-const CommunityAddPost = () => {
+const CommunityEditPost = ({route}) => {
   const navigation = useNavigation();
-  const route = useRoute();
-
-  const [selectedImages, setSelectedImages] = useState([]); // 선택된 이미지 배열
+  const [selectedImages, setSelectedImages] = useState({
+    existingImages: [], // 기존 이미지 URL 배열
+    newImages: [], // 새로 선택한 이미지 배열
+  });
   const [isUploading, setIsUploading] = useState(false); // 업로드 상태
   const [uploadProgress, setUploadProgress] = useState(0); // 업로드 진행률
   const [postContent, setPostContent] = useState(null); // 게시글 내용
@@ -34,6 +36,7 @@ const CommunityAddPost = () => {
   const [isImagePickerModalVisible, setIsImagePickerModalVisible] =
     useState(false); // 이미지 선택 모달의 가시성을 담당
   const [currentUser, setCurrentUser] = useState(null);
+  const [postId, setPostId] = useState(null); // 수정할 게시글의 ID
 
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged(user => {
@@ -44,89 +47,58 @@ const CommunityAddPost = () => {
   }, []);
 
   useEffect(() => {
-    if (route.params?.action === 'submitPost') {
-      if (postContent && postContent.trim() !== '') {
-        submitPost(selectedImages);
-      } else {
-        Alert.alert('게시글 내용을 입력해주세요.');
-        navigation.setParams({action: ''});
+    // 수정할 게시글의 ID를 route params에서 가져옴
+    const {postId} = route.params;
+    setPostId(postId);
+
+    // Firestore에서 해당 게시글의 데이터를 가져와서 state에 저장
+    const fetchPost = async () => {
+      try {
+        const postDoc = await firestore().collection('posts').doc(postId).get();
+        if (postDoc.exists) {
+          const postData = postDoc.data();
+          setPostContent(postData.post_content);
+          setSelectedImages({
+            existingImages: postData.post_files,
+            newImages: [],
+          });
+        }
+      } catch (error) {
+        console.log('게시글 데이터를 가져오는 중 오류 발생:', error);
       }
-    }
-  }, [route.params, postContent, selectedImages, submitPost, navigation]);
+    };
 
-  useEffect(() => {
-    console.log('useEffect selectedImages updated:', selectedImages);
-  }, [selectedImages]);
+    fetchPost();
+  }, [route.params]);
 
-  // 게시글 제출 핸들러
-  const handlePostSubmit = useCallback(() => {
+  // 게시글 수정 핸들러
+  const handlePostUpdate = useCallback(async () => {
     if (postContent && postContent.trim() !== '') {
-      submitPost(selectedImages);
+      try {
+        // 새로 추가된 이미지 업로드
+        const newImageUrls = await Promise.all(
+          selectedImages.newImages.map(image => uploadImage(image)),
+        );
+
+        // Firestore에서 게시글 업데이트
+        await firestore()
+          .collection('posts')
+          .doc(postId)
+          .update({
+            post_content: postContent,
+            post_files: [...selectedImages.existingImages, ...newImageUrls],
+          });
+
+        console.log('게시글 수정 완료!');
+        Alert.alert('게시글 수정!', '성공적으로 게시글이 수정되었습니다!');
+        navigation.goBack();
+      } catch (error) {
+        console.log('게시글을 수정하는 중 오류 발생:', error);
+      }
     } else {
       Alert.alert('게시글 내용을 입력해주세요.');
     }
-  }, [postContent, selectedImages, submitPost]);
-
-  // 게시글 제출 함수
-  const submitPost = async images => {
-    if (!postContent || postContent.trim() === '') {
-      Alert.alert('게시글 내용을 입력해주세요.');
-      return;
-    }
-
-    if (!currentUser) {
-      console.log('사용자가 로그인되어 있지 않습니다.');
-      return;
-    }
-    setIsUploading(true);
-
-    try {
-      // 선택된 이미지들 업로드 및 URL 배열 반환
-      const imageUrls = await Promise.all(
-        images.map(image => uploadImage(image)),
-      );
-
-      console.log('selectedImages: ', selectedImages);
-      console.log('이미지 URLs: ', imageUrls);
-      console.log('게시글 내용: ', postContent);
-
-      // Firestore에 게시글 추가
-      await firestore()
-        .collection('posts')
-        .add({
-          userId: currentUser.uid,
-          post_content: postContent,
-          post_files: imageUrls,
-          post_created: firestore.Timestamp.fromDate(new Date()),
-          post_actflag: true,
-        });
-
-      console.log('게시글 업로드 완료!');
-      Alert.alert('게시글 업로드!', '성공적으로 게시글이 업로드됐습니다!');
-      setPostContent(null);
-      setSelectedImages([]);
-      navigation.goBack();
-    } catch (error) {
-      console.log(
-        'Firestore에 게시물을 추가하는 중에 문제가 발생했습니다.',
-        error,
-      );
-    }
-
-    setIsUploading(false);
-  };
-
-  // 게시글 내용 변경 핸들러
-  const handlePostContentChange = text => {
-    if (text.length <= maxPostContentLength) {
-      setPostContent(text);
-      setPostContentLength(text.length);
-    }
-  };
-
-  const removeImage = image => {
-    setSelectedImages(selectedImages.filter(img => img !== image));
-  };
+  }, [postContent, selectedImages, postId, navigation]);
 
   // 이미지 업로드 함수
   const uploadImage = async image => {
@@ -173,6 +145,22 @@ const CommunityAddPost = () => {
     }
   };
 
+  // 게시글 내용 변경 핸들러
+  const handlePostContentChange = text => {
+    if (text.length <= maxPostContentLength) {
+      setPostContent(text);
+      setPostContentLength(text.length);
+    }
+  };
+
+  //이미지 삭제 함수
+  const removeImage = image => {
+    setSelectedImages(prevState => ({
+      existingImages: prevState.existingImages.filter(img => img !== image),
+      newImages: prevState.newImages.filter(img => img !== image),
+    }));
+  };
+
   // 이미지 선택기 열기
   const openImagePicker = () => {
     setIsImagePickerModalVisible(true);
@@ -187,7 +175,6 @@ const CommunityAddPost = () => {
       );
       return;
     }
-
     ImagePicker.openCamera({
       width: 1200,
       height: 780,
@@ -196,7 +183,10 @@ const CommunityAddPost = () => {
       .then(image => {
         console.log(image);
         const imageUri = Platform.OS === 'ios' ? image.sourceURL : image.path;
-        setSelectedImages([...selectedImages, imageUri]);
+        setSelectedImages(prevState => ({
+          ...prevState,
+          newImages: [...prevState.newImages, imageUri],
+        }));
         setIsImagePickerModalVisible(false);
       })
       .catch(error => {
@@ -213,26 +203,18 @@ const CommunityAddPost = () => {
       );
       return;
     }
-
     ImagePicker.openPicker({
       width: 900,
       height: 900,
       cropping: true,
     })
       .then(image => {
-        console.log('first input image : ' + image.path);
+        console.log(image);
         const imageUri = Platform.OS === 'ios' ? image.sourceURL : image.path;
-        console.log('imageUri1 = ', imageUri);
-        setSelectedImages(prevSelectedImages => [
-          ...JSON.parse(JSON.stringify(prevSelectedImages)),
-          imageUri,
-        ]);
-        //TODO: 깊은 복사로 바꾸기
-        //ㅅㅂ 이거 뭐야
-        //이 구조로 setSelectedImages에 imageUri이 안들어갈 수 있나?
-        //심지어 imageUri에는 파일이 있는데도?
-        console.log('imageUri2 = ', imageUri);
-        console.log('selectedImages = ', selectedImages);
+        setSelectedImages(prevState => ({
+          ...prevState,
+          newImages: [...prevState.newImages, imageUri],
+        }));
         setIsImagePickerModalVisible(false);
       })
       .catch(error => {
@@ -242,7 +224,7 @@ const CommunityAddPost = () => {
 
   return (
     <SafeAreaView style={{flex: 1}}>
-    <CommunityHeader onPressRightText = {handlePostSubmit} rightText= {"등록"} title={"새로운 게시글"}/>
+    <CommunityHeader onPressRightText = {handlePostUpdate} rightText= {"등록"} title={"기존 게시글"}/>
       <View style={styles.container}>
         <View style={styles.contentWrapper}>
           <View style={styles.postInputContainer}>
@@ -276,40 +258,45 @@ const CommunityAddPost = () => {
                 onPress={openImagePicker}>
                 <Image source={cameraIcon} style={{width: 24, height: 24}} />
                 <Text style={styles.imageUploadButtonText}>
-                  {selectedImages.length}
+                  {selectedImages.existingImages.length +
+                    selectedImages.newImages.length}
                 </Text>
               </TouchableOpacity>
               <ScrollView horizontal>
-                {selectedImages.slice(0, 3).map((image, index) => (
-                  <View key={index} style={styles.imageThumbnailContainer}>
-                    <Image
-                      source={{uri: image}}
-                      style={styles.imageThumbnail}
-                    />
-                    <TouchableOpacity
-                      style={styles.removeImageButton}
-                      onPress={() => removeImage(image)}>
-                      <Text style={styles.removeImageButtonText}>X</Text>
-                    </TouchableOpacity>
-                  </View>
-                ))}
+                {[...selectedImages.existingImages, ...selectedImages.newImages]
+                  .slice(0, 3)
+                  .map((image, index) => (
+                    <View key={index} style={styles.imageThumbnailContainer}>
+                      <Image
+                        source={{uri: image}}
+                        style={styles.imageThumbnail}
+                      />
+                      <TouchableOpacity
+                        style={styles.removeImageButton}
+                        onPress={() => removeImage(image)}>
+                        <Text style={styles.removeImageButtonText}>X</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ))}
               </ScrollView>
             </View>
             <ScrollView>
               <View style={styles.imageGrid}>
-                {selectedImages.slice(3).map((image, index) => (
-                  <View key={index} style={styles.imageThumbnailContainer}>
-                    <Image
-                      source={{uri: image}}
-                      style={styles.imageThumbnail}
-                    />
-                    <TouchableOpacity
-                      style={styles.removeImageButton}
-                      onPress={() => removeImage(image)}>
-                      <Text style={styles.removeImageButtonText}>X</Text>
-                    </TouchableOpacity>
-                  </View>
-                ))}
+                {[...selectedImages.existingImages, ...selectedImages.newImages]
+                  .slice(3)
+                  .map((image, index) => (
+                    <View key={index} style={styles.imageThumbnailContainer}>
+                      <Image
+                        source={{uri: image}}
+                        style={styles.imageThumbnail}
+                      />
+                      <TouchableOpacity
+                        style={styles.removeImageButton}
+                        onPress={() => removeImage(image)}>
+                        <Text style={styles.removeImageButtonText}>X</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ))}
               </View>
             </ScrollView>
           </View>
@@ -337,7 +324,7 @@ const CommunityAddPost = () => {
   );
 };
 
-export default CommunityAddPost;
+export default CommunityEditPost;
 
 const cameraIcon = require('../../assets/icons/cameraIcon.png');
 const pictureIcon = require('../../assets/icons/pictureIcon.png');
@@ -375,6 +362,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Pretendard',
     paddingHorizontal: 8,
     fontSize: 14,
+    fontFamily: 'Pretendard',
     fontWeight: 'bold',
     color: '#07ac7d',
   },
@@ -445,7 +433,6 @@ const styles = StyleSheet.create({
   removeImageButtonText: {
     color: '#FEFFFE',
     fontSize: 12,
-    fontFamily: 'Pretendard',
     fontWeight: 'bold',
   },
   imagePickerModalContainer: {
@@ -485,8 +472,7 @@ const styles = StyleSheet.create({
   uploadStatusWrapper: {
     alignItems: 'center',
     marginTop: 16,
-  },
-  modalContent: {
+  },  modalContent: {
     padding: 16,
   },
   modalButton: {
