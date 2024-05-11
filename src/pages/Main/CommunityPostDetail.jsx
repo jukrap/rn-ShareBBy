@@ -11,6 +11,7 @@ import {
   StyleSheet,
   SafeAreaView,
   KeyboardAvoidingView,
+  ActivityIndicator,
 } from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
 import storage from '@react-native-firebase/storage';
@@ -45,6 +46,8 @@ const CommunityPostDetail = ({route}) => {
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [isImageModalVisible, setIsImageModalVisible] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [lastVisible, setLastVisible] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   const maxCommentContentLength = 200;
 
@@ -67,6 +70,27 @@ const CommunityPostDetail = ({route}) => {
       fetchComments();
     }
   }, [postId]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      // 현재 사용자가 해당 게시글에 좋아요를 눌렀는지 확인
+      const checkLikeStatus = async () => {
+        if (currentUser) {
+          const likeDoc = await firestore()
+            .collection('likes')
+            .where('postId', '==', postId)
+            .where('userId', '==', currentUser.uid)
+            .get();
+
+          if (!likeDoc.empty) {
+            setIsLiked(true);
+          }
+        }
+      };
+
+      checkLikeStatus();
+    }, [currentUser, postId]),
+  );
 
   const fetchPost = async postId => {
     try {
@@ -110,6 +134,7 @@ const CommunityPostDetail = ({route}) => {
         .where('comment_actflag', '==', true)
         .where('postId', '==', postId)
         .orderBy('comment_created', 'asc')
+        .limit(4)
         .get();
 
       const commentData = querySnapshot.docs.map(doc => ({
@@ -118,31 +143,52 @@ const CommunityPostDetail = ({route}) => {
       }));
 
       setComments(commentData);
+      setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1]);
     } catch (error) {
       console.log('댓글을 가져오는 중에 오류가 발생했습니다:', error);
     }
   };
 
-  useFocusEffect(
-    React.useCallback(() => {
-      // 현재 사용자가 해당 게시글에 좋아요를 눌렀는지 확인
-      const checkLikeStatus = async () => {
-        if (currentUser) {
-          const likeDoc = await firestore()
-            .collection('likes')
-            .where('postId', '==', postId)
-            .where('userId', '==', currentUser.uid)
-            .get();
+  const fetchMoreComments = async () => {
+    if (lastVisible) {
+      setRefreshing(true);
 
-          if (!likeDoc.empty) {
-            setIsLiked(true);
-          }
-        }
-      };
+      try {
+        const querySnapshot = await firestore()
+          .collection('comments')
+          .where('comment_actflag', '==', true)
+          .where('postId', '==', postId)
+          .orderBy('comment_created', 'asc')
+          .startAfter(lastVisible)
+          .limit(4)
+          .get();
 
-      checkLikeStatus();
-    }, [currentUser, postId]),
-  );
+        const newComments = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        setComments([...comments, ...newComments]);
+        setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1]);
+        setRefreshing(false);
+      } catch (error) {
+        console.log('추가 댓글을 가져오는 중에 오류가 발생했습니다:', error);
+        setRefreshing(false);
+      }
+    }
+  };
+
+  const renderFooter = () => {
+    if (!refreshing) return null;
+
+    return (
+      <ActivityIndicator
+        size="large"
+        color="#07AC7D"
+        style={{marginVertical: 16, marginBottom: 32}}
+      />
+    );
+  };
 
   const handleLikePress = async () => {
     if (currentUser && !isLikeProcessing) {
@@ -504,12 +550,10 @@ const CommunityPostDetail = ({route}) => {
                 {likeCount}
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.interactionButton}
-              onPress={() => {}}>
+            <View style={styles.interactionButton} onPress={() => {}}>
               <Image source={commentLineIcon} style={{width: 24, height: 24}} />
               <Text style={styles.interactionText}>{commentCount}</Text>
-            </TouchableOpacity>
+            </View>
           </View>
           <View style={styles.rightInteractionContainer}>
             <TouchableOpacity style={styles.interactionRightButton}>
@@ -558,6 +602,9 @@ const CommunityPostDetail = ({route}) => {
             />
           )}
           keyExtractor={(item, index) => item.id || index.toString()}
+          onEndReached={fetchMoreComments}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={renderFooter}
           style={styles.container}
         />
         <View style={styles.commentInputContainer}>
