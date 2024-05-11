@@ -468,7 +468,6 @@ const ChatRoom = ({route, navigation}) => {
           <View style={{flex: 0.25}}></View>
           <View
             style={{
-              backgroundColor: 'red',
               width: '100%',
               flex: 0.6,
               paddingHorizontal: 12,

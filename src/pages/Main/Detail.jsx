@@ -480,7 +480,7 @@ import DatePicker from 'react-native-date-picker';
 import Modal from 'react-native-modal';
 import firestore from '@react-native-firebase/firestore';
 
-import {recruitHobby} from '../../lib/hobby';
+import {recruitHobby, getHobbies} from '../../lib/hobby';
 import Tobbar from '../../components/Main/TobTab';
 
 const {width, height} = Dimensions.get('window');
@@ -562,23 +562,24 @@ const Detail = ({route, navigation}) => {
       writeTime,
     };
     try {
-      await recruitHobby(body);
-      console.log('==============> 🚀 success post body : ', body);
-      // setSelectedUsers([body.user_id])
+      const res = await recruitHobby(body);
+      console.log('==============> 🚀 success res : ', res);
+      setSelectedUsers([body.user_id]);
       setIsModalVisible(false);
-      createGroupChat();
+      createGroupChat(res);
     } catch (e) {
       console.log('error ======> ', e);
     }
   };
 
-  const createGroupChat = async () => {
+  const createGroupChat = async hobbiesId => {
     try {
       const chatRoomRef = await firestore()
         .collection('chatRooms')
         .add({
           name: detailContent.showTitle,
           members: [id],
+          hobbiesId: hobbiesId,
         });
       setSelectedUsers([]);
       console.log('채팅방 생성됨');
