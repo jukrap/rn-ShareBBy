@@ -15,6 +15,7 @@ import Profile from '../pages/Main/Profile';
 import EditProfile from '../pages/Main/EditProfile';
 import SynthesisAgree from '../components/SignUp/AgreeList/SynthesisAgree';
 import MyPosts from '../pages/Main/MyPosts';
+import LoginTab from './LoginTab';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -23,6 +24,7 @@ const AboutMap = ({params}) => {
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name="Main" component={Main} initialParams={params} />
+      <Stack.Screen name="Profile" component={Profile} initialParams={params} />
       <Stack.Screen name="Recruit" component={Recruit} initialParams={params} />
       <Stack.Screen name="Join" component={Join} initialParams={params} />
       <Stack.Screen name="Detail" component={Detail} initialParams={params} />

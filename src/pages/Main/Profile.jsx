@@ -13,8 +13,10 @@ import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 // import ImagePicker from 'react-native-image-crop-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import useStore from '../../lib/useStore';
+import useStore from '../../lib/userStore';
 import {useFocusEffect} from '@react-navigation/native';
+import { StackActions } from '@react-navigation/native';
+
 const heart = require('../../assets/newIcons/heart-icon.png');
 const pencil = require('../../assets/newIcons/pencil-icon.png');
 const marker = require('../../assets/newIcons/marker-icon.png');
@@ -85,9 +87,9 @@ const Profile = ({navigation, route}) => {
       // Firebase에서 로그아웃
       await auth().signOut();
 
-      await AsyncStorage.removeItem('userToken');
+      await AsyncStorage.removeItem('userInfo');
 
-      navigation.navigate('LoginTab');
+      navigation.replace('Login');
     } catch (error) {
       console.error('로그아웃 실패:', error);
     }

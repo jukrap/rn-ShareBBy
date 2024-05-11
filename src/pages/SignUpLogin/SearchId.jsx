@@ -100,7 +100,8 @@ const SignUpEmail = ({navigation}) => {
             </TouchableOpacity>
           </View>
         </View>
-        <Modal visible={showModal} transparent animationType="slide">
+      </KeyboardAvoidingView>
+      <Modal visible={showModal} transparent animationType="slide">
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <Text style={styles.modalText}>아이디 찾기 결과</Text>
@@ -120,7 +121,6 @@ const SignUpEmail = ({navigation}) => {
             </View>
           </View>
         </Modal>
-      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   modalButton1: {
-    backgroundColor: '#07AC7D',
+    backgroundColor: '#A7A7A7',
     paddingVertical: 10,
     width: 130,
     borderRadius: 5,

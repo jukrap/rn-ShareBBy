@@ -7,7 +7,7 @@ import {WEB_CLIENT_ID} from '@env';
 import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import useStore from './useStore';
+import useStore from './userStore';
 
 // 네이버 로그인 초기화
 const initializeNaverLogin = async () => {

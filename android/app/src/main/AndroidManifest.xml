@@ -18,7 +18,6 @@
         android:launchMode="singleTask"
         android:windowSoftInputMode="adjustPan"
         android:exported="true"
-        android:theme="@style/BootTheme"
         >
         
         <intent-filter>

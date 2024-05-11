@@ -2404,11 +2404,9 @@ PODS:
     - React-perflogger (= 0.74.0)
     - React-utils (= 0.74.0)
   - RecaptchaInterop (100.0.0)
-  - RNBootSplash (5.5.3):
-    - React-Core
   - RNCAsyncStorage (1.23.1):
     - React-Core
-  - RNCMaskedView (0.3.1):
+  - RNCMaskedView (0.2.8):
     - React-Core
   - RNFastImage (8.6.3):
     - React-Core
@@ -2613,7 +2611,6 @@ DEPENDENCIES:
   - React-runtimescheduler (from `../node_modules/react-native/ReactCommon/react/renderer/runtimescheduler`)
   - React-utils (from `../node_modules/react-native/ReactCommon/react/utils`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
-  - RNBootSplash (from `../node_modules/react-native-bootsplash`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
   - "RNCMaskedView (from `../node_modules/@react-native-masked-view/masked-view`)"
   - RNFastImage (from `../node_modules/react-native-fast-image`)
@@ -2793,8 +2790,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/react/utils"
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
-  RNBootSplash:
-    :path: "../node_modules/react-native-bootsplash"
   RNCAsyncStorage:
     :path: "../node_modules/@react-native-async-storage/async-storage"
   RNCMaskedView:
@@ -2922,9 +2917,8 @@ SPEC CHECKSUMS:
   React-utils: e3a1dd8f290ecc2a015d8de54c9ffbc04ada7605
   ReactCommon: caf0aeedbd8afc25731582379f15a4f86407ae29
   RecaptchaInterop: 7d1a4a01a6b2cb1610a47ef3f85f0c411434cb21
-  RNBootSplash: e025d4ee98d942ee6c8b495a6fe66339a6b5f6dd
   RNCAsyncStorage: 826b603ae9c0f88b5ac4e956801f755109fa4d5c
-  RNCMaskedView: 090213d32d8b3bb83a4dcb7d12c18f0152591906
+  RNCMaskedView: bc0170f389056201c82a55e242e5d90070e18e5a
   RNFastImage: 5c9c9fed9c076e521b3f509fe79e790418a544e8
   RNFBApp: 91311b27bc9a33e23b76a62825afd1635501018a
   RNFBAuth: 92172d8976baaa829825017174106e2b2c550319
@@ -2942,7 +2936,7 @@ SPEC CHECKSUMS:
   SDWebImageWebPCoder: 908b83b6adda48effe7667cd2b7f78c897e5111d
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
   TOCropViewController: b9b2905938c0424f289ea2d9964993044913fac6
-  Yoga: 3f9165051bbc60b66f6a88c5eeafd9e9faa29500
+  Yoga: d97d4830fe26d7abad29a92f2b11012d2e1f58d1
 
 PODFILE CHECKSUM: 5d0e5b908db75e5ddbab222ee98f0ae44effb92e
 
