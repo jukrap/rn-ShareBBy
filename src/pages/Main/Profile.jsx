@@ -12,9 +12,9 @@ import {
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import useStore from '../../lib/userStore';
+import userStore from '../../lib/userStore';
 import {useFocusEffect} from '@react-navigation/native';
-import { StackActions } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 
 const heart = require('../../assets/newIcons/heart-icon.png');
 const pencil = require('../../assets/newIcons/pencil-icon.png');
@@ -23,12 +23,13 @@ const marker = require('../../assets/newIcons/marker-icon.png');
 const {width, height} = Dimensions.get('window');
 const rightArrow = require('../../assets/icons/right-arrow.png');
 
-const Profile = ({navigation, route}) => {
+const Profile = () => {
   const [users, setUsers] = useState(null);
   const [userUid, setUserUid] = useState(null);
   const usersCollection = firestore().collection('users');
   // const clearUserToken = useStore(state => state.clearUserToken);
-  const userToken = useStore(state => state.userToken); // 토큰 상태 추가
+  const userToken = userStore(state => state.userToken); // 토큰 상태 추가
+  const navigation = useNavigation();
 
   // useEffect(() => {
   //   const fetchUserUid = async () => {
@@ -85,9 +86,16 @@ const Profile = ({navigation, route}) => {
     try {
       // Firebase에서 로그아웃
       await auth().signOut();
-
+  
+      // AsyncStorage에서 사용자 정보 제거
       await AsyncStorage.removeItem('userInfo');
-
+      await AsyncStorage.removeItem('userToken');
+  
+      // Zustand 스토어에서 사용자 토큰 및 정보 초기화
+      userStore.getState().clearUserToken();
+      userStore.getState().setUser(null);
+  
+      // 로그인 화면으로 이동
       navigation.replace('Login');
     } catch (error) {
       console.error('로그아웃 실패:', error);
