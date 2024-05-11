@@ -10,6 +10,7 @@ import {
   FlatList,
   SafeAreaView,
   TouchableOpacity,
+  ActivityIndicator,
   Alert,
 } from 'react-native';
 
@@ -27,9 +28,10 @@ import CommunityHeader from '../../components/Community/CommunityHeader';
 const {width, height} = Dimensions.get('window');
 
 const CommunityBoard = ({navigation}) => {
-  const [post, setPost] = useState([]);
+  const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [deleted, setDeleted] = useState(false);
+  const [lastVisible, setLastVisible] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
@@ -40,59 +42,68 @@ const CommunityBoard = ({navigation}) => {
     return unsubscribe;
   }, []);
 
-  const fetchPost = async () => {
-    try {
-      const list = [];
+  const fetchPosts = async () => {
+    setLoading(true);
 
+    try {
       const querySnapshot = await firestore()
         .collection('posts')
         .where('post_actflag', '==', true)
         .orderBy('post_created', 'desc')
+        .limit(10)
         .get();
 
-      querySnapshot.forEach(doc => {
-        const {
-          userId,
-          post_content,
-          post_files,
-          post_created,
-          post_actflag,
-          likeCount,
-          commentCount,
-        } = doc.data();
-        list.push({
-          id: doc.id,
-          userId,
-          post_content,
-          post_files,
-          post_created,
-          post_actflag,
-          likeCount,
-          commentCount,
-        });
-      });
+      const newPosts = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
 
-      setPost(list);
-
-      if (loading) {
-        setLoading(false);
-      }
+      setPosts(newPosts);
+      setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1]);
+      setLoading(false);
     } catch (e) {
       console.log(e);
+      setLoading(false);
+    }
+  };
+
+  const fetchMorePosts = async () => {
+    if (lastVisible) {
+      setRefreshing(true);
+
+      try {
+        const querySnapshot = await firestore()
+          .collection('posts')
+          .where('post_actflag', '==', true)
+          .orderBy('post_created', 'desc')
+          .startAfter(lastVisible)
+          .limit(10)
+          .get();
+
+        const newPosts = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        setPosts([...posts, ...newPosts]);
+        setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1]);
+        setRefreshing(false);
+      } catch (e) {
+        console.log(e);
+        setRefreshing(false);
+      }
     }
   };
 
   useEffect(() => {
-    fetchPost();
+    fetchPosts();
   }, []);
 
   useFocusEffect(
     React.useCallback(() => {
-      setPost(prevPosts => [...prevPosts]);
-      fetchPost();
+      fetchPosts();
     }, []),
   );
-
   /*
   useEffect(() => {
     fetchPost();
@@ -178,23 +189,36 @@ const CommunityBoard = ({navigation}) => {
   const ListHeader = () => {
     return null;
   };
+
+  const renderFooter = () => {
+    if (!refreshing) return null;
+
+    return (
+      <ActivityIndicator
+        size="large"
+        color="#07AC7D"
+        style={{marginVertical: 16, marginBottom: 32}}
+      />
+    );
+  };
+
   return (
     <SafeAreaView style={{flex: 1}}>
-      {loading ? (
-        <ScrollView
-          style={{flex: 1}}
-          contentContainerStyle={{alignItems: 'center'}}></ScrollView>
-      ) : (
-        <View style={{flex: 1, backgroundColor: '#FEFFFE'}}>
-          <CommunityHeader
-            showBackButton={false}
-            rightIcon={pencilIcon}
-            title={'실시간 게시판'}
-            onPressRightIcon={() => navigation.navigate('CommunityAddPost')}
-          />
-          <View style={styles.Container}>
+      <View style={{flex: 1, backgroundColor: '#FEFFFE'}}>
+        <CommunityHeader
+          showBackButton={false}
+          rightIcon={pencilIcon}
+          title={'실시간 게시판'}
+          onPressRightIcon={() => navigation.navigate('CommunityAddPost')}
+        />
+        <View style={styles.Container}>
+          {loading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#07AC7D" />
+            </View>
+          ) : (
             <FlatList
-              data={post}
+              data={posts}
               renderItem={({item}) => (
                 <PostCard
                   item={item}
@@ -211,12 +235,14 @@ const CommunityBoard = ({navigation}) => {
                   <Text style={styles.realtimeText}>게시글</Text>
                 </View>
               )}
-              ListFooterComponent={ListHeader}
+              onEndReached={fetchMorePosts}
+              onEndReachedThreshold={0.5}
+              ListFooterComponent={renderFooter}
               showsVerticalScrollIndicator={false}
             />
-          </View>
+          )}
         </View>
-      )}
+      </View>
     </SafeAreaView>
   );
 };
@@ -230,6 +256,12 @@ const styles = StyleSheet.create({
   Container: {
     alignItems: 'center',
     backgroundColor: '#FEFFFE',
+    flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   topView: {
     width: '100%',
