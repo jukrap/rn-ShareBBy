@@ -61,7 +61,7 @@ const CommentCard = ({item, onDelete, onEdit}) => {
             source={
               commentUserData && commentUserData.profileImage
                 ? {uri: commentUserData.profileImage}
-                : require('../../assets/images/defaultProfileImg.jpeg')
+                : defaultProfileImg
             }
           />
           <View style={styles.userInfoTextContainer}>
@@ -122,6 +122,7 @@ export default CommentCard;
 const moreIcon = require('../../assets/icons/moreIcon.png');
 const pencilIcon = require('../../assets/icons/pencilIcon.png');
 const deleteIcon = require('../../assets/icons/deleteIcon.png');
+const defaultProfileImg = require('../../assets/images/defaultProfileImg.jpeg');
 
 const styles = StyleSheet.create({
   topContainer: {

@@ -16,7 +16,6 @@ import {useFocusEffect} from '@react-navigation/native';
 import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
-import PostDetailHeader from '../../components/Community/PostDetailHeader';
 import CommentCard from '../../components/Community/CommentCard';
 import {formatDistanceToNow} from 'date-fns';
 import {ko} from 'date-fns/locale';
@@ -24,6 +23,8 @@ import Modal from 'react-native-modal';
 import {useNavigation} from '@react-navigation/native';
 import {SwiperFlatList} from 'react-native-swiper-flatlist';
 import BottomSheetModal from '../../components/Community/BottomSheetModal';
+import CommunityHeader from '../../components/Community/CommunityHeader';
+import ImageDetailModal from '../../components/Community/ImageDetailModal';
 
 const {width, height} = Dimensions.get('window');
 
@@ -42,6 +43,8 @@ const CommunityPostDetail = ({route}) => {
   const [commentCount, setCommentCount] = useState(0);
   const [isLikeProcessing, setIsLikeProcessing] = useState(false);
   const [editingCommentId, setEditingCommentId] = useState(null);
+  const [isImageModalVisible, setIsImageModalVisible] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const maxCommentContentLength = 200;
 
@@ -423,7 +426,7 @@ const CommunityPostDetail = ({route}) => {
               source={
                 postUserData.profileImage
                   ? {uri: postUserData.profileImage}
-                  : require('../../assets/images/defaultProfileImg.jpeg')
+                  : defaultProfileImg
               }
             />
             <View style={styles.userInfoTextContainer}>
@@ -460,13 +463,19 @@ const CommunityPostDetail = ({route}) => {
               paginationStyleItemActive={styles.paginationStyleItemActives}
               data={post.post_files}
               style={styles.postSwiperFlatList}
-              renderItem={({item}) => (
-                <Image
-                  style={styles.postImage}
-                  source={{uri: item}}
-                  resizeMode="cover"
-                  defaultSource={defaultPostImg}
-                />
+              renderItem={({item, index}) => (
+                <TouchableOpacity
+                  onPress={() => {
+                    setCurrentImageIndex(index);
+                    setIsImageModalVisible(true);
+                  }}>
+                  <Image
+                    style={styles.postImage}
+                    source={{uri: item}}
+                    resizeMode="cover"
+                    defaultSource={defaultPostImg}
+                  />
+                </TouchableOpacity>
               )}
             />
           </View>
@@ -510,31 +519,45 @@ const CommunityPostDetail = ({route}) => {
         </View>
       </View>
       <View style={styles.separatorBottom} />
+      {isImageModalVisible && (
+        <ImageDetailModal
+          images={post.post_files}
+          currentIndex={currentImageIndex}
+          isVisible={isImageModalVisible}
+          onClose={() => setIsImageModalVisible(false)}
+        />
+      )}
+    </View>
+  );
+
+  const renderEmptyComment = () => (
+    <View style={styles.emptyCommentContainer}>
+      <Image source={writeCommentIcon} style={styles.emptyCommentIcon} />
+      <Text style={styles.emptyCommentText}>
+        댓글이 없습니다. {'\n'} 첫 댓글의 주인공이 돼보세요!
+      </Text>
     </View>
   );
 
   return (
     <SafeAreaView style={{flex: 1}}>
+      <CommunityHeader title={'게시글'} />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={48}
         style={{flex: 1, backgroundColor: 'white'}}>
         <FlatList
-          data={[{key: 'postContent'}, ...comments]}
-          renderItem={({item}) =>
-            item.key === 'postContent' ? (
-              renderPostContent()
-            ) : (
-              <CommentCard
-                item={item}
-                onDelete={() => handleCommentDelete(item.id)}
-                onEdit={() => handleCommentEdit(item.id)}
-              />
-            )
-          }
-          keyExtractor={(item, index) =>
-            item.key || item.id || index.toString()
-          }
+          data={comments}
+          ListHeaderComponent={renderPostContent}
+          ListEmptyComponent={renderEmptyComment}
+          renderItem={({item}) => (
+            <CommentCard
+              item={item}
+              onDelete={() => handleCommentDelete(item.id)}
+              onEdit={() => handleCommentEdit(item.id)}
+            />
+          )}
+          keyExtractor={(item, index) => item.id || index.toString()}
           style={styles.container}
         />
         <View style={styles.commentInputContainer}>
@@ -551,7 +574,7 @@ const CommunityPostDetail = ({route}) => {
             <Image
               style={[styles.commentSubmitIcon, styles.frameItemLayout]}
               resizeMode="cover"
-              source={require('../../assets/icons/planeMessageIcon.png')}
+              source={planeMessageIcon}
             />
           </TouchableOpacity>
           <BottomSheetModal isVisible={isModalVisible} onClose={toggleModal}>
@@ -585,12 +608,15 @@ const CommunityPostDetail = ({route}) => {
 const moreIcon = require('../../assets/icons/moreIcon.png');
 const commentLineIcon = require('../../assets/icons/commentLineIcon.png');
 const commentFillIcon = require('../../assets/icons/commentFillIcon.png');
+const writeCommentIcon = require('../../assets/icons/WriteCommentIcon.png');
 const heartLineIcon = require('../../assets/icons/heartLineIcon.png');
 const heartRedIcon = require('../../assets/icons/heartRedIcon.png');
 const shareIcon = require('../../assets/icons/shareIcon.png');
 const pencilIcon = require('../../assets/icons/pencilIcon.png');
 const deleteIcon = require('../../assets/icons/deleteIcon.png');
 const defaultPostImg = require('../../assets/images/defaultPostImg.jpg');
+const planeMessageIcon = require('../../assets/icons/planeMessageIcon.png');
+const defaultProfileImg = require('../../assets/images/defaultProfileImg.jpeg');
 
 const styles = StyleSheet.create({
   container: {
@@ -776,6 +802,24 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Pretendard',
     color: '#212529',
+  },
+  emptyCommentContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 56,
+  },
+  emptyCommentIcon: {
+    width: 48,
+    height: 48,
+    marginBottom: 12,
+  },
+  emptyCommentText: {
+    fontSize: 16,
+    color: '#07AC7D',
+    fontFamily: 'Pretendard',
+    fontWeight: '600',
+    textAlign: 'center',
   },
 });
 

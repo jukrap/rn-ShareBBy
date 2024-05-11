@@ -17,6 +17,7 @@ import auth from '@react-native-firebase/auth';
 import Modal from 'react-native-modal';
 import {SwiperFlatList} from 'react-native-swiper-flatlist';
 import BottomSheetModal from './BottomSheetModal';
+import ImageDetailModal from './ImageDetailModal';
 
 const {width, height} = Dimensions.get('window');
 
@@ -30,6 +31,9 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
   const [commentCount, setCommentCount] = useState(item.commentCount || 0);
   const [isLikeProcessing, setIsLikeProcessing] = useState(false);
   const [isMoreContent, setIsMoreContent] = useState(false);
+  const [isImageModalVisible, setIsImageModalVisible] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
   const colors = ['tomato', 'thistle', 'skyblue', 'teal'];
 
   useEffect(() => {
@@ -173,7 +177,7 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
             source={
               postUserData && postUserData.profileImage
                 ? {uri: postUserData.profileImage}
-                : require('../../assets/images/defaultProfileImg.jpeg') //빼내기
+                : defaultProfileImg
             }
           />
           <View style={styles.userInfoTextContainer}>
@@ -227,13 +231,19 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
             paginationStyleItemActive={styles.paginationStyleItemActives}
             data={item.post_files}
             style={styles.postSwiperFlatList}
-            renderItem={({item}) => (
-              <Image
-                style={styles.postImage}
-                source={{uri: item}}
-                resizeMode="cover"
-                defaultSource={defaultPostImg}
-              />
+            renderItem={({item, index}) => (
+              <TouchableOpacity
+                onPress={() => {
+                  setCurrentImageIndex(index);
+                  setIsImageModalVisible(true);
+                }}>
+                <Image
+                  style={styles.postImage}
+                  source={{uri: item}}
+                  resizeMode="cover"
+                  defaultSource={defaultPostImg}
+                />
+              </TouchableOpacity>
             )}
           />
         </View>
@@ -295,6 +305,14 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
           </TouchableOpacity>
         </View>
       </BottomSheetModal>
+      {isImageModalVisible && (
+        <ImageDetailModal
+          images={item.post_files}
+          currentIndex={currentImageIndex}
+          isVisible={isImageModalVisible}
+          onClose={() => setIsImageModalVisible(false)}
+        />
+      )}
     </View>
   );
 };
@@ -308,6 +326,7 @@ const shareIcon = require('../../assets/icons/shareIcon.png');
 const pencilIcon = require('../../assets/icons/pencilIcon.png');
 const deleteIcon = require('../../assets/icons/deleteIcon.png');
 const defaultPostImg = require('../../assets/images/defaultPostImg.jpg');
+const defaultProfileImg = require('../../assets/images/defaultProfileImg.jpeg');
 
 export default PostCard;
 
