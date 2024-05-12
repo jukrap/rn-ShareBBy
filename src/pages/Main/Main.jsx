@@ -14,8 +14,6 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
 
-import { getHobbiesDetail } from '../../lib/hobby';
-
 const {width, height} = Dimensions.get('window');
 
 // OptimizedImageItem 컴포넌트를 메모이제이션해서 성능 향상

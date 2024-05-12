@@ -1,4 +1,4 @@
-import firestore from '@react-native-firebase/firestore';
+import firestore, { query, collection, getDocs, orderBy, startAt, endAt } from '@react-native-firebase/firestore';
 
 export const hobbiesCollection = firestore().collection('hobbies');
 
@@ -17,7 +17,6 @@ export async function recruitHobby({
     writeTime,
 
 }) {
-    // Add a new document with a generated id.
     const res = await hobbiesCollection.add({
         user_id,
         nickname,
@@ -41,12 +40,10 @@ export async function getHobbies() {
     return doc.docs;
 }
 
-export async function getHobbiesDetail() {
-    const docList = await hobbiesCollection.get();
-    const hobbyIdList = docList.docs.map((data) => ({
+export async function getNearHobbies(userAddress) {
+    const querySnapshot = await getDocs(query(hobbiesCollection, orderBy('address'), startAt(userAddress), endAt(userAddress+'\uf8ff')));
+    return querySnapshot.docs.map((data) => ({
         id: data._ref._documentPath._parts[1],
         data: data
     }));
-    console.log(hobbyIdList);
-    return hobbyIdList;
-}
+} 
