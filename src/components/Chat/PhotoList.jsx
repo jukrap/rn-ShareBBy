@@ -38,7 +38,12 @@ const PhotoList = ({chatRoomId}) => {
         horizontal
         data={photoUrls}
         renderItem={({item}) => (
-          <View style={{marginHorizontal: 4}}>
+          <View
+            style={{
+              width: 70,
+              height: 70,
+              marginHorizontal: 4,
+            }}>
             <Image
               style={{width: 64, height: 64, borderRadius: 8}}
               source={{uri: item}}

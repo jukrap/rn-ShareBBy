@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { View, Image, StyleSheet } from 'react-native';
 import userStore from '../lib/userStore'; // Zustand 스토어 import
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Geolocation from "react-native-geolocation-service";
 
 const SplashScreen = ({ navigation }) => {
   const { setUserData } = userStore(); // 사용자 정보만 필요하므로 userToken은 사용하지 않음
@@ -25,6 +26,15 @@ const SplashScreen = ({ navigation }) => {
       }, 2000); // 2초 후에 이동하도록 설정
     }
   };
+
+  const getMyLocation = () => {
+    console.log('✅ get Location =====>');
+    Geolocation.getCurrentPosition(
+      async (position) => {
+        console.log('✅ position =====>', position);
+      }
+    )
+  }
 
   return (
     <View style={styles.container}>

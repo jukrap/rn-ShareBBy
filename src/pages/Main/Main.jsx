@@ -14,7 +14,6 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
 
-import { getHobbiesDetail } from '../../lib/hobby';
 import userStore from '../../lib/userStore' 
 
 const {width, height} = Dimensions.get('window');
