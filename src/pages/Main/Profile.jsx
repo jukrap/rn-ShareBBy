@@ -12,9 +12,9 @@ import {
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import useStore from '../../lib/userStore';
 import {useFocusEffect} from '@react-navigation/native';
-import { useNavigation } from '@react-navigation/native';
-import userStore from '../../lib/userStore' 
+import { StackActions } from '@react-navigation/native';
 
 const heart = require('../../assets/newIcons/heart-icon.png');
 const pencil = require('../../assets/newIcons/pencil-icon.png');
@@ -23,14 +23,29 @@ const marker = require('../../assets/newIcons/marker-icon.png');
 const {width, height} = Dimensions.get('window');
 const rightArrow = require('../../assets/icons/right-arrow.png');
 
-const Profile = () => {
+const Profile = ({navigation, route}) => {
   const [users, setUsers] = useState(null);
-  const [userUid, setUserUid] = useState('');
+  const [userUid, setUserUid] = useState(null);
   const usersCollection = firestore().collection('users');
-  const userData = userStore(state => state.userData); 
-  
-  const navigation = useNavigation();
+  // const clearUserToken = useStore(state => state.clearUserToken);
+  const userToken = useStore(state => state.userToken); // 토큰 상태 추가
 
+  // useEffect(() => {
+  //   const fetchUserUid = async () => {
+  //     try {
+  //       const user = auth().currentUser;
+  //       if (user) {
+  //         //set uuid
+  //         const userUID = user.uid;
+  //         setUserUid(userUID);
+  //       }
+  //     } catch (error) {
+  //       console.error('Error fetching current user: ', error);
+  //     }
+  //     console.log('call user uid', userUid);
+  //   };
+  //   fetchUserUid();
+  // }, [navigation]);
   const fetchUserUid = async () => {
     try {
       const user = auth().currentUser;
@@ -58,34 +73,28 @@ const Profile = () => {
       fetchUserUid();
     }, [setUserUid]), // setUserUid를 의존성 배열에 포함
   );
-   useEffect(() => {
-    if (userData) {
-      // userStore에서 사용자 데이터가 이미 존재하는 경우 해당 데이터를 사용하여 UI를 렌더링합니다.
-      setUsers(userData);
-    } else {
-      // userStore에 사용자 데이터가 없는 경우 fetchUserUid를 호출하여 데이터를 가져옵니다.
+  useEffect(() => {
+    if (userUid) {
+      // userUid가 설정된 후에 fetchUserData 호출
+
       fetchUserData();
     }
-  }, [userData]);
+  }, [userUid]);
 
   const handleLogout = async () => {
     try {
       // Firebase에서 로그아웃
       await auth().signOut();
-  
-      // AsyncStorage에서 사용자 정보 제거
+
       await AsyncStorage.removeItem('userInfo');
-  
-      // Zustand 스토어에서 사용자 토큰 및 정보 초기화
-      userStore.getState().setUserData(null);
-  
-      // 로그인 화면으로 이동
+
       navigation.replace('Login');
     } catch (error) {
       console.error('로그아웃 실패:', error);
     }
   };
 
+  console.log('User Token:', userToken);
   return (
     <SafeAreaView style={styles.safeAreaViewStyle}>
       {users ? (
@@ -108,10 +117,10 @@ const Profile = () => {
                   })
                 }
                 style={styles.name}>
-                <Text style={styles.nameStyle}>{userData ? (userData.nickname) : '데이터 없음'}</Text>
+                <Text style={styles.nameStyle}>{users.nickname}</Text>
                 <Image source={rightArrow} style={styles.arrow} />
               </TouchableOpacity>
-              <Text style={styles.emailStyle}>{userData ? JSON.stringify(userData.email) : '데이터 없음'}</Text>
+              <Text style={styles.emailStyle}>{users.email}</Text>
             </View>
           </View>
           <View style={styles.infoStyle}>

@@ -13,8 +13,8 @@ import {
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { getHobbiesDetail } from '../../lib/hobby';
 import userStore from '../../lib/userStore' 
 
 const {width, height} = Dimensions.get('window');
@@ -36,6 +36,7 @@ const Main = ({navigation}) => {
   const bannerRef = useRef('');
   const userData = userStore(state => state.userData); 
 
+  
   // 사용자 데이터를 가져오는 useEffect
   useEffect(() => {
     const fetchData = async () => {
@@ -133,7 +134,9 @@ const Main = ({navigation}) => {
       </TouchableOpacity>
     );
   };
+  console.log('현재 사용자 데이터:', currUserData);
 
+  
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: '#fff'}}>
       <View style={styles.topbarView}>
@@ -243,7 +246,7 @@ const Main = ({navigation}) => {
                 <View style={styles.gradeNum}>
                   <Text style={{color: '#fff', fontWeight: 'bold'}}>2</Text>
                 </View>
-                <Text style={{fontSize: 16, fontWeight: '600'}}>{userData ? JSON.stringify(userData.nname) : '데이터 없음'}</Text>
+                <Text style={{fontSize: 16, fontWeight: '600'}}>{userData ? (userData.nickname) : '데이터 없음'}</Text>
               </View>
               <View style={styles.gradeUp}>
                 <Image source={dummyProfileIcon} />

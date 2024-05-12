@@ -12,11 +12,9 @@ import {
 import firestore from '@react-native-firebase/firestore';
 import ImagePicker from 'react-native-image-crop-picker';
 import storage from '@react-native-firebase/storage';
-import userStore from '../../lib/userStore';
 const leftArrow = require('../../assets/newIcons/backIcon.png');
 const EditProfile = ({navigation, route}) => {
   const [nickname, setNickname] = useState(route.params.nickname);
-  const { userData, setUserData } = userStore();
   const [editImage, setEditImage] = useState({
     IsEdit: false,
     ImageUrl: '',
@@ -57,10 +55,7 @@ const EditProfile = ({navigation, route}) => {
     try {
       const userDocRef = await usersCollection.doc(route.params.uuid);
 
-      await userDocRef.update({ nickname: nickname });
-
-      // useStore를 사용하여 userData 업데이트
-      setUserData({ ...userData, nickname: nickname });
+      await userDocRef.update({nickname: nickname});
     } catch (error) {
       console.log(error.message);
     }
