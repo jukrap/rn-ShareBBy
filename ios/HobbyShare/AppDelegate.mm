@@ -3,7 +3,6 @@
 #import <RNKakaoLogins.h>
 #import <React/RCTBundleURLProvider.h>
 #import <NaverThirdPartyLogin/NaverThirdPartyLoginConnection.h>
-#import "RNBootSplash.h"
 
 
 @implementation AppDelegate
@@ -51,10 +50,6 @@
 #else
   return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
 #endif
-}
-
-- (void)customizeRootView:(RCTRootView *)rootView {
-  [RNBootSplash initWithStoryboard:@"LaunchScreen" rootView:rootView]; // ⬅️ initialize the splash screen
 }
 
 

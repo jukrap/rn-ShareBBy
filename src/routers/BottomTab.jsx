@@ -11,6 +11,8 @@ import Chat from '../pages/Main/Chat';
 import ChatRoom from '../pages/Main/ChatRoom';
 import CommunityBoard from '../pages/Main/CommunityBoard';
 import CommunityAddPost from '../pages/Main/CommunityAddPost';
+import CommunityEditPost from '../pages/Main/CommunityEditPost';
+import CommunityPostDetail from '../pages/Main/CommunityPostDetail';
 import Profile from '../pages/Main/Profile';
 import EditProfile from '../pages/Main/EditProfile';
 import SynthesisAgree from '../components/SignUp/AgreeList/SynthesisAgree';
@@ -25,6 +27,7 @@ const AboutMap = ({params}) => {
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name="Main" component={Main} initialParams={params} />
+      <Stack.Screen name="Profile" component={Profile} initialParams={params} />
       <Stack.Screen name="Recruit" component={Recruit} initialParams={params} />
       <Stack.Screen name="Join" component={Join} initialParams={params} />
       <Stack.Screen name="Detail" component={Detail} initialParams={params} />
@@ -60,6 +63,8 @@ const AboutCommunity = () => {
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name="CommunityBoard" component={CommunityBoard} />
       <Stack.Screen name="CommunityAddPost" component={CommunityAddPost} />
+      <Stack.Screen name="CommunityEditPost" component={CommunityEditPost} />
+      <Stack.Screen name="CommunityPostDetail" component={CommunityPostDetail} />
     </Stack.Navigator>
   );
 };
