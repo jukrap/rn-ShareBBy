@@ -33,6 +33,7 @@ const Login = ({ navigation }) => {
   const [isEmailValid, setIsEmailValid] = useState(false);
 
   const setUserData = userStore(state => state.setUserData); // Zustand 스토어 custom hook 사용
+  const setUserToken = userStore(state => state.setUserToken);
 
   const onSignIn = async () => {
     try {
@@ -47,7 +48,9 @@ const Login = ({ navigation }) => {
   
       // Zustand 스토어에 사용자 정보 설정
       setUserData(userInfo);
-      
+
+      await AsyncStorage.setItem('userToken', user.uid);
+      setUserToken(user.uid); // Zustand 스토어에 사용자 토큰 설정
       // navigation을 여기서 호출
       navigation.navigate('BottomTab');
     } catch (e) {
