@@ -15,6 +15,7 @@ import firestore from '@react-native-firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import userStore from '../../lib/userStore';
 
+
 import {
   onGoogleButtonPress,
   handleNaverLogin,
@@ -31,8 +32,7 @@ const Login = ({ navigation }) => {
   const [password, setPassword] = useState();
   const [isEmailValid, setIsEmailValid] = useState(false);
 
-  const setUserToken = userStore(state => state.setUserToken); // Zustand 스토어 custom hook 사용
-  const setUser = userStore(state => state.setUser); // Zustand 스토어 custom hook 사용
+  const setUserData = userStore(state => state.setUserData); // Zustand 스토어 custom hook 사용
 
   const onSignIn = async () => {
     try {
@@ -46,11 +46,8 @@ const Login = ({ navigation }) => {
       await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
   
       // Zustand 스토어에 사용자 정보 설정
-      setUser(userInfo);
-  
-      await AsyncStorage.setItem('userToken', user.uid);
-      setUserToken(user.uid); // Zustand 스토어에 사용자 토큰 설정
-  
+      setUserData(userInfo);
+      
       // navigation을 여기서 호출
       navigation.navigate('BottomTab');
     } catch (e) {
@@ -58,10 +55,6 @@ const Login = ({ navigation }) => {
       Alert.alert('아이디 또는 비밀번호를 확인해주세요.');
     }
   };
-  
-  
-  
-  
   
 
   const validateEmail = email => {
