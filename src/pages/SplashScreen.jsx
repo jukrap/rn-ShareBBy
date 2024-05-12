@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { View, Image, StyleSheet } from 'react-native';
 import userStore from '../lib/userStore'; // Zustand 스토어 import
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Geolocation from "react-native-geolocation-service";
 
 const SplashScreen = ({ navigation }) => {
   const { userToken, setUserToken, user, setUser } = userStore();
@@ -28,6 +29,15 @@ const SplashScreen = ({ navigation }) => {
       }
     }
   };
+
+  const getMyLocation = () => {
+    console.log('✅ get Location =====>');
+    Geolocation.getCurrentPosition(
+      async (position) => {
+        console.log('✅ position =====>', position);
+      }
+    )
+  }
 
   return (
     <View style={styles.container}>
