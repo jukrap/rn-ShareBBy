@@ -14,6 +14,8 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
 
+import userStore from '../../lib/userStore' 
+
 const {width, height} = Dimensions.get('window');
 
 // OptimizedImageItem 컴포넌트를 메모이제이션해서 성능 향상
@@ -31,6 +33,7 @@ const Main = ({navigation}) => {
   const [imageUrl, setImageUrl] = useState(null);
   const [eventBanner, setEventBanner] = useState([]);
   const bannerRef = useRef('');
+  const userData = userStore(state => state.userData); 
 
   // 사용자 데이터를 가져오는 useEffect
   useEffect(() => {
@@ -239,7 +242,7 @@ const Main = ({navigation}) => {
                 <View style={styles.gradeNum}>
                   <Text style={{color: '#fff', fontWeight: 'bold'}}>2</Text>
                 </View>
-                <Text style={{fontSize: 16, fontWeight: '600'}}>장혜림</Text>
+                <Text style={{fontSize: 16, fontWeight: '600'}}>유저 데이터: {userData ? JSON.stringify(userData.nname) : '데이터 없음'}</Text>
               </View>
               <View style={styles.gradeUp}>
                 <Image source={dummyProfileIcon} />

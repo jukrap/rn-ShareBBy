@@ -12,9 +12,9 @@ import {
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import userStore from '../../lib/userStore';
 import {useFocusEffect} from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
+import userStore from '../../lib/userStore' 
 
 const heart = require('../../assets/newIcons/heart-icon.png');
 const pencil = require('../../assets/newIcons/pencil-icon.png');
@@ -25,28 +25,12 @@ const rightArrow = require('../../assets/icons/right-arrow.png');
 
 const Profile = () => {
   const [users, setUsers] = useState(null);
-  const [userUid, setUserUid] = useState(null);
+  const [userUid, setUserUid] = useState('');
   const usersCollection = firestore().collection('users');
-  // const clearUserToken = useStore(state => state.clearUserToken);
-  const userToken = userStore(state => state.userToken); // 토큰 상태 추가
+  const userData = userStore(state => state.userData); 
+  
   const navigation = useNavigation();
 
-  // useEffect(() => {
-  //   const fetchUserUid = async () => {
-  //     try {
-  //       const user = auth().currentUser;
-  //       if (user) {
-  //         //set uuid
-  //         const userUID = user.uid;
-  //         setUserUid(userUID);
-  //       }
-  //     } catch (error) {
-  //       console.error('Error fetching current user: ', error);
-  //     }
-  //     console.log('call user uid', userUid);
-  //   };
-  //   fetchUserUid();
-  // }, [navigation]);
   const fetchUserUid = async () => {
     try {
       const user = auth().currentUser;
@@ -74,13 +58,15 @@ const Profile = () => {
       fetchUserUid();
     }, [setUserUid]), // setUserUid를 의존성 배열에 포함
   );
-  useEffect(() => {
-    if (userUid) {
-      // userUid가 설정된 후에 fetchUserData 호출
-
+   useEffect(() => {
+    if (userData) {
+      // userStore에서 사용자 데이터가 이미 존재하는 경우 해당 데이터를 사용하여 UI를 렌더링합니다.
+      setUsers(userData);
+    } else {
+      // userStore에 사용자 데이터가 없는 경우 fetchUserUid를 호출하여 데이터를 가져옵니다.
       fetchUserData();
     }
-  }, [userUid]);
+  }, [userData]);
 
   const handleLogout = async () => {
     try {
@@ -89,11 +75,9 @@ const Profile = () => {
   
       // AsyncStorage에서 사용자 정보 제거
       await AsyncStorage.removeItem('userInfo');
-      await AsyncStorage.removeItem('userToken');
   
       // Zustand 스토어에서 사용자 토큰 및 정보 초기화
-      userStore.getState().clearUserToken();
-      userStore.getState().setUser(null);
+      userStore.getState().setUserData(null);
   
       // 로그인 화면으로 이동
       navigation.replace('Login');
@@ -102,7 +86,6 @@ const Profile = () => {
     }
   };
 
-  console.log('User Token:', userToken);
   return (
     <SafeAreaView style={styles.safeAreaViewStyle}>
       {users ? (
@@ -125,10 +108,10 @@ const Profile = () => {
                   })
                 }
                 style={styles.name}>
-                <Text style={styles.nameStyle}>{users.nickname}</Text>
+                <Text style={styles.nameStyle}>{userData ? (userData.nickname) : '데이터 없음'}</Text>
                 <Image source={rightArrow} style={styles.arrow} />
               </TouchableOpacity>
-              <Text style={styles.emailStyle}>{users.email}</Text>
+              <Text style={styles.emailStyle}>{userData ? JSON.stringify(userData.email) : '데이터 없음'}</Text>
             </View>
           </View>
           <View style={styles.infoStyle}>
