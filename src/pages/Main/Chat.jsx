@@ -12,7 +12,7 @@ import {
 
 import firestore from '@react-native-firebase/firestore';
 import {useNavigation} from '@react-navigation/native';
-import useStore from '../../lib/useStore';
+import userStore from '../../lib/userStore';
 import dayjs from 'dayjs';
 
 import ChatListTime from '../../components/Chat/ChatListTime';
@@ -27,7 +27,7 @@ const Chat = () => {
   const [lastChat, setLastChat] = useState({});
 
   const navigation = useNavigation();
-  const userToken = useStore(state => state.userToken);
+  const userToken = userStore(state => state.userToken);
 
   useEffect(() => {
     const fetchData = async () => {

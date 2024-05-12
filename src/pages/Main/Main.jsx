@@ -14,6 +14,7 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
 
+import { getHobbiesDetail } from '../../lib/hobby';
 import userStore from '../../lib/userStore' 
 
 const {width, height} = Dimensions.get('window');
@@ -242,7 +243,7 @@ const Main = ({navigation}) => {
                 <View style={styles.gradeNum}>
                   <Text style={{color: '#fff', fontWeight: 'bold'}}>2</Text>
                 </View>
-                <Text style={{fontSize: 16, fontWeight: '600'}}>유저 데이터: {userData ? JSON.stringify(userData.nname) : '데이터 없음'}</Text>
+                <Text style={{fontSize: 16, fontWeight: '600'}}>{userData ? JSON.stringify(userData.nname) : '데이터 없음'}</Text>
               </View>
               <View style={styles.gradeUp}>
                 <Image source={dummyProfileIcon} />
