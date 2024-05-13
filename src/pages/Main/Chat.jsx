@@ -9,22 +9,19 @@ import {
   Image,
   Dimensions,
 } from 'react-native';
-
 import firestore from '@react-native-firebase/firestore';
 import {useNavigation} from '@react-navigation/native';
 import userStore from '../../lib/userStore';
 import dayjs from 'dayjs';
-
 import ChatListTime from '../../components/Chat/ChatListTime';
-
-import {BackIcon} from '../../assets/assets';
-import {DefaultProfileIcon} from '../../assets/assets';
+import {BackIcon, DefaultProfileIcon} from '../../assets/assets';
 
 const {width, height} = Dimensions.get('window');
 
 const Chat = () => {
   const [chatRooms, setChatRooms] = useState([]);
   const [lastChat, setLastChat] = useState({});
+  const [userImages, setUserImages] = useState({});
 
   const navigation = useNavigation();
   const userToken = userStore(state => state.userToken);
@@ -53,9 +50,11 @@ const Chat = () => {
           id: doc.id,
           ...doc.data(),
         }))
-        .filter(room => room.members.includes(userToken)); //합쳐보기. 방법 고민 필요
+        .filter(room => room.members.includes(userToken)); //합쳐보기 방법 고민 필요
 
       const latestChats = {};
+      const userImagePromises = {};
+
       for (const room of chatRoomList) {
         const messageSnapshot = await firestore()
           .collection('chatRooms')
@@ -72,7 +71,31 @@ const Chat = () => {
             timestamp: latestMessage.timestamp.toDate(),
           };
         }
+
+        userImagePromises[room.id] = firestore()
+          .collection('hobbies')
+          .doc(room.hobbiesId)
+          .get()
+          .then(hobbyData => {
+            const userId = hobbyData.data().user_id;
+            return firestore()
+              .collection('users')
+              .doc(userId)
+              .get()
+              .then(userData => {
+                return userData.data().profileImage;
+              });
+          });
       }
+
+      const userImagesResult = await Promise.all(
+        Object.values(userImagePromises),
+      );
+      const userImageState = {};
+      chatRoomList.forEach((room, index) => {
+        userImageState[room.id] = userImagesResult[index];
+      });
+      setUserImages(userImageState);
 
       setChatRooms(chatRoomList);
       setLastChat(latestChats);
@@ -115,9 +138,11 @@ const Chat = () => {
         return latestChatB.timestamp - latestChatA.timestamp;
       }
     });
-  }; //콜백지옥 어떻게 수정?
+  };
 
   const renderGroups = ({item}) => {
+    const userImage = userImages[item.id];
+
     const goToChatRoom = () => {
       navigation.navigate('ChatRoom', {
         chatRoomId: item.id,
@@ -140,7 +165,11 @@ const Chat = () => {
           }}>
           <Image
             style={{width: 48, height: 48, borderRadius: 8}}
-            source={DefaultProfileIcon}
+            source={
+              item.chatRoomImage
+                ? {uri: item.chatRoomImage[0]}
+                : DefaultProfileIcon
+            }
           />
         </View>
         <View
