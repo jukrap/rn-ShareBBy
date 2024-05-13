@@ -51,7 +51,8 @@ const Chat = () => {
           id: doc.id,
           ...doc.data(),
         }))
-        .filter(room => room.members.includes(userToken)); //합쳐보기 방법 고민 필요.
+
+        .filter(room => room.members.includes(userToken)); //합쳐보기 방법 고민 필요
 
       const latestChats = {};
       const userImagePromises = {};
@@ -166,9 +167,10 @@ const Chat = () => {
             style={{width: 48, height: 48, borderRadius: 8}}
             source={
               item.chatRoomImage
-                ? {uri: item.chatRoomImage}
+                ? {uri: item.chatRoomImage[0]}
                 : DefaultProfileIcon
             }
+
           />
         </View>
         <View
