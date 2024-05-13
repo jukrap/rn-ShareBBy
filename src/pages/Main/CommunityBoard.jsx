@@ -139,12 +139,8 @@ const CommunityBoard = ({navigation}) => {
   const handleDelete = postId => {
     if (posts) {
       const selectedPost = posts.find(item => item.id === postId);
-
-      if (
-        selectedPost &&
-        currentUser &&
-        currentUser.uid === selectedPost.userId
-      ) {
+  
+      if (selectedPost && currentUser && currentUser.uid === selectedPost.userId) {
         Alert.alert(
           '게시글 삭제',
           '해당 게시글을 삭제하겠습니까?',
@@ -156,7 +152,10 @@ const CommunityBoard = ({navigation}) => {
             },
             {
               text: '네',
-              onPress: () => deletePost(postId),
+              onPress: () => {
+                deletePost(postId);
+                setPosts(posts.filter(post => post.id !== postId));
+              },
             },
           ],
           {cancelable: false},
@@ -166,7 +165,7 @@ const CommunityBoard = ({navigation}) => {
       }
     }
   };
-
+  
   const deletePost = postId => {
     firestore()
       .collection('posts')
@@ -256,8 +255,10 @@ const CommunityBoard = ({navigation}) => {
         />
         <View style={styles.Container}>
           {loading ? (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color="#07AC7D" />
+            <View style={styles.loadingOverlay}>
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#07AC7D" />
+              </View>
             </View>
           ) : (
             <FlatList
@@ -369,5 +370,16 @@ const styles = StyleSheet.create({
     fontFamily: 'Pretendard',
     letterSpacing: 0,
     fontWeight: '600',
+  },
+  loadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
   },
 });

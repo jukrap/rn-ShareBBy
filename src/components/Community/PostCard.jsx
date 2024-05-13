@@ -224,7 +224,11 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
         {isMoreContent && <Text style={styles.readMoreText}>...더보기</Text>}
       </TouchableOpacity>
       {item?.post_files?.length > 0 ? (
-        <ImageSlider images={item.post_files} autoSlide={true} autoSlideInterval={5000} />
+        <ImageSlider
+          images={item.post_files}
+          autoSlide={true}
+          autoSlideInterval={5000}
+        />
       ) : (
         <View style={styles.divider} />
       )}
