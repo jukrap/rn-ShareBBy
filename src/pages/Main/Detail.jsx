@@ -23,7 +23,8 @@ const {width, height} = Dimensions.get('window');
 
 const Detail = ({route, navigation}) => {
   const userData = route.params;
-  const {pickAddress, pickLatitude, pickLongitude, id, nickname} = userData;
+  const {pickAddress, pickLatitude, pickLongitude,id,  nickname, profileImage} =
+    userData;
 
   const writeTime = new Date(); // 내가 쓴 모집글 시간을 저장
   const [date, setDate] = useState(new Date());
@@ -116,6 +117,7 @@ const Detail = ({route, navigation}) => {
           name: detailContent.showTitle,
           members: [id],
           hobbiesId: hobbiesId,
+          chatRoomImage: profileImage,
         });
       setSelectedUsers([]);
       console.log('채팅방 생성됨');

@@ -127,6 +127,49 @@ const ChatRoom = ({route, navigation}) => {
     }
   };
 
+  const uploadProfileImage = async (localImagePath, chatRoomId) => {
+    try {
+      const fileName = localImagePath.substring(
+        localImagePath.lastIndexOf('/') + 1,
+      );
+      const path = storage().ref(
+        `chatRoomProfileImage/${chatRoomId}/${fileName}`,
+      );
+
+      await path.putFile(localImagePath);
+
+      return await path.getDownloadURL();
+    } catch (error) {
+      console.error('Error uploading image to Firebase Storage:', error);
+      throw error; //alert으로 처리 (토스트) 컴포넌트 - 메인에 있음
+    }
+  };
+
+  const getProfileImage = async () => {
+    try {
+      const image = await ImagePicker.openPicker({
+        width: 300,
+        height: 400,
+        multiple: false,
+        cropping: true,
+        mediaType: 'photo',
+        cropperChooseText: '이미지 변경',
+        cropperCancelText: '취소',
+        cropperRotateButtonsHidden: true,
+      });
+
+      const imageUrl = await uploadProfileImage(image.sourceURL, chatRoomId);
+      await firestore()
+        .collection('chatRooms')
+        .doc(chatRoomId)
+        .update({chatRoomImage: imageUrl});
+    } catch (error) {
+      if (error.code === 'E_PICKER_CANCELLED') {
+        return false;
+      }
+      console.error('Error selecting or uploading image:', error);
+    }
+  };
   const handleGoBack = () => {
     navigation.goBack();
   };
@@ -535,7 +578,7 @@ const ChatRoom = ({route, navigation}) => {
               toggleChatRoomNameChangeModal={toggleChatRoomNameChangeModal}
               updateChatRoomName={updateChatRoomName}
             />
-            <TouchableOpacity>
+            <TouchableOpacity onPress={getProfileImage}>
               <Text>채팅방 사진 변경</Text>
             </TouchableOpacity>
           </View>
