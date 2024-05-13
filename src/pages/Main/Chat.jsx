@@ -1,18 +1,29 @@
-import React, { useState, useEffect } from 'react';
-import { SafeAreaView, StyleSheet, TouchableOpacity, View, Text, FlatList, Image, Dimensions } from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {
+  SafeAreaView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+  Text,
+  FlatList,
+  Image,
+  Dimensions,
+} from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 import userStore from '../../lib/userStore';
 import dayjs from 'dayjs';
 import ChatListTime from '../../components/Chat/ChatListTime';
-import { BackIcon, DefaultProfileIcon } from '../../assets/assets';
+import {BackIcon, DefaultProfileIcon} from '../../assets/assets';
 
-const { width, height } = Dimensions.get('window');
+const {width, height} = Dimensions.get('window');
+
 
 const Chat = () => {
   const [chatRooms, setChatRooms] = useState([]);
   const [lastChat, setLastChat] = useState({});
-  const [userImages, setUserImages] = useState({}); // 유저 이미지를 저장할 상태 추가
+  const [userImages, setUserImages] = useState({});
+
 
   const navigation = useNavigation();
   const userToken = userStore(state => state.userToken);
@@ -41,10 +52,11 @@ const Chat = () => {
           id: doc.id,
           ...doc.data(),
         }))
-        .filter(room => room.members.includes(userToken)); //합쳐보기. 방법 고민 필요
+        .filter(room => room.members.includes(userToken)); //합쳐보기 방법 고민 필요
 
       const latestChats = {};
-      const userImagePromises = {}; // 각 유저의 이미지를 가져오는 비동기 함수 프로미스를 저장할 객체
+      const userImagePromises = {};
+
 
       for (const room of chatRoomList) {
         const messageSnapshot = await firestore()
@@ -62,20 +74,25 @@ const Chat = () => {
             timestamp: latestMessage.timestamp.toDate(),
           };
         }
-
-        // 각 유저의 이미지를 가져오는 비동기 함수 프로미스를 생성하여 저장
-        userImagePromises[room.id] = firestore().collection('hobbies').doc(room.hobbiesId).get()
+        userImagePromises[room.id] = firestore()
+          .collection('hobbies')
+          .doc(room.hobbiesId)
+          .get()
           .then(hobbyData => {
             const userId = hobbyData.data().user_id;
-            return firestore().collection('users').doc(userId).get()
+            return firestore()
+              .collection('users')
+              .doc(userId)
+              .get()
+
               .then(userData => {
                 return userData.data().profileImage;
               });
           });
       }
-
-      // 각 유저의 이미지를 비동기로 모두 가져오고, 상태를 업데이트
-      const userImagesResult = await Promise.all(Object.values(userImagePromises));
+      const userImagesResult = await Promise.all(
+        Object.values(userImagePromises),
+      );
       const userImageState = {};
       chatRoomList.forEach((room, index) => {
         userImageState[room.id] = userImagesResult[index];
@@ -124,9 +141,9 @@ const Chat = () => {
       }
     });
   };
+  const renderGroups = ({item}) => {
+    const userImage = userImages[item.id];
 
-  const renderGroups = ({ item }) => {
-    const userImage = userImages[item.id]; // 저장된 유저 이미지 가져오기
 
     const goToChatRoom = () => {
       navigation.navigate('ChatRoom', {
@@ -149,8 +166,13 @@ const Chat = () => {
             alignItems: 'flex-start',
           }}>
           <Image
-            style={{ width: 48, height: 48, borderRadius: 8 }}
-            source={userImage ? { uri: userImage } : DefaultProfileIcon}
+            style={{width: 48, height: 48, borderRadius: 8}}
+            source={
+              item.chatRoomImage
+                ? {uri: item.chatRoomImage[0]}
+                : DefaultProfileIcon
+            }
+
           />
         </View>
         <View
