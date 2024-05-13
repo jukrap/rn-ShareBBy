@@ -507,7 +507,9 @@ const CommunityPostDetail = ({route}) => {
         </View>
         <Text style={styles.postContentText}>{posts.post_content}</Text>
         {posts?.post_files?.length > 0 ? (
-          <ImageSlider images={posts.post_files} autoSlide={true} autoSlideInterval={5000} />
+          <View style={styles.postImageWrapper}>
+          <ImageSlider images={posts.post_files} autoSlide={false}/>
+          </View>
         ) : (
           <View style={styles.divider} />
         )}
@@ -700,10 +702,7 @@ const styles = StyleSheet.create({
   },
 
   postImageWrapper: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 32,
-    borderRadius: 8,
+    marginBottom: 8,
   },
   postSwiperFlatList: {},
   postImage: {

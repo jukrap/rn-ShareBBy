@@ -15,26 +15,42 @@ const ImageSlider = ({images, autoSlide = false, autoSlideInterval = 3000}) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isImageModalVisible, setIsImageModalVisible] = useState(false);
   const flatListRef = useRef(null);
+  const slideTimerRef = useRef(null);
 
   useEffect(() => {
-    let slideTimer = null;
-
     if (autoSlide && images.length > 1) {
-      slideTimer = setInterval(() => {
-        setCurrentIndex(prevIndex => (prevIndex + 1) % images.length);
-      }, autoSlideInterval);
+      startSlideTimer();
     }
 
     return () => {
-      if (slideTimer) {
-        clearInterval(slideTimer);
-      }
+      clearSlideTimer();
     };
   }, [autoSlide, autoSlideInterval, images]);
 
   useEffect(() => {
     flatListRef.current.scrollToIndex({index: currentIndex, animated: true});
+
+    if (autoSlide && images.length > 1) {
+      resetSlideTimer();
+    }
   }, [currentIndex]);
+
+  const startSlideTimer = () => {
+    slideTimerRef.current = setInterval(() => {
+      setCurrentIndex(prevIndex => (prevIndex + 1) % images.length);
+    }, autoSlideInterval);
+  };
+
+  const resetSlideTimer = () => {
+    clearSlideTimer();
+    startSlideTimer();
+  };
+
+  const clearSlideTimer = () => {
+    if (slideTimerRef.current) {
+      clearInterval(slideTimerRef.current);
+    }
+  };
 
   const handleImagePress = index => {
     setCurrentIndex(index);
@@ -76,7 +92,11 @@ const ImageSlider = ({images, autoSlide = false, autoSlideInterval = 3000}) => {
   );
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        images.length > 1 && styles.multiImageContainer,
+      ]}>
       <View style={styles.imageContainer}>
         <FlatList
           ref={flatListRef}
@@ -87,6 +107,15 @@ const ImageSlider = ({images, autoSlide = false, autoSlideInterval = 3000}) => {
           pagingEnabled
           snapToInterval={width}
           showsHorizontalScrollIndicator={false}
+          onMomentumScrollEnd={event => {
+            const index = Math.round(event.nativeEvent.contentOffset.x / width);
+            setCurrentIndex(index);
+          }}
+          getItemLayout={(data, index) => ({
+            length: width,
+            offset: width * index,
+            index,
+          })}
         />
       </View>
       {images.length > 1 && (
@@ -104,11 +133,16 @@ const ImageSlider = ({images, autoSlide = false, autoSlideInterval = 3000}) => {
   );
 };
 
+export default ImageSlider;
+
 const defaultPostImg = require('../../assets/images/defaultPostImg.jpg');
 
 const styles = StyleSheet.create({
   container: {
     height: height * 0.3,
+    marginBottom: 16,
+  },
+  multiImageContainer: {
     marginBottom: 24,
   },
   imageContainer: {
@@ -134,7 +168,7 @@ const styles = StyleSheet.create({
     height: 4,
     borderRadius: 50,
     backgroundColor: '#DBDBDB',
-    marginHorizontal: 2,
+    marginHorizontal: 3,
   },
   paginationItemActive: {
     width: 6,
@@ -142,5 +176,3 @@ const styles = StyleSheet.create({
     backgroundColor: '#07AC7D',
   },
 });
-
-export default ImageSlider;

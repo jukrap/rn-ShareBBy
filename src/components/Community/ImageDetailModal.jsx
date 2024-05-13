@@ -5,13 +5,12 @@ import {
   TouchableOpacity,
   StyleSheet,
   Dimensions,
-  TouchableWithoutFeedback,
 } from 'react-native';
-import {SwiperFlatList} from 'react-native-swiper-flatlist';
 import Modal from 'react-native-modal';
-import { FasterImageView } from '@candlefinance/faster-image';
+import ImageDetailSlider from './ImageDetailSlider';
 
 const {width, height} = Dimensions.get('window');
+
 const ImageDetailModal = ({images, currentIndex, isVisible, onClose}) => {
   return (
     <Modal
@@ -24,40 +23,13 @@ const ImageDetailModal = ({images, currentIndex, isVisible, onClose}) => {
         <TouchableOpacity style={styles.closeButton} onPress={onClose}>
           <Image source={greenCloseIcon} style={styles.closeIcon} />
         </TouchableOpacity>
-
-        <SwiperFlatList
-          index={currentIndex}
-          showPagination
-          paginationDefaultColor="#DBDBDB"
-          paginationActiveColor="#07AC7D"
-          paginationStyleItem={styles.paginationStyleItems}
-          paginationStyleItemActive={styles.paginationStyleItemActives}
-          data={images}
-          style={styles.postSwiperFlatList}
-          renderItem={({item, index}) => (
-            <TouchableWithoutFeedback key={index}>
-              <View style={styles.slide}>
-              <FasterImageView
-                  style={styles.postImage}
-                  source={{
-                    url: item,
-                    priority: 'high',
-                    cachePolicy: 'discWithCacheControl',
-                    failureImageUrl: defaultPostImg,
-                    resizeMode: 'contain',
-                  }}
-                />
-              </View>
-            </TouchableWithoutFeedback>
-          )}
-        />
+        <ImageDetailSlider images={images} initialIndex={currentIndex} />
       </View>
     </Modal>
   );
 };
 
 const greenCloseIcon = require('../../assets/icons/greenCloseIcon.png');
-const defaultPostImg = require('../../assets/images/defaultPostImg.jpg');
 
 const styles = StyleSheet.create({
   modal: {
@@ -65,22 +37,12 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: 'black',
+    backgroundColor: '#212529',
     justifyContent: 'center',
     alignItems: 'center',
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
     marginTop: 40,
-  },
-  wrapper: {},
-  slide: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  postImage: {
-    width: width,
-    height: height * 0.7,
   },
   closeButton: {
     position: 'absolute',
@@ -91,20 +53,6 @@ const styles = StyleSheet.create({
   closeIcon: {
     width: 24,
     height: 24,
-  },
-  paginationStyleItems: {
-    width: 8,
-    height: 8,
-    bottom: 48,
-    borderRadius: 100,
-    marginHorizontal: 8,
-  },
-  paginationStyleItemActives: {
-    width: 12,
-    height: 12,
-    borderRadius: 100,
-    marginHorizontal: 8,
-    bottom: 50,
   },
 });
 
