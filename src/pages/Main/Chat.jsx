@@ -10,7 +10,7 @@ import {
   Dimensions,
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import userStore from '../../lib/userStore';
 import dayjs from 'dayjs';
 import ChatListTime from '../../components/Chat/ChatListTime';
@@ -18,10 +18,12 @@ import {BackIcon, DefaultProfileIcon} from '../../assets/assets';
 
 const {width, height} = Dimensions.get('window');
 
+
 const Chat = () => {
   const [chatRooms, setChatRooms] = useState([]);
   const [lastChat, setLastChat] = useState({});
   const [userImages, setUserImages] = useState({});
+
 
   const navigation = useNavigation();
   const userToken = userStore(state => state.userToken);
@@ -55,6 +57,7 @@ const Chat = () => {
       const latestChats = {};
       const userImagePromises = {};
 
+
       for (const room of chatRoomList) {
         const messageSnapshot = await firestore()
           .collection('chatRooms')
@@ -71,7 +74,6 @@ const Chat = () => {
             timestamp: latestMessage.timestamp.toDate(),
           };
         }
-
         userImagePromises[room.id] = firestore()
           .collection('hobbies')
           .doc(room.hobbiesId)
@@ -82,12 +84,12 @@ const Chat = () => {
               .collection('users')
               .doc(userId)
               .get()
+
               .then(userData => {
                 return userData.data().profileImage;
               });
           });
       }
-
       const userImagesResult = await Promise.all(
         Object.values(userImagePromises),
       );
@@ -111,9 +113,9 @@ const Chat = () => {
 
     switch (true) {
       case date.isSame(today, 'day'):
-        return {type: 'timeOnly', time: date.format('A hh:mm')};
+        return { type: 'timeOnly', time: date.format('A hh:mm') };
       case date.isSame(yesterday, 'day'):
-        return {type: 'yesterday'};
+        return { type: 'yesterday' };
       default:
         return {
           type: 'monthAndDay',
@@ -139,9 +141,9 @@ const Chat = () => {
       }
     });
   };
-
   const renderGroups = ({item}) => {
     const userImage = userImages[item.id];
+
 
     const goToChatRoom = () => {
       navigation.navigate('ChatRoom', {
@@ -153,7 +155,7 @@ const Chat = () => {
     const latestChat = lastChat[item.id];
     const formattedTime = latestChat
       ? formatMessageTime(latestChat.timestamp)
-      : {type: 'none'};
+      : { type: 'none' };
 
     return (
       <TouchableOpacity onPress={goToChatRoom} style={styles.chatRoomItem}>
@@ -170,6 +172,7 @@ const Chat = () => {
                 ? {uri: item.chatRoomImage[0]}
                 : DefaultProfileIcon
             }
+
           />
         </View>
         <View
@@ -185,8 +188,8 @@ const Chat = () => {
               alignItems: 'flex-end',
               gap: 4,
             }}>
-            <Text style={{fontSize: 16, fontWeight: '600'}}>{item.name}</Text>
-            <Text style={{fontSize: 14, color: '#A7A7A7'}}>
+            <Text style={{ fontSize: 16, fontWeight: '600' }}>{item.name}</Text>
+            <Text style={{ fontSize: 14, color: '#A7A7A7' }}>
               {item.members.length}
             </Text>
           </View>
@@ -198,7 +201,7 @@ const Chat = () => {
               fontSize: 10,
             }}>
             {latestChat && (
-              <Text style={{color: '#A7A7A7', fontSize: 13}}>
+              <Text style={{ color: '#A7A7A7', fontSize: 13 }}>
                 {latestChat.text}
               </Text>
             )}
@@ -215,7 +218,7 @@ const Chat = () => {
   };
 
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <SafeAreaView style={{ flex: 1 }}>
       <View
         style={{
           paddingTop: 8,
@@ -226,12 +229,12 @@ const Chat = () => {
           marginBottom: 32,
         }}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Image source={BackIcon} style={{width: 24, height: 24}} />
+          <Image source={BackIcon} style={{ width: 24, height: 24 }} />
         </TouchableOpacity>
-        <Text style={{fontSize: 24, fontWeight: '700'}}>채팅목록</Text>
+        <Text style={{ fontSize: 24, fontWeight: '700' }}>채팅목록</Text>
         <View />
       </View>
-      <View style={{flex: 1, alignItems: 'center'}}>
+      <View style={{ flex: 1, alignItems: 'center' }}>
         <FlatList
           data={sortLast()}
           renderItem={renderGroups}

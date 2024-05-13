@@ -4,9 +4,8 @@ import userStore from '../lib/userStore'; // Zustand 스토어 import
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Geolocation from 'react-native-geolocation-service';
 
-
-const SplashScreen = ({ navigation }) => {
-  const { setUserData } = userStore(); // 사용자 정보만 필요하므로 userToken은 사용하지 않음
+const SplashScreen = ({navigation}) => {
+  const {setUserData} = userStore(); // 사용자 정보만 필요하므로 userToken은 사용하지 않음
 
   useEffect(() => {
     checkUser();
