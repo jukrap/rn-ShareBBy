@@ -26,6 +26,7 @@ import {SwiperFlatList} from 'react-native-swiper-flatlist';
 import BottomSheetModal from '../../components/Community/BottomSheetModal';
 import CommunityHeader from '../../components/Community/CommunityHeader';
 import ImageDetailModal from '../../components/Community/ImageDetailModal';
+import ImageSlider from '../../components/Community/ImageSlider';
 
 const {width, height} = Dimensions.get('window');
 
@@ -506,34 +507,7 @@ const CommunityPostDetail = ({route}) => {
         </View>
         <Text style={styles.postContentText}>{posts.post_content}</Text>
         {posts?.post_files?.length > 0 ? (
-          <View style={styles.postImageWrapper}>
-            <SwiperFlatList
-              autoplay
-              autoplayDelay={5}
-              autoplayLoop
-              showPagination
-              paginationDefaultColor="#DBDBDB"
-              paginationActiveColor="#07AC7D"
-              paginationStyleItem={styles.paginationStyleItems}
-              paginationStyleItemActive={styles.paginationStyleItemActives}
-              data={posts.post_files}
-              style={styles.postSwiperFlatList}
-              renderItem={({item, index}) => (
-                <TouchableOpacity
-                  onPress={() => {
-                    setCurrentImageIndex(index);
-                    setIsImageModalVisible(true);
-                  }}>
-                  <Image
-                    style={styles.postImage}
-                    source={{uri: item}}
-                    resizeMode="cover"
-                    defaultSource={defaultPostImg}
-                  />
-                </TouchableOpacity>
-              )}
-            />
-          </View>
+          <ImageSlider images={posts.post_files} autoSlide={true} autoSlideInterval={5000} />
         ) : (
           <View style={styles.divider} />
         )}
@@ -729,6 +703,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 32,
+    borderRadius: 8,
   },
   postSwiperFlatList: {},
   postImage: {

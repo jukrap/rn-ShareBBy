@@ -9,10 +9,10 @@ import {
 } from 'react-native';
 import {SwiperFlatList} from 'react-native-swiper-flatlist';
 import Modal from 'react-native-modal';
+import { FasterImageView } from '@candlefinance/faster-image';
 
 const {width, height} = Dimensions.get('window');
 const ImageDetailModal = ({images, currentIndex, isVisible, onClose}) => {
-  console.log('currentIndex: ', currentIndex);
   return (
     <Modal
       isVisible={isVisible}
@@ -37,11 +37,15 @@ const ImageDetailModal = ({images, currentIndex, isVisible, onClose}) => {
           renderItem={({item, index}) => (
             <TouchableWithoutFeedback key={index}>
               <View style={styles.slide}>
-                <Image
+              <FasterImageView
                   style={styles.postImage}
-                  source={{uri: item}}
-                  resizeMode="contain"
-                  defaultSource={defaultPostImg}
+                  source={{
+                    url: item,
+                    priority: 'high',
+                    cachePolicy: 'discWithCacheControl',
+                    failureImageUrl: defaultPostImg,
+                    resizeMode: 'contain',
+                  }}
                 />
               </View>
             </TouchableWithoutFeedback>
@@ -64,6 +68,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'black',
     justifyContent: 'center',
     alignItems: 'center',
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    marginTop: 40,
   },
   wrapper: {},
   slide: {
@@ -73,7 +80,7 @@ const styles = StyleSheet.create({
   },
   postImage: {
     width: width,
-    height: height * 0.8,
+    height: height * 0.7,
   },
   closeButton: {
     position: 'absolute',
@@ -88,7 +95,7 @@ const styles = StyleSheet.create({
   paginationStyleItems: {
     width: 8,
     height: 8,
-    bottom: 80,
+    bottom: 48,
     borderRadius: 100,
     marginHorizontal: 8,
   },
@@ -97,7 +104,7 @@ const styles = StyleSheet.create({
     height: 12,
     borderRadius: 100,
     marginHorizontal: 8,
-    bottom: 82,
+    bottom: 50,
   },
 });
 

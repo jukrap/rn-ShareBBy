@@ -30,7 +30,7 @@ const CommunityHeader = ({
   };
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: '#FEFFFE'}}>
+    <SafeAreaView style={{backgroundColor: '#FEFFFE'}}>
       <View style={styles.topbarView}>
         <View style={styles.leftButtonContainer}>
           {showBackButton && (

@@ -21,6 +21,7 @@ import ImageDetailModal from './ImageDetailModal';
 
 import FastImage from 'react-native-fast-image';
 import {FasterImageView} from '@candlefinance/faster-image';
+import ImageSlider from './ImageSlider';
 
 const {width, height} = Dimensions.get('window');
 
@@ -175,13 +176,16 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
         <TouchableOpacity
           style={styles.userInfoWrapper}
           onPress={() => onProfile(item.userId)}>
-          <Image
-            style={styles.userProfileImage}
-            source={
-              postUserData && postUserData.profileImage
-                ? {uri: postUserData.profileImage}
-                : defaultProfileImg
-            }
+          <FasterImageView
+            style={[styles.userProfileImage, {overflow: 'hidden'}]}
+            source={{
+              url: postUserData?.profileImage,
+              priority: 'high',
+              cachePolicy: 'discWithCacheControl',
+              failureImageUrl: defaultProfileImg,
+              resizeMode: 'cover',
+              borderRadius: 50,
+            }}
           />
           <View style={styles.userInfoTextContainer}>
             <Text style={styles.userNameText}>{postUserData?.nickname}</Text>
@@ -220,40 +224,7 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
         {isMoreContent && <Text style={styles.readMoreText}>...더보기</Text>}
       </TouchableOpacity>
       {item?.post_files?.length > 0 ? (
-        //테두리 둥굴게, 이미지 전환을 보다 더 정확하게 하려고 했으나 안 됨
-        //사유: 파이어베이스에서 불러오는 이미지 + 라이브러리 자체가 하드 코딩되어 있음
-        <View style={styles.postImageWrapper}>
-          <SwiperFlatList
-            autoplay
-            autoplayDelay={5}
-            autoplayLoop
-            showPagination
-            paginationDefaultColor="#DBDBDB"
-            paginationActiveColor="#07AC7D"
-            paginationStyleItem={styles.paginationStyleItems}
-            paginationStyleItemActive={styles.paginationStyleItemActives}
-            data={item.post_files}
-            style={styles.postSwiperFlatList}
-            renderItem={({item, index}) => (
-              <TouchableOpacity
-                onPress={() => {
-                  setCurrentImageIndex(index);
-                  setIsImageModalVisible(true);
-                }}activeOpacity={1}>
-                <FasterImageView
-                  style={styles.postImage}
-                  source={{
-                    url: item,
-                    priority: 'high',
-                    cachePolicy: 'discWithCacheControl',
-                    failureImageUrl: defaultPostImg,
-                    resizeMode: 'cover',
-                  }}
-                />
-              </TouchableOpacity>
-            )}
-          />
-        </View>
+        <ImageSlider images={item.post_files} autoSlide={true} autoSlideInterval={5000} />
       ) : (
         <View style={styles.divider} />
       )}
@@ -412,6 +383,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 24,
+    borderRadius: 8,
   },
   postSwiperFlatList: {},
   postImage: {
@@ -505,5 +477,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Pretendard',
     color: '#212529',
+  },
+  imageSliderContainer: {
+    height: height * 0.3,
+    marginBottom: 24,
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  imageSliderImage: {
+    width,
+    height: height * 0.3,
   },
 });

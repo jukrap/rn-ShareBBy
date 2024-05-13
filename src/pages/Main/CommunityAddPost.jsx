@@ -227,10 +227,6 @@ const CommunityAddPost = () => {
           ...JSON.parse(JSON.stringify(prevSelectedImages)),
           imageUri,
         ]);
-        //TODO: 깊은 복사로 바꾸기
-        //ㅅㅂ 이거 뭐야
-        //이 구조로 setSelectedImages에 imageUri이 안들어갈 수 있나?
-        //심지어 imageUri에는 파일이 있는데도?
         console.log('imageUri2 = ', imageUri);
         console.log('selectedImages = ', selectedImages);
         setIsImagePickerModalVisible(false);
