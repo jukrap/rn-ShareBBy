@@ -19,6 +19,9 @@ import {SwiperFlatList} from 'react-native-swiper-flatlist';
 import BottomSheetModal from './BottomSheetModal';
 import ImageDetailModal from './ImageDetailModal';
 
+import FastImage from 'react-native-fast-image';
+import {FasterImageView} from '@candlefinance/faster-image';
+
 const {width, height} = Dimensions.get('window');
 
 const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
@@ -236,12 +239,16 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
                 onPress={() => {
                   setCurrentImageIndex(index);
                   setIsImageModalVisible(true);
-                }}>
-                <Image
+                }}activeOpacity={1}>
+                <FasterImageView
                   style={styles.postImage}
-                  source={{uri: item}}
-                  resizeMode="cover"
-                  defaultSource={defaultPostImg}
+                  source={{
+                    url: item,
+                    priority: 'high',
+                    cachePolicy: 'discWithCacheControl',
+                    failureImageUrl: defaultPostImg,
+                    resizeMode: 'cover',
+                  }}
                 />
               </TouchableOpacity>
             )}
