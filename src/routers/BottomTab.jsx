@@ -18,6 +18,7 @@ import EditProfile from '../pages/Main/EditProfile';
 import SynthesisAgree from '../components/SignUp/AgreeList/SynthesisAgree';
 import MyPosts from '../pages/Main/MyPosts';
 import MyLists from '../pages/Main/MyLists';
+import ShowAllImages from '../pages/Main/ShowAllImages';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -26,6 +27,7 @@ const AboutMap = ({params}) => {
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name="Main" component={Main} initialParams={params} />
+      <Stack.Screen name="Profile" component={Profile} initialParams={params} />
       <Stack.Screen name="Recruit" component={Recruit} initialParams={params} />
       <Stack.Screen name="Join" component={Join} initialParams={params} />
       <Stack.Screen name="Detail" component={Detail} initialParams={params} />
@@ -39,6 +41,7 @@ const AboutChat = () => {
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name="Chat" component={Chat} />
       <Stack.Screen name="ChatRoom" component={ChatRoom} />
+      <Stack.Screen name="ShowAllImages" component={ShowAllImages} />
     </Stack.Navigator>
   );
 };

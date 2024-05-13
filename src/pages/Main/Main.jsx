@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useRef} from 'react';
+import React, {useEffect, useState, useRef, useMemo} from 'react';
 import {
   SafeAreaView,
   View,
@@ -12,28 +12,54 @@ import {
 } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import useStore from '../../lib/useStore';
 import storage from '@react-native-firebase/storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { getHobbiesDetail } from '../../lib/hobby';
+import userStore from '../../lib/userStore' 
 
 const {width, height} = Dimensions.get('window');
 
-const Main = ({navigation, route}) => {
-  const [optionClick, setOptionClick] = useState(null);
+// OptimizedImageItem 컴포넌트를 메모이제이션해서 성능 향상
+const OptimizedImageItem = React.memo(({item}) => {
+  const source = useMemo(() => item.bgImg, [item.bgImg]);
+  return (
+    <Image source={source} style={{width: width, height: height / 4}} />
+  );
+});
+
+const Main = ({navigation}) => {
+  const [optionClick, setOptionClick] = useState('');
   const [currUserData, setCurrUserData] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [imageUrl, setImageUrl] = useState('');
+  const [imageUrl, setImageUrl] = useState(null);
   const [eventBanner, setEventBanner] = useState([]);
+  const bannerRef = useRef('');
+  const userData = userStore(state => state.userData); 
 
-  const bannerRef = useRef(null);
-
-  const userToken = useStore(state => state.userToken);
-
+  
+  // 사용자 데이터를 가져오는 useEffect
   useEffect(() => {
-    console.log('User token:', userToken);
-  }, [userToken]);
+    const fetchData = async () => {
+      try {
+        const user = auth().currentUser;
+        if (user) {
+          const userCollection = firestore().collection('users');
+          const currUser = await userCollection.doc(user.uid).get();
+          const userData = currUser.data();
+          setCurrUserData(userData);
+          setImageUrl(userData.profileImage);
+        } else {
+          console.log('사용자를 찾을 수 없음');
+        }
+      } catch (error) {
+        console.error('데이터를 가져오는 중 오류 발생:', error);
+      }
+    };
 
+    fetchData();
+  }, []);
+
+  // 이벤트 배너 이미지를 가져오는 useEffect , 파이어스토어 테이블 만들기
   useEffect(() => {
     const fetchEventBannerImages = async () => {
       try {
@@ -42,14 +68,11 @@ const Main = ({navigation, route}) => {
         const updatedEventBanner = await Promise.all(
           imageRefs.items.map(async itemRef => {
             const url = await itemRef.getDownloadURL();
-            console.log('이미지 URL:', url);
             return {bgImg: {uri: url}};
           }),
         );
 
-        const beforeSlide = updatedEventBanner[updatedEventBanner.length - 1];
-        const afterSlide = updatedEventBanner[0];
-        setEventBanner([beforeSlide, ...updatedEventBanner, afterSlide]);
+        setEventBanner(updatedEventBanner);
       } catch (error) {
         console.error('이벤트 배너를 가져오는 중 오류 발생:', error);
       }
@@ -58,6 +81,7 @@ const Main = ({navigation, route}) => {
     fetchEventBannerImages();
   }, []);
 
+  // 이벤트 배너를 자동으로 스크롤하는 useEffect, 이너벌 대신 애니메이션에서 duration
   useEffect(() => {
     const scrollInterval = setInterval(() => {
       if (eventBanner.length > 1 && bannerRef.current) {
@@ -84,37 +108,12 @@ const Main = ({navigation, route}) => {
     };
   }, [currentIndex, eventBanner.length]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const user = auth().currentUser;
-        if (user) {
-          const userCollection = firestore().collection('users');
-          const currUser = await userCollection.doc(user.uid).get();
-          const userData = currUser.data();
-          setCurrUserData(userData);
-          setImageUrl(userData.profileImage);
-        } else {
-          console.log('사용자를 찾을 수 없음');
-        }
-      } catch (error) {
-        console.error('데이터를 가져오는 중 오류 발생:', error);
-      }
-    };
-
-    fetchData();
-  }, []);
-
+  // 옵션 클릭 이벤트 핸들러
   const handleOptionClick = id => {
     setOptionClick(id);
   };
 
-  const renderItem = ({item}) => {
-    return (
-      <Image source={item.bgImg} style={{width: width, height: height / 4}} />
-    );
-  };
-
+  // 옵션 아이템 렌더링 함수
   const optionItem = ({item}) => {
     return (
       <TouchableOpacity
@@ -135,11 +134,13 @@ const Main = ({navigation, route}) => {
       </TouchableOpacity>
     );
   };
+  console.log('현재 사용자 데이터:', currUserData);
 
+  
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: '#fff'}}>
       <View style={styles.topbarView}>
-        <Text style={{fontSize: 24, fontWeight: 700, color: '#07AC7D'}}>
+        <Text style={{fontSize: 24, fontWeight: '700', color: '#07AC7D'}}>
           ShareBBy
         </Text>
       </View>
@@ -154,8 +155,7 @@ const Main = ({navigation, route}) => {
           data={topOption}
           renderItem={optionItem}
           keyExtractor={item => item.id.toString()}
-          horizontal={true}
-          showsHorizontalScrollIndicator={false}
+          horizontal
         />
       </View>
       <ScrollView style={{height: '50%'}}>
@@ -163,9 +163,9 @@ const Main = ({navigation, route}) => {
           <FlatList
             data={eventBanner}
             ref={bannerRef}
-            renderItem={renderItem}
+            renderItem={({item}) => <OptimizedImageItem item={item} />}
             keyExtractor={(_, index) => index.toString()}
-            horizontal={true}
+            horizontal
             showsHorizontalScrollIndicator={false}
             automaticallyAdjustContentInsets={false}
             decelerationRate="fast"
@@ -184,6 +184,7 @@ const Main = ({navigation, route}) => {
                 source={{uri: imageUrl}}
                 style={{
                   borderWidth: 1,
+                  borderColor: '#a7a7a7',
                   borderRadius: 10,
                   width: 20,
                   height: 20,
@@ -245,7 +246,7 @@ const Main = ({navigation, route}) => {
                 <View style={styles.gradeNum}>
                   <Text style={{color: '#fff', fontWeight: 'bold'}}>2</Text>
                 </View>
-                <Text style={{fontSize: 16, fontWeight: '600'}}>장혜림</Text>
+                <Text style={{fontSize: 16, fontWeight: '600'}}>{userData ? (userData.nickname) : '데이터 없음'}</Text>
               </View>
               <View style={styles.gradeUp}>
                 <Image source={dummyProfileIcon} />
@@ -305,7 +306,6 @@ const Main = ({navigation, route}) => {
 
 const goJoin = require('../../assets/images/goJoin.png');
 const goRecruit = require('../../assets/images/goRecruit.png');
-const tennisBg = require('../../assets/images/tennisBg.png');
 const dummyProfileIcon = require('../../assets/icons/dummyProfileIcon.png');
 
 const topOption = [
@@ -368,7 +368,7 @@ const styles = StyleSheet.create({
   hobbyNameView: {
     flexDirection: 'row',
     alignItems: 'center',
-    ustifyContent: 'flex-start',
+    justifyContent: 'flex-start',
     paddingVertical: 15,
     gap: 8,
   },

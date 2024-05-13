@@ -13,7 +13,8 @@ import {
 import { signIn } from '../../lib/auth';
 import firestore from '@react-native-firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import useStore from '../../lib/useStore'; // Zustand 스토어 import
+import userStore from '../../lib/userStore';
+
 
 import {
   onGoogleButtonPress,
@@ -31,21 +32,33 @@ const Login = ({ navigation }) => {
   const [password, setPassword] = useState();
   const [isEmailValid, setIsEmailValid] = useState(false);
 
-  const setUserToken = useStore(state => state.setUserToken); // Zustand 스토어 custom hook 사용
+  const setUserData = userStore(state => state.setUserData); // Zustand 스토어 custom hook 사용
+  const setUserToken = userStore(state => state.setUserToken);
 
   const onSignIn = async () => {
     try {
       const { user } = await signIn({ email, password });
-      const userCollection = firestore().collection('users');
-      console.log((await userCollection.doc(user.uid).get()).data());
+  
+      // 사용자의 문서를 가져와서 전체 정보를 가져옴
+      const userDoc = await firestore().collection('users').doc(user.uid).get();
+      const userInfo = userDoc.data();
+  
+      // AsyncStorage에 사용자 정보 저장
+      await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
+  
+      // Zustand 스토어에 사용자 정보 설정
+      setUserData(userInfo);
+
       await AsyncStorage.setItem('userToken', user.uid);
       setUserToken(user.uid); // Zustand 스토어에 사용자 토큰 설정
+      // navigation을 여기서 호출
       navigation.navigate('BottomTab');
     } catch (e) {
       console.error('로그인 실패:', e);
       Alert.alert('아이디 또는 비밀번호를 확인해주세요.');
     }
   };
+  
 
   const validateEmail = email => {
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -129,7 +142,7 @@ const Login = ({ navigation }) => {
             onPress={() => navigation.navigate('SignUp')}
             style={styles.signInButton}
           >
-            <Text style={styles.signInText}>Are You Ready 가입하기</Text>
+            <Text style={styles.signInText}>ShareBBy 가입하기</Text>
           </TouchableOpacity>
 
           <View style={styles.orContainer}>
@@ -177,7 +190,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   loginTextInput: {
-    backgroundColor: '#d9d9d9',
+    backgroundColor: '#d3d3d3',
     borderRadius: 10,
     flex: Platform.OS === 'android' ? 0.15 : 0.12,
     justifyContent: 'center',
