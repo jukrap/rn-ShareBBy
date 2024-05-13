@@ -246,8 +246,8 @@ const CommunityBoard = ({navigation}) => {
   };
 
   return (
-    <SafeAreaView style={{flex: 1}}>
-      <View style={{flex: 1, backgroundColor: '#FEFFFE'}}>
+    <SafeAreaView style={{flex: 1, backgroundColor: '#FEFFFE'}}>
+      <View style={{flex: 1}}>
         <CommunityHeader
           showBackButton={false}
           rightIcon={pencilIcon}

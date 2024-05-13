@@ -593,12 +593,12 @@ const CommunityPostDetail = ({route}) => {
   );
 
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <SafeAreaView style={{flex: 1, backgroundColor: '#FEFFFE'}}>
       <CommunityHeader title={'게시글'} />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={48}
-        style={{flex: 1, backgroundColor: 'white'}}>
+        style={{flex: 1, backgroundColor: '#FEFFFE'}}>
         <FlatList
           data={comments}
           ListHeaderComponent={renderPostContent}

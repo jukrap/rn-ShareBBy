@@ -176,8 +176,8 @@ const CommunityEditPost = ({route}) => {
       return;
     }
     ImagePicker.openCamera({
-      width: 1200,
-      height: 780,
+      width: 900,
+      height: 900,
       cropping: true,
     })
       .then(image => {
@@ -223,7 +223,7 @@ const CommunityEditPost = ({route}) => {
   };
 
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <SafeAreaView style={{flex: 1, backgroundColor: '#FEFFFE'}}>
     <CommunityHeader onPressRightText = {handlePostUpdate} rightText= {"등록"} title={"기존 게시글"}/>
       <View style={styles.container}>
         <View style={styles.contentWrapper}>
