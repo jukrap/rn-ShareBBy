@@ -22,7 +22,7 @@ const {width, height} = Dimensions.get('window');
 const OptimizedImageItem = React.memo(({item}) => {
   const source = useMemo(() => (item.bgImg ? item.bgImg : null), [item.bgImg]);
   return source ? (
-    <Image source={source} style={{width: width, height: height / 4}} />
+    <Image resizeMethod='auto' source={source} style={{width: width, height: height / 4}} />
   ) : null;
 });
 

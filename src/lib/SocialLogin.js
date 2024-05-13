@@ -90,12 +90,19 @@ const getNaverProfiles = async navigation => {
         'temporary_password',
       );
 
-      await firestore().collection('users').doc(user.uid).set({
+      // 사용자 정보를 AsyncStorage에 저장
+      const userInfo = {
         id: user.uid,
         email: profileData.response.email,
         nickname: profileData.response.nickname,
         profileImage: profileImageUrl,
-      });
+      };
+      await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
+
+      // Firestore에 사용자 정보 저장
+      await firestore().collection('users').doc(user.uid).set(userInfo);
+
+      // 사용자 토큰 및 화면 전환
       await AsyncStorage.setItem('userToken', user.uid);
       navigation.navigate('BottomTab');
     } else {
@@ -126,12 +133,19 @@ export const onGoogleButtonPress = async navigation => {
         .ref('dummyprofile.png')
         .getDownloadURL();
 
-      await firestore().collection('users').doc(user.uid).set({
+      // 사용자 정보를 AsyncStorage에 저장
+      const userInfo = {
         id: user.uid,
         email: email,
         nickname: displayName,
         profileImage: profileImageUrl,
-      });
+      };
+      await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
+
+      // Firestore에 사용자 정보 저장
+      await firestore().collection('users').doc(user.uid).set(userInfo);
+
+      // 사용자 토큰 및 화면 전환
       await AsyncStorage.setItem('userToken', user.uid);
       navigation.navigate('BottomTab');
     } else {
