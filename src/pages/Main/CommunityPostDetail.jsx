@@ -23,6 +23,7 @@ import {ko} from 'date-fns/locale';
 import Modal from 'react-native-modal';
 import {useNavigation} from '@react-navigation/native';
 import {SwiperFlatList} from 'react-native-swiper-flatlist';
+import {FasterImageView} from '@candlefinance/faster-image';
 import BottomSheetModal from '../../components/Community/BottomSheetModal';
 import CommunityHeader from '../../components/Community/CommunityHeader';
 import ImageDetailModal from '../../components/Community/ImageDetailModal';
@@ -477,14 +478,17 @@ const CommunityPostDetail = ({route}) => {
       <View style={styles.postInContainer}>
         <View style={styles.userInfoContainer}>
           <View style={styles.userInfoWrapper}>
-            <Image
-              style={styles.userProfileImage}
-              source={
-                postUserData.profileImage
-                  ? {uri: postUserData.profileImage}
-                  : defaultProfileImg
-              }
-            />
+          <FasterImageView
+            style={[styles.userProfileImage, {overflow: 'hidden'}]}
+            source={{
+              url: postUserData?.profileImage,
+              priority: 'high',
+              cachePolicy: 'discWithCacheControl',
+              failureImageUrl: defaultProfileImg,
+              resizeMode: 'cover',
+              borderRadius: 50,
+            }}
+          />
             <View style={styles.userInfoTextContainer}>
               <Text style={styles.userNameText}>{postUserData.nickname}</Text>
               <Text style={styles.postTimeText}>
