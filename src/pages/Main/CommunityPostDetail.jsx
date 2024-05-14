@@ -31,7 +31,6 @@ import ImageSlider from '../../components/Community/ImageSlider';
 import CommunityActionToast from '../../components/Community/CommunityActionToast';
 import CommunityActionModal from '../../components/Community/CommunityActionModal';
 
-
 const {width, height} = Dimensions.get('window');
 
 const CommunityPostDetail = ({route}) => {
@@ -660,27 +659,27 @@ const CommunityPostDetail = ({route}) => {
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: '#FEFFFE'}}>
       <CommunityHeader title={'게시글'} />
+      <FlatList
+        data={comments}
+        ListHeaderComponent={renderPostContent}
+        ListEmptyComponent={renderEmptyComment}
+        renderItem={({item}) => (
+          <CommentCard
+            item={item}
+            onDelete={() => handleCommentDelete(item.id)}
+            onEdit={() => handleCommentEdit(item.id)}
+          />
+        )}
+        keyExtractor={(item, index) => item.id || index.toString()}
+        onEndReached={fetchMoreComments}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={renderFooter}
+        style={styles.container}
+      />
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={48}
-        style={{flex: 1, backgroundColor: '#FEFFFE'}}>
-        <FlatList
-          data={comments}
-          ListHeaderComponent={renderPostContent}
-          ListEmptyComponent={renderEmptyComment}
-          renderItem={({item}) => (
-            <CommentCard
-              item={item}
-              onDelete={() => handleCommentDelete(item.id)}
-              onEdit={() => handleCommentEdit(item.id)}
-            />
-          )}
-          keyExtractor={(item, index) => item.id || index.toString()}
-          onEndReached={fetchMoreComments}
-          onEndReachedThreshold={0.5}
-          ListFooterComponent={renderFooter}
-          style={styles.container}
-        />
+        behavior={Platform.OS === 'ios' ? 'padding' : null}
+        keyboardVerticalOffset={16}
+        style={{backgroundColor: '#FEFFFE'}}>
         <View style={styles.commentInputContainer}>
           <TextInput
             style={styles.commentInput}
@@ -698,29 +697,30 @@ const CommunityPostDetail = ({route}) => {
               source={planeMessageIcon}
             />
           </TouchableOpacity>
-          <BottomSheetModal isVisible={isModalVisible} onClose={toggleModal}>
-            <View style={styles.modalContent}>
-              <TouchableOpacity
-                style={styles.modalButton}
-                onPress={() => {
-                  handleEdit();
-                  toggleModal();
-                }}>
-                <Image source={pencilIcon} style={{width: 24, height: 24}} />
-                <Text style={styles.modalButtonText}>게시글 수정</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.modalButton}
-                onPress={() => {
-                  handleDelete();
-                  toggleModal();
-                }}>
-                <Image source={deleteIcon} style={{width: 24, height: 24}} />
-                <Text style={styles.modalButtonText}>게시글 삭제</Text>
-              </TouchableOpacity>
-            </View>
-          </BottomSheetModal>
         </View>
+      </KeyboardAvoidingView>
+      <BottomSheetModal isVisible={isModalVisible} onClose={toggleModal}>
+        <View style={styles.modalContent}>
+          <TouchableOpacity
+            style={styles.modalButton}
+            onPress={() => {
+              handleEdit();
+              toggleModal();
+            }}>
+            <Image source={pencilIcon} style={{width: 24, height: 24}} />
+            <Text style={styles.modalButtonText}>게시글 수정</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.modalButton}
+            onPress={() => {
+              handleDelete();
+              toggleModal();
+            }}>
+            <Image source={deleteIcon} style={{width: 24, height: 24}} />
+            <Text style={styles.modalButtonText}>게시글 삭제</Text>
+          </TouchableOpacity>
+        </View>
+      </BottomSheetModal>
       <CommunityActionToast
         visible={toastVisible}
         message={toastMessage.message}
@@ -739,7 +739,6 @@ const CommunityPostDetail = ({route}) => {
         iconSource={modalMessage.iconSource}
         showConfirmButton={modalMessage.showConfirmButton}
       />
-      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
