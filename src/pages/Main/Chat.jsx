@@ -14,7 +14,7 @@ import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import dayjs from 'dayjs';
 import ChatListTime from '../../components/Chat/ChatListTime';
-import {BackIcon, DefaultProfileIcon} from '../../assets/assets';
+import {BackIcon} from '../../assets/assets';
 
 const {width, height} = Dimensions.get('window');
 
@@ -118,6 +118,7 @@ const Chat = () => {
       navigation.navigate('ChatRoom', {
         chatRoomId: item.id,
         chatRoomName: item.name,
+        hobbiesId: item.hobbiesId,
       });
     };
 
@@ -136,11 +137,7 @@ const Chat = () => {
           }}>
           <Image
             style={{width: 48, height: 48, borderRadius: 8}}
-            source={
-              item.chatRoomImage
-                ? {uri: item.chatRoomImage}
-                : DefaultProfileIcon
-            }
+            source={{uri: item.chatRoomImage}}
           />
         </View>
         <View
