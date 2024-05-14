@@ -140,6 +140,8 @@ const CommunityAddPost = () => {
           post_files: imageUrls,
           post_created: firestore.Timestamp.fromDate(new Date()),
           post_actflag: true,
+          likeCount: 0,
+          commentCount: 0,
         });
 
       console.log('게시글 업로드 완료!');
