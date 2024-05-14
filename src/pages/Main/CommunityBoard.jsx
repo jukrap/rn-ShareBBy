@@ -24,10 +24,12 @@ import {Modal} from 'react-native-modal';
 
 import {useNavigation} from '@react-navigation/native';
 import CommunityHeader from '../../components/Community/CommunityHeader';
+import CommunityActionToast from '../../components/Community/CommunityActionToast';
+import CommunityActionModal from '../../components/Community/CommunityActionModal';
 
 const {width, height} = Dimensions.get('window');
 
-const CommunityBoard = ({navigation}) => {
+const CommunityBoard = ({navigation, route}) => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [oldestVisible, setOldestVisible] = useState(null);
@@ -35,6 +37,24 @@ const CommunityBoard = ({navigation}) => {
   const [refreshingOlder, setRefreshingOlder] = useState(false);
   const [refreshingNewer, setRefreshingNewer] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
+  const [selectedPostId, setSelectedPostId] = useState(null);
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalMessage, setModalMessage] = useState({
+    title: '',
+    modalText: '',
+    iconSource: null,
+    showConfirmButton: false,
+    onConfirm: null,
+    onCancel: null,
+  });
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState({
+    message: '',
+    leftIcon: '',
+    closeButton: true,
+    progressBar: true,
+  });
 
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged(user => {
@@ -53,6 +73,18 @@ const CommunityBoard = ({navigation}) => {
       fetchInitialPosts();
     }, []),
   );
+
+  useEffect(() => {
+    if (route.params?.sendToastMessage) {
+      setToastMessage({
+        message: route.params.sendToastMessage,
+        leftIcon: 'successIcon',
+        closeButton: true,
+        progressBar: true,
+      });
+      setToastVisible(true);
+    }
+  }, [route.params]);
 
   const fetchInitialPosts = async () => {
     setLoading(true);
@@ -139,34 +171,45 @@ const CommunityBoard = ({navigation}) => {
   const handleDelete = postId => {
     if (posts) {
       const selectedPost = posts.find(item => item.id === postId);
-  
-      if (selectedPost && currentUser && currentUser.uid === selectedPost.userId) {
-        Alert.alert(
-          '게시글 삭제',
-          '해당 게시글을 삭제하겠습니까?',
-          [
-            {
-              text: '아니오',
-              onPress: () => console.log('아니오를 클릭'),
-              style: 'cancel',
-            },
-            {
-              text: '네',
-              onPress: () => {
-                deletePost(postId);
-                setPosts(posts.filter(post => post.id !== postId));
-              },
-            },
-          ],
-          {cancelable: false},
-        );
+
+      if (
+        selectedPost &&
+        currentUser &&
+        currentUser.uid === selectedPost.userId
+      ) {
+        setSelectedPostId(postId);
+        setModalMessage({
+          title: '게시글 삭제',
+          modalText: '해당 게시글을 삭제하겠습니까?',
+          iconSource: require('../../assets/icons/warningIcon.png'),
+          showConfirmButton: false,
+          onConfirm: () => {
+            deletePost();
+            setModalVisible(false);
+          },
+          onCancel: () => {
+            setSelectedPostId(null);
+            setModalVisible(false);
+          },
+        });
+        setModalVisible(true);
       } else {
-        Alert.alert('권한 없음', '게시글 작성자만 삭제할 수 있습니다.');
+        setModalMessage({
+          title: '권한 없음',
+          modalText: '게시글 작성자만 수정/삭제할 수 있습니다.',
+          iconSource: require('../../assets/icons/warningIcon.png'),
+          showConfirmButton: true,
+          onConfirm: () => {
+            setModalVisible(false);
+          },
+        });
+        setModalVisible(true);
       }
     }
   };
-  
-  const deletePost = postId => {
+
+  const deletePost = () => {
+    const postId = selectedPostId;
     firestore()
       .collection('posts')
       .doc(postId)
@@ -174,8 +217,15 @@ const CommunityBoard = ({navigation}) => {
         post_actflag: false,
       })
       .then(() => {
-        Alert.alert('게시글 삭제', '게시글이 성공적으로 삭제되었습니다!');
-        fetchPost();
+        setToastMessage({
+          message: '게시글이 성공적으로 삭제되었습니다!',
+          leftIcon: 'successIcon',
+          closeButton: true,
+          progressBar: true,
+        });
+        setToastVisible(true);
+        setPosts(posts.filter(post => post.id !== postId));
+        setSelectedPostId(null);
       })
       .catch(e => {
         console.log('게시물을 삭제하는 중에 오류가 발생', e);
@@ -193,7 +243,13 @@ const CommunityBoard = ({navigation}) => {
       ) {
         editPost(postId);
       } else {
-        Alert.alert('권한 없음', '게시글 작성자만 수정할 수 있습니다.');
+        setModalMessage({
+          title: '권한 없음',
+          modalText: '게시글 작성자만 수정/삭제할 수 있습니다.',
+          iconSource: require('../../assets/icons/warningIcon.png'),
+          showConfirmButton: true,
+        });
+        setModalVisible(true);
       }
     }
   };
@@ -285,6 +341,24 @@ const CommunityBoard = ({navigation}) => {
           )}
         </View>
       </View>
+      <CommunityActionToast
+        visible={toastVisible}
+        message={toastMessage.message}
+        duration={7000}
+        onClose={() => setToastVisible(false)}
+        leftIcon={toastMessage.leftIcon}
+        closeButton={toastMessage.closeButton}
+        progressBar={toastMessage.progressBar}
+      />
+      <CommunityActionModal
+        isVisible={modalVisible}
+        onConfirm={modalMessage.onConfirm}
+        onCancel={modalMessage.onCancel}
+        title={modalMessage.title}
+        modalText={modalMessage.modalText}
+        iconSource={modalMessage.iconSource}
+        showConfirmButton={modalMessage.showConfirmButton}
+      />
     </SafeAreaView>
   );
 };

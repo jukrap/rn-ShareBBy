@@ -21,6 +21,8 @@ import auth from '@react-native-firebase/auth';
 import {useNavigation} from '@react-navigation/native';
 import CommunityHeader from '../../components/Community/CommunityHeader';
 import BottomSheetModal from '../../components/Community/BottomSheetModal';
+import CommunityActionToast from '../../components/Community/CommunityActionToast';
+import CommunityActionModal from '../../components/Community/CommunityActionModal';
 
 const CommunityEditPost = ({route}) => {
   const navigation = useNavigation();
@@ -37,6 +39,24 @@ const CommunityEditPost = ({route}) => {
     useState(false); // 이미지 선택 모달의 가시성을 담당
   const [currentUser, setCurrentUser] = useState(null);
   const [postId, setPostId] = useState(null); // 수정할 게시글의 ID
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalMessage, setModalMessage] = useState({
+    title: '',
+    modalText: '',
+    iconSource: null,
+    showConfirmButton: false,
+    onConfirm: null,
+    onCancel: null,
+  });
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState({
+    message: '',
+    leftIcon: '',
+    closeButton: true,
+    progressBar: true,
+  });
+
 
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged(user => {
@@ -90,13 +110,25 @@ const CommunityEditPost = ({route}) => {
           });
 
         console.log('게시글 수정 완료!');
-        Alert.alert('게시글 수정!', '성공적으로 게시글이 수정되었습니다!');
+        setToastMessage({
+          message: '성공적으로 게시글이 수정되었습니다!',
+          leftIcon: 'successIcon',
+          closeButton: true,
+          progressBar: true,
+        });
+        setToastVisible(true);
         navigation.goBack();
       } catch (error) {
         console.log('게시글을 수정하는 중 오류 발생:', error);
       }
     } else {
-      Alert.alert('게시글 내용을 입력해주세요.');
+      setToastMessage({
+        message: '게시글 내용을 입력해주세요.',
+        leftIcon: 'cautionIcon',
+        closeButton: true,
+        progressBar: true,
+      });
+      setToastVisible(true);
     }
   }, [postContent, selectedImages, postId, navigation]);
 
@@ -137,10 +169,16 @@ const CommunityEditPost = ({route}) => {
     } catch (error) {
       console.log(error);
       setIsUploading(false);
-      Alert.alert(
-        '이미지 업로드 실패',
-        '이미지 업로드 중 오류가 발생했습니다.',
-      );
+      setModalMessage({
+        title: '이미지 업로드 실패',
+        modalText: '이미지 업로드 중 오류가 발생했습니다.',
+        iconSource: require('../../assets/icons/warningIcon.png'),
+        showConfirmButton: true,
+        onConfirm: () => {
+          setModalVisible(false);
+        },
+      });
+      setModalVisible(true);
       return null;
     }
   };
@@ -168,11 +206,20 @@ const CommunityEditPost = ({route}) => {
 
   // 카메라로 사진 촬영
   const takePhotoFromCamera = () => {
-    if (selectedImages.length >= 7) {
-      Alert.alert(
-        '이미지 업로드 제한',
-        '최대 7장까지 이미지를 업로드할 수 있습니다.',
-      );
+    if (
+      selectedImages.existingImages.length + selectedImages.newImages.length >=
+      7
+    ) {
+      setModalMessage({
+        title: '이미지 업로드 제한',
+        modalText: '최대 7장까지 이미지를 업로드할 수 있습니다.',
+        iconSource: require('../../assets/icons/cautionIcon.png'),
+        showConfirmButton: true,
+        onConfirm: () => {
+          setModalVisible(false);
+        },
+      });
+      setModalVisible(true);
       return;
     }
     ImagePicker.openCamera({
@@ -196,11 +243,20 @@ const CommunityEditPost = ({route}) => {
 
   // 갤러리에서 사진 선택
   const choosePhotoFromLibrary = () => {
-    if (selectedImages.length >= 7) {
-      Alert.alert(
-        '이미지 업로드 제한',
-        '최대 7장까지 이미지를 업로드할 수 있습니다.',
-      );
+    if (
+      selectedImages.existingImages.length + selectedImages.newImages.length >=
+      7
+    ) {
+      setModalMessage({
+        title: '이미지 업로드 제한',
+        modalText: '최대 7장까지 이미지를 업로드할 수 있습니다.',
+        iconSource: require('../../assets/icons/cautionIcon.png'),
+        showConfirmButton: true,
+        onConfirm: () => {
+          setModalVisible(false);
+        },
+      });
+      setModalVisible(true);
       return;
     }
     ImagePicker.openPicker({
@@ -224,7 +280,11 @@ const CommunityEditPost = ({route}) => {
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: '#FEFFFE'}}>
-    <CommunityHeader onPressRightText = {handlePostUpdate} rightText= {"등록"} title={"기존 게시글"}/>
+      <CommunityHeader
+        onPressRightText={handlePostUpdate}
+        rightText={'등록'}
+        title={'기존 게시글'}
+      />
       <View style={styles.container}>
         <View style={styles.contentWrapper}>
           <View style={styles.postInputContainer}>
@@ -320,6 +380,24 @@ const CommunityEditPost = ({route}) => {
           </View>
         </BottomSheetModal>
       </View>
+      <CommunityActionToast
+        visible={toastVisible}
+        message={toastMessage.message}
+        duration={7000}
+        onClose={() => setToastVisible(false)}
+        leftIcon={toastMessage.leftIcon}
+        closeButton={toastMessage.closeButton}
+        progressBar={toastMessage.progressBar}
+      />
+      <CommunityActionModal
+        isVisible={modalVisible}
+        onConfirm={modalMessage.onConfirm}
+        onCancel={modalMessage.onCancel}
+        title={modalMessage.title}
+        modalText={modalMessage.modalText}
+        iconSource={modalMessage.iconSource}
+        showConfirmButton={modalMessage.showConfirmButton}
+      />
     </SafeAreaView>
   );
 };
@@ -472,7 +550,8 @@ const styles = StyleSheet.create({
   uploadStatusWrapper: {
     alignItems: 'center',
     marginTop: 16,
-  },  modalContent: {
+  },
+  modalContent: {
     padding: 16,
   },
   modalButton: {

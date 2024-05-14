@@ -37,6 +37,12 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
   const [isMoreContent, setIsMoreContent] = useState(false);
   const [isImageModalVisible, setIsImageModalVisible] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isChatOutModalVisible, setIsChatOutModalVisible] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+
+  const handleSharePress = () => {
+    setIsChatOutModalVisible(true);
+  };
 
   const colors = ['tomato', 'thistle', 'skyblue', 'teal'];
 
@@ -260,7 +266,9 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
           </TouchableOpacity>
         </View>
         <View style={styles.rightInteractionContainer}>
-          <TouchableOpacity style={styles.interactionButton}>
+          <TouchableOpacity
+            style={styles.interactionButton}
+            onPress={handleSharePress}>
             <Image source={shareIcon} style={{width: 24, height: 24}} />
           </TouchableOpacity>
         </View>
@@ -451,7 +459,7 @@ const styles = StyleSheet.create({
     margin: 0,
   },
   modalViewContainer: {
-    backgroundColor: 'white',
+    backgroundColor: '#FEFFFE',
     paddingTop: 20,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,

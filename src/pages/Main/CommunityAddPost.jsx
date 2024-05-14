@@ -20,6 +20,8 @@ import auth from '@react-native-firebase/auth';
 
 import CommunityHeader from '../../components/Community/CommunityHeader';
 import BottomSheetModal from '../../components/Community/BottomSheetModal';
+import CommunityActionToast from '../../components/Community/CommunityActionToast';
+import CommunityActionModal from '../../components/Community/CommunityActionModal';
 
 const CommunityAddPost = () => {
   const navigation = useNavigation();
@@ -35,6 +37,28 @@ const CommunityAddPost = () => {
     useState(false); // 이미지 선택 모달의 가시성을 담당
   const [currentUser, setCurrentUser] = useState(null);
 
+  const [cautionToastVisible, setCautionToastVisible] = useState(false);
+  const [cautionToastMessage, setCautionToastMessage] = useState('');
+  const [successToastVisible, setSuccessToastVisible] = useState(false);
+  const [successToastMessage, setSuccessToastMessage] = useState('');
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalMessage, setModalMessage] = useState({
+    title: '',
+    modalText: '',
+    iconSource: null,
+    showConfirmButton: false,
+    onConfirm: null,
+    onCancel: null,
+  });
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState({
+    message: '',
+    leftIcon: '',
+    closeButton: true,
+    progressBar: true,
+  });
+
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged(user => {
       setCurrentUser(user);
@@ -48,8 +72,13 @@ const CommunityAddPost = () => {
       if (postContent && postContent.trim() !== '') {
         submitPost(selectedImages);
       } else {
-        Alert.alert('게시글 내용을 입력해주세요.');
-        navigation.setParams({action: ''});
+        setToastMessage({
+          message: '게시글 내용을 입력해주세요.',
+          leftIcon: 'cautionIcon',
+          closeButton: true,
+          progressBar: true,
+        });
+        setToastVisible(true);
       }
     }
   }, [route.params, postContent, selectedImages, submitPost, navigation]);
@@ -63,14 +92,26 @@ const CommunityAddPost = () => {
     if (postContent && postContent.trim() !== '') {
       submitPost(selectedImages);
     } else {
-      Alert.alert('게시글 내용을 입력해주세요.');
+      setToastMessage({
+        message: '게시글 내용을 입력해주세요.',
+        leftIcon: 'cautionIcon',
+        closeButton: true,
+        progressBar: true,
+      });
+      setToastVisible(true);
     }
   }, [postContent, selectedImages, submitPost]);
 
   // 게시글 제출 함수
   const submitPost = async images => {
     if (!postContent || postContent.trim() === '') {
-      Alert.alert('게시글 내용을 입력해주세요.');
+      setToastMessage({
+        message: '게시글 내용을 입력해주세요.',
+        leftIcon: 'cautionIcon',
+        closeButton: true,
+        progressBar: true,
+      });
+      setToastVisible(true);
       return;
     }
 
@@ -102,10 +143,12 @@ const CommunityAddPost = () => {
         });
 
       console.log('게시글 업로드 완료!');
-      Alert.alert('게시글 업로드!', '성공적으로 게시글이 업로드됐습니다!');
+      navigation.navigate('CommunityBoard', {
+        sendToastMessage: '성공적으로 게시글이 업로드됐습니다!',
+      });
+      navigation.goBack();
       setPostContent(null);
       setSelectedImages([]);
-      navigation.goBack();
     } catch (error) {
       console.log(
         'Firestore에 게시물을 추가하는 중에 문제가 발생했습니다.',
@@ -165,10 +208,17 @@ const CommunityAddPost = () => {
     } catch (error) {
       console.log(error);
       setIsUploading(false);
-      Alert.alert(
-        '이미지 업로드 실패',
-        '이미지 업로드 중 오류가 발생했습니다.',
-      );
+
+      setModalMessage({
+        title: '이미지 업로드 실패',
+        modalText: '이미지 업로드 중 오류가 발생했습니다.',
+        iconSource: require('../../assets/icons/warningIcon.png'),
+        showConfirmButton: true,
+        onConfirm: () => {
+          setModalVisible(false);
+        },
+      });
+      setModalVisible(true);
       return null;
     }
   };
@@ -181,10 +231,16 @@ const CommunityAddPost = () => {
   // 카메라로 사진 촬영
   const takePhotoFromCamera = () => {
     if (selectedImages.length >= 7) {
-      Alert.alert(
-        '이미지 업로드 제한',
-        '최대 7장까지 이미지를 업로드할 수 있습니다.',
-      );
+      setModalMessage({
+        title: '이미지 업로드 제한',
+        modalText: '최대 7장까지 이미지를 업로드할 수 있습니다.',
+        iconSource: require('../../assets/icons/cautionIcon.png'),
+        showConfirmButton: true,
+        onConfirm: () => {
+          setModalVisible(false);
+        },
+      });
+      setModalVisible(true);
       return;
     }
 
@@ -207,10 +263,16 @@ const CommunityAddPost = () => {
   // 갤러리에서 사진 선택
   const choosePhotoFromLibrary = () => {
     if (selectedImages.length >= 7) {
-      Alert.alert(
-        '이미지 업로드 제한',
-        '최대 7장까지 이미지를 업로드할 수 있습니다.',
-      );
+      setModalMessage({
+        title: '이미지 업로드 제한',
+        modalText: '최대 7장까지 이미지를 업로드할 수 있습니다.',
+        iconSource: require('../../assets/icons/cautionIcon.png'),
+        showConfirmButton: true,
+        onConfirm: () => {
+          setModalVisible(false);
+        },
+      });
+      setModalVisible(true);
       return;
     }
 
@@ -238,7 +300,11 @@ const CommunityAddPost = () => {
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: '#FEFFFE'}}>
-    <CommunityHeader onPressRightText = {handlePostSubmit} rightText= {"등록"} title={"새로운 게시글"}/>
+      <CommunityHeader
+        onPressRightText={handlePostSubmit}
+        rightText={'등록'}
+        title={'새로운 게시글'}
+      />
       <View style={styles.container}>
         <View style={styles.contentWrapper}>
           <View style={styles.postInputContainer}>
@@ -329,6 +395,33 @@ const CommunityAddPost = () => {
           </View>
         </BottomSheetModal>
       </View>
+      <CommunityActionToast
+        visible={toastVisible}
+        message={toastMessage.message}
+        duration={7000}
+        onClose={() => setToastVisible(false)}
+        leftIcon={toastMessage.leftIcon}
+        closeButton={toastMessage.closeButton}
+        progressBar={toastMessage.progressBar}
+      />
+      <CommunityActionModal
+        isVisible={modalVisible}
+        onConfirm={modalMessage.onConfirm}
+        onCancel={modalMessage.onCancel}
+        title={modalMessage.title}
+        modalText={modalMessage.modalText}
+        iconSource={modalMessage.iconSource}
+        showConfirmButton={modalMessage.showConfirmButton}
+      />
+
+      <CommunityActionModal
+        isVisible={modalVisible}
+        onConfirm={() => setModalVisible(false)}
+        title="이미지 업로드 실패"
+        modalText={modalMessage}
+        iconSource={require('../../assets/icons/warningIcon.png')}
+        showConfirmButton={true}
+      />
     </SafeAreaView>
   );
 };
