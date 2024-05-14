@@ -321,7 +321,7 @@ const CommunityPostDetail = ({route}) => {
 
       console.log('댓글 업로드 완료!');
       setToastMessage({
-        message: '성공적으로 댓글이 업로드됐습니다!',
+        message: '댓글이 등록되었습니다.',
         leftIcon: 'successIcon',
         closeButton: true,
         progressBar: true,
@@ -393,7 +393,7 @@ const CommunityPostDetail = ({route}) => {
       })
       .then(() => {
         setToastMessage({
-          message: '게시글이 성공적으로 삭제되었습니다!',
+          message: '게시글이 삭제되었습니다.',
           leftIcon: 'successIcon',
           closeButton: true,
           progressBar: true,
@@ -475,7 +475,7 @@ const CommunityPostDetail = ({route}) => {
       });
 
       setToastMessage({
-        message: '댓글이 성공적으로 삭제되었습니다!',
+        message: '댓글이 삭제되었습니다.',
         leftIcon: 'successIcon',
         closeButton: true,
         progressBar: true,

@@ -103,7 +103,7 @@ const greenCloseIcon = require('../../assets/icons/greenCloseIcon.png');
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#212529CC',
+    backgroundColor: '#212529',
     borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 12,
@@ -112,11 +112,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     position: 'absolute',
     bottom: 40,
-    left: 20,
-    right: 20,
+    left: 32,
+    right: 32,
     zIndex: 9999,
     overflow: 'hidden',
-    marginBottom: 40,
+    marginBottom: 8,
   },
   leftIcon: {
     width: 24,

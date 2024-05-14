@@ -162,6 +162,23 @@ const CommunityBoard = ({navigation, route}) => {
         setPosts([...newerPosts, ...posts]);
         setNewestVisible(querySnapshot.docs[0]);
         setRefreshingNewer(false);
+        if (querySnapshot.size > 0) {
+          setToastMessage({
+            message: `${querySnapshot.size}개의 새로운 게시글을 불러왔습니다!`,
+            leftIcon: 'successIcon',
+            closeButton: true,
+            progressBar: true,
+          });
+          setToastVisible(true);
+        } else {
+          setToastMessage({
+            message: '새로운 게시글이 없습니다.',
+            leftIcon: 'otherIcon',
+            closeButton: true,
+            progressBar: true,
+          });
+          setToastVisible(true);
+        }
       } catch (e) {
         console.log(e);
         setRefreshingNewer(false);
@@ -259,6 +276,9 @@ const CommunityBoard = ({navigation, route}) => {
           modalText: '게시글 작성자만 수정/삭제할 수 있습니다.',
           iconSource: require('../../assets/icons/warningIcon.png'),
           showConfirmButton: true,
+          onConfirm: () => {
+            setModalVisible(false);
+          },
         });
         setModalVisible(true);
       }
