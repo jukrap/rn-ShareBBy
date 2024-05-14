@@ -18,6 +18,7 @@ import EditProfile from '../pages/Main/EditProfile';
 import SynthesisAgree from '../components/SignUp/AgreeList/SynthesisAgree';
 import MyPosts from '../pages/Main/MyPosts';
 import MyLists from '../pages/Main/MyLists';
+import MyRecruits from '../pages/Main/MyRecruits';
 import ShowAllImages from '../pages/Main/ShowAllImages';
 
 const Stack = createNativeStackNavigator();
@@ -54,6 +55,7 @@ const AboutProfile = () => {
       <Stack.Screen name="EditProfile" component={EditProfile} />
       <Stack.Screen name="MyPosts" component={MyPosts} />
       <Stack.Screen name="MyLikes" component={MyLists} />
+      <Stack.Screen name="MyRecruits" component={MyRecruits} />
     </Stack.Navigator>
   );
 };
@@ -64,7 +66,10 @@ const AboutCommunity = () => {
       <Stack.Screen name="CommunityBoard" component={CommunityBoard} />
       <Stack.Screen name="CommunityAddPost" component={CommunityAddPost} />
       <Stack.Screen name="CommunityEditPost" component={CommunityEditPost} />
-      <Stack.Screen name="CommunityPostDetail" component={CommunityPostDetail} />
+      <Stack.Screen
+        name="CommunityPostDetail"
+        component={CommunityPostDetail}
+      />
     </Stack.Navigator>
   );
 };

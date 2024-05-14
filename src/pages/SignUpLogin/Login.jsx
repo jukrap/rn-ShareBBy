@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   Text,
   View,
@@ -10,11 +10,10 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { signIn } from '../../lib/auth';
+import {signIn} from '../../lib/auth';
 import firestore from '@react-native-firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import userStore from '../../lib/userStore';
-
 
 import {
   onGoogleButtonPress,
@@ -27,7 +26,7 @@ const googleIcon = require('../../assets/icons/google.png');
 
 const LoginTitle = require('../../assets/images/LoginTitle.png');
 
-const Login = ({ navigation }) => {
+const Login = ({navigation}) => {
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
   const [isEmailValid, setIsEmailValid] = useState(false);
@@ -37,15 +36,15 @@ const Login = ({ navigation }) => {
 
   const onSignIn = async () => {
     try {
-      const { user } = await signIn({ email, password });
-  
+      const {user} = await signIn({email, password});
+
       // 사용자의 문서를 가져와서 전체 정보를 가져옴
       const userDoc = await firestore().collection('users').doc(user.uid).get();
       const userInfo = userDoc.data();
-  
+
       // AsyncStorage에 사용자 정보 저장
       await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
-  
+
       // Zustand 스토어에 사용자 정보 설정
       setUserData(userInfo);
 
@@ -54,11 +53,9 @@ const Login = ({ navigation }) => {
       // navigation을 여기서 호출
       navigation.navigate('BottomTab');
     } catch (e) {
-      console.error('로그인 실패:', e);
       Alert.alert('아이디 또는 비밀번호를 확인해주세요.');
     }
   };
-  
 
   const validateEmail = email => {
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -73,7 +70,7 @@ const Login = ({ navigation }) => {
   };
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1, backgroundColor:'#fff' }}>
+    <KeyboardAvoidingView style={{flex: 1, backgroundColor: '#fff'}}>
       <View style={styles.firstContainer}>
         <View>
           <Image source={LoginTitle} />
@@ -90,7 +87,7 @@ const Login = ({ navigation }) => {
 
           <View style={styles.loginTextInput}>
             <TextInput
-              style={{ paddingLeft: 12 }}
+              style={{paddingLeft: 12}}
               value={email}
               placeholder="아이디를 입력해주세요"
               onChangeText={handleEmailChange}
@@ -103,7 +100,7 @@ const Login = ({ navigation }) => {
 
           <View style={styles.passwordTextInput}>
             <TextInput
-              style={{ paddingLeft: 12 }}
+              style={{paddingLeft: 12}}
               value={password}
               placeholder="비밀번호를 입력해주세요"
               onChangeText={setPassword}
@@ -117,10 +114,9 @@ const Login = ({ navigation }) => {
             onPress={onSignIn}
             style={[
               styles.loginButton,
-              !isEmailValid && { backgroundColor: '#A7A7A7' },
+              !isEmailValid && {backgroundColor: '#A7A7A7'},
             ]}
-            disabled={!isEmailValid}
-          >
+            disabled={!isEmailValid}>
             <Text style={styles.loginButtonText}>로그인</Text>
           </TouchableOpacity>
 
@@ -132,16 +128,14 @@ const Login = ({ navigation }) => {
               <View style={styles.searchBar} />
             </View>
             <TouchableOpacity
-              onPress={() => navigation.navigate('SearchPassword')}
-            >
+              onPress={() => navigation.navigate('SearchPassword')}>
               <Text style={styles.searchPassword}>비밀번호 찾기</Text>
             </TouchableOpacity>
           </View>
 
           <TouchableOpacity
             onPress={() => navigation.navigate('SignUp')}
-            style={styles.signInButton}
-          >
+            style={styles.signInButton}>
             <Text style={styles.signInText}>ShareBBy 가입하기</Text>
           </TouchableOpacity>
 
