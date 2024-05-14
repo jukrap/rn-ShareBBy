@@ -29,7 +29,6 @@ const Chat = () => {
     };
 
     fetchData();
-
     const unsubscribe = navigation.addListener('focus', () => {
       fetchData();
     });
@@ -48,8 +47,7 @@ const Chat = () => {
           id: doc.id,
           ...doc.data(),
         }))
-
-        .filter(room => room.members.includes(userToken)); //합쳐보기 방법 고민 필요
+        .filter(room => room.members.includes(userToken)); //합쳐보기 방법 고민 필요.
 
       const latestChats = {};
 
