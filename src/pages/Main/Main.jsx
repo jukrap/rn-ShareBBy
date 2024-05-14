@@ -18,6 +18,11 @@ import userStore from '../../lib/userStore';
 
 const {width, height} = Dimensions.get('window');
 
+const goJoin = require('../../assets/images/goJoin.png');
+const goRecruit = require('../../assets/images/goRecruit.png');
+
+const defaultImage = require('../../assets/images/dummyprofile.png')
+
 
 
 // OptimizedImageItem 컴포넌트를 메모이제이션해서 성능 향상
@@ -34,7 +39,7 @@ const OptimizedImageItem = React.memo(({item}) => {
 
 
 const Main = ({navigation}) => {
-  const [currUserData, setCurrUserData] = useState(() => []);
+  const [currUserData, setCurrUserData] = useState({});
   const [currentIndex, setCurrentIndex] = useState(0);
   const [imageUrl, setImageUrl] = useState(null);
   const [eventBanner, setEventBanner] = useState([]);
@@ -262,146 +267,116 @@ const Main = ({navigation}) => {
         </View>
         <View style={styles.divisionView} />
 
-        {/* <View style={styles.joinBox}>
-          <Text style={[styles.nomalText, {fontSize: 16, fontWeight: '600'}]}>
-            이달의 인기왕 🔥
+        <View style={styles.joinBox}>
+  <Text style={[styles.nomalText, {fontSize: 16, fontWeight: '600'}]}>
+    이달의 인기왕 🔥
+  </Text>
+  <Text
+    style={[
+      styles.nomalText,
+      {fontSize: 14, fontWeight: '600', color: '#7B7B7B'},
+    ]}>
+    현재 게시글에 가장 많은 좋아요를 받은 유저는 누구일까요?
+  </Text>
+  <View style={{gap: 10, marginTop: 10}}>
+    <View style={styles.gradeUpView}>
+      <View style={[styles.gradeUp, {top: 20}]}>
+      <Image
+  source={secondPlace && secondPlace.imageUrl ? { uri: secondPlace.imageUrl } : defaultImage}
+  style={{borderRadius: 25, width: 50, height: 50}}
+/>
+        <View style={styles.gradeNum}>
+          <Text style={{color: '#fff', fontWeight: 'bold'}}>2</Text>
+        </View>
+        <Text style={{fontSize: 16, fontWeight: '600'}}>
+          {secondPlace && secondPlace.nickname
+            ? secondPlace.nickname
+            : '배드민턴왕'}
+        </Text>
+      </View>
+      <View style={styles.gradeUp}>
+      <Image
+  source={firstPlace && firstPlace.imageUrl ? { uri: firstPlace.imageUrl } : defaultImage}
+  style={{borderRadius: 25, width: 50, height: 50}}
+/>
+        <View style={styles.gradeNum}>
+          <Text style={{color: '#fff', fontWeight: 'bold'}}>1</Text>
+        </View>
+        <Text style={{fontSize: 16, fontWeight: '600'}}>
+          {firstPlace && firstPlace.nickname
+            ? firstPlace.nickname
+            : '축구왕'}
+        </Text>
+      </View>
+      <View style={[styles.gradeUp, {top: 20}]}>
+      <Image
+  source={thirdPlace && thirdPlace.imageUrl ? { uri: thirdPlace.imageUrl } : defaultImage}
+  style={{borderRadius: 25, width: 50, height: 50}}
+/>
+
+        <View style={styles.gradeNum}>
+          <Text style={{color: '#fff', fontWeight: 'bold'}}>3</Text>
+        </View>
+        <Text style={{fontSize: 16, fontWeight: '600'}}>
+          {thirdPlace && thirdPlace.nickname
+            ? thirdPlace.nickname
+            : '테니스왕'}
+        </Text>
+      </View>
+    </View>
+    <View
+      style={{
+        marginTop: 20,
+        borderTopWidth: 1,
+        borderTopColor: '#DBDBDB',
+      }}>
+      <View style={styles.gradeLow}>
+        <Text>4등 : </Text>
+        <Image
+  source={foursPlace && foursPlace.imageUrl ? { uri: foursPlace.imageUrl } : defaultImage}
+  style={{borderRadius: 25, width: 50, height: 50}}
+/>
+        <Text>
+          {foursPlace && foursPlace.nickname
+            ? foursPlace.nickname
+            : '야구왕'}{' '}
+        </Text>
+      </View>
+      <View style={styles.gradeLow}>
+        <Text>5등 : </Text>
+        <Image
+  source={fifthPlace && fifthPlace.imageUrl ? { uri: fifthPlace.imageUrl } : defaultImage}
+  style={{borderRadius: 25, width: 50, height: 50}}
+/>
+        <Text>
+          {fifthPlace && fifthPlace.nickname
+            ? fifthPlace.nickname
+            : '농구왕'}{' '}
+        </Text>
+      </View>
+      {sixthPlace && (
+        <View style={styles.gradeLow}>
+          <Text>6등 : </Text>
+          <Image
+  source={sixthPlace && sixthPlace.imageUrl ? { uri: sixthPlace.imageUrl } : defaultImage}
+  style={{borderRadius: 25, width: 50, height: 50}}
+/>
+          <Text>
+            {sixthPlace && sixthPlace.nickname
+              ? sixthPlace.nickname
+              : '배구왕'}{' '}
           </Text>
-          <Text
-            style={[
-              styles.nomalText,
-              {fontSize: 14, fontWeight: '600', color: '#7B7B7B'},
-            ]}>
-            현재 게시글에 가장 많은 좋아요를 받은 유저는 누구일까요?
-          </Text>
-          <View style={{gap: 10, marginTop: 10}}>
-            <View style={styles.gradeUpView}>
-              <View style={[styles.gradeUp, {top: 20}]}>
-                <Image
-                  source={{
-                    uri:
-                      secondPlace && secondPlace.imageUrl
-                        ? secondPlace.imageUrl
-                        : goRecruit,
-                  }} 
-                  style={{borderRadius: 25, width: 50, height: 50}}
-                />
-                <View style={styles.gradeNum}>
-                  <Text style={{color: '#fff', fontWeight: 'bold'}}>2</Text>
-                </View>
-                <Text style={{fontSize: 16, fontWeight: '600'}}>
-                  {secondPlace && secondPlace.nickname
-                    ? secondPlace.nickname
-                    : '기본 닉네임'}
-                </Text>
-              </View>
-              <View style={styles.gradeUp}>
-                <Image
-                  source={{
-                    uri:
-                      firstPlace && firstPlace.imageUrl
-                        ? firstPlace.imageUrl
-                        : goRecruit,
-                  }}
-                  style={{borderRadius: 25, width: 50, height: 50}}
-                />
-                <View style={styles.gradeNum}>
-                  <Text style={{color: '#fff', fontWeight: 'bold'}}>1</Text>
-                </View>
-                <Text style={{fontSize: 16, fontWeight: '600'}}>
-                  {firstPlace && firstPlace.nickname
-                    ? firstPlace.nickname
-                    : '기본 닉네임'}
-                </Text>
-              </View>
-              <View style={[styles.gradeUp, {top: 20}]}>
-                <Image
-                  source={{
-                    uri:
-                      thirdPlace && thirdPlace.imageUrl
-                        ? thirdPlace.imageUrl
-                        : goRecruit,
-                  }}
-                  style={{borderRadius: 25, width: 50, height: 50}}
-                />
-                <View style={styles.gradeNum}>
-                  <Text style={{color: '#fff', fontWeight: 'bold'}}>3</Text>
-                </View>
-                <Text style={{fontSize: 16, fontWeight: '600'}}>
-                  {thirdPlace && thirdPlace.nickname
-                    ? thirdPlace.nickname
-                    : '기본 닉네임'}
-                </Text>
-              </View>
-            </View>
-            <View
-              style={{
-                marginTop: 20,
-                borderTopWidth: 1,
-                borderTopColor: '#DBDBDB',
-              }}>
-              <View style={styles.gradeLow}>
-                <Text>4등 : </Text>
-                <Image
-                  source={{
-                    uri:
-                      foursPlace && foursPlace.imageUrl
-                        ? foursPlace.imageUrl
-                        : goRecruit,
-                  }}
-                  style={{width: 36, height: 36, borderRadius: 18}}
-                />
-                <Text>
-                  {foursPlace && foursPlace.nickname
-                    ? foursPlace.nickname
-                    : '기본 닉네임'}{' '}
-                </Text>
-              </View>
-              <View style={styles.gradeLow}>
-                <Text>5등 : </Text>
-                <Image
-                  source={{
-                    uri:
-                      fifthPlace && fifthPlace.imageUrl
-                        ? fifthPlace.imageUrl
-                        : goRecruit,
-                  }}
-                  style={{width: 36, height: 36, borderRadius: 18}}
-                />
-                <Text>
-                  {fifthPlace && fifthPlace.nickname
-                    ? fifthPlace.nickname
-                    : '기본 닉네임'}{' '}
-                </Text>
-              </View>
-              {sixthPlace && (
-                <View style={styles.gradeLow}>
-                  <Text>6등 : </Text>
-                  <Image
-                    source={{
-                      uri:
-                        sixthPlace && sixthPlace.imageUrl
-                          ? sixthPlace.imageUrl
-                          : goRecruit,
-                    }}
-                    style={{width: 36, height: 36, borderRadius: 18}}
-                  />
-                  <Text>
-                    {sixthPlace && sixthPlace.nickname
-                      ? sixthPlace.nickname
-                      : '기본 닉네임'}{' '}
-                  </Text>
-                </View>
-              )}
-            </View>
-          </View>
-        </View> */}
+        </View>
+      )}
+    </View>
+  </View>
+</View> 
+
       </ScrollView>
     </SafeAreaView>
   );
 };
 
-const goJoin = require('../../assets/images/goJoin.png');
-const goRecruit = require('../../assets/images/goRecruit.png');
 
 const styles = StyleSheet.create({
   topbarView: {
