@@ -63,7 +63,8 @@ const Detail = ({route, navigation}) => {
       ...detailContent,
       [name]: value,
     });
-  };
+};
+
 
   const countTextLength = text => {
     setCurrTextlength(text.length);
