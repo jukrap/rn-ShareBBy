@@ -106,7 +106,7 @@ const Join = ({ navigation, route }) => {
         const finalHobbiesData = await getNearHobbies(centerGu);
 
         const deadlineData = finalHobbiesData.filter(v => dayjs(v.data._data.deadline).diff(now, 'days') > 0)
-        console.log(centerGu);
+        // console.log(centerGu);
         setHobbiesData(deadlineData)
 
     }
@@ -227,8 +227,10 @@ const Join = ({ navigation, route }) => {
                 layerGroups={layerGroups}
                 initialRegion={initialRegion}
                 locale={'ko'}
+                isShowIndoorLevelPicker={true}
                 isShowLocationButton={false}
                 onCameraChanged={onCameraChanged}
+                isExtentBoundedInKorea
                 maxZoom={15}
                 minZoom={15}
             >

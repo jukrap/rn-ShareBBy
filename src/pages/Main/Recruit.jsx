@@ -177,6 +177,7 @@ const Recruit = ({ navigation, route }) => {
                 initialRegion={initialRegion}
                 isShowIndoorLevelPicker={true}
                 isShowLocationButton={false}
+                isExtentBoundedInKorea
                 locale={'ko'}
                 onTapMap={(props) => {
                             console.log('🚀 ===============>  : ', props);
