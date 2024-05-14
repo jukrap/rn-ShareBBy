@@ -34,7 +34,7 @@ import {
 } from '../../assets/assets';
 
 const ChatRoom = ({route, navigation}) => {
-  const {chatRoomId, chatRoomName} = route.params;
+  const {chatRoomId, chatRoomName, hobbiesId} = route.params;
 
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
@@ -68,6 +68,122 @@ const ChatRoom = ({route, navigation}) => {
     getChatRoomMembers();
   }, []);
 
+  const getChatRoomMembers = async () => {
+    try {
+      const chatRoomRef = firestore().collection('chatRooms').doc(chatRoomId);
+      const chatRoomSnapshot = await chatRoomRef.get();
+      if (chatRoomSnapshot.exists) {
+        const {members} = chatRoomSnapshot.data();
+        const memberDetails = [];
+        for (const memberId of members) {
+          const userSnapshot = await firestore()
+            .collection('users')
+            .doc(memberId)
+            .get();
+          if (userSnapshot.exists) {
+            const userData = userSnapshot.data();
+            memberDetails.push(userData);
+          }
+        }
+        setChatMembers(memberDetails);
+      } else {
+        console.log('Chat room does not exist.');
+      }
+    } catch (error) {
+      console.error('Error fetching chat room members:', error);
+    }
+  };
+
+  const sendMessage = async () => {
+    try {
+      if (!inputMessage.trim()) {
+        return;
+      }
+
+      const currentUser = auth().currentUser; //
+
+      let senderName = 'Unknown';
+      if (currentUser) {
+        const userSnapshot = await firestore()
+          .collection('users')
+          .doc(currentUser.uid)
+          .get();
+        if (userSnapshot.exists) {
+          senderName = userSnapshot.data().nickname;
+          senderProfileImg = userSnapshot.data().profileImage;
+        }
+      }
+
+      const newMessage = {
+        text: inputMessage,
+        sender: senderName,
+        senderId: currentUser.uid,
+        timestamp: firestore.FieldValue.serverTimestamp(),
+        senderProfileImg: senderProfileImg,
+      };
+
+      await firestore()
+        .collection('chatRooms')
+        .doc(chatRoomId)
+        .collection('messages')
+        .add(newMessage);
+
+      setInputMessage(''); //
+    } catch (error) {
+      console.error('Error sending message: ', error);
+    }
+  };
+
+  const deleteChat = async () => {
+    try {
+      const currentUser = auth().currentUser;
+      const currentUserUID = currentUser ? currentUser.uid : null;
+
+      let currentUserNickname = 'Unknown';
+      if (currentUser) {
+        const userSnapshot = await firestore()
+          .collection('users')
+          .doc(currentUser.uid)
+          .get();
+        if (userSnapshot.exists) {
+          currentUserNickname = userSnapshot.data().nickname;
+        }
+      }
+
+      const chatRoomRef = firestore().collection('chatRooms').doc(chatRoomId);
+      const chatRoomSnapshot = await chatRoomRef.get();
+      const currentMembers = chatRoomSnapshot.data().members;
+      const updatedMembers = currentMembers.filter(
+        memberUID => memberUID !== currentUserUID,
+      );
+
+      await chatRoomRef.update({members: updatedMembers});
+
+      const newMessage = {
+        text: `${currentUserNickname}님이 나갔습니다.`,
+        sender: '시스템',
+        timestamp: firestore.FieldValue.serverTimestamp(),
+      };
+
+      await firestore()
+        .collection('chatRooms')
+        .doc(chatRoomId)
+        .collection('messages')
+        .add(newMessage);
+
+      await firestore()
+        .collection('hobbies')
+        .doc(hobbiesId)
+        .update({
+          personNumber: firestore.FieldValue.increment(-1),
+        });
+
+      navigation.goBack();
+    } catch (error) {
+      console.error('Error deleting chat:', error);
+    }
+  };
+
   const uploadImage = async (localImagePath, chatRoomId) => {
     try {
       const fileName = localImagePath.substring(
@@ -80,7 +196,7 @@ const ChatRoom = ({route, navigation}) => {
       return await path.getDownloadURL();
     } catch (error) {
       console.error('Error uploading image to Firebase Storage:', error);
-      throw error; //alert으로 처리 (토스트) 컴포넌트 - 메인에 있음
+      throw error;
     }
   };
 
@@ -127,103 +243,6 @@ const ChatRoom = ({route, navigation}) => {
     }
   };
 
-  const handleGoBack = () => {
-    navigation.goBack();
-  };
-
-  const goToShowAllImages = () => {
-    //이름 바꾸기,
-    navigation.navigate('ShowAllImages', {messages: messages});
-    setSlideModalVisible(false);
-  };
-
-  const toggleHamburgerModal = () => {
-    setSlideModalVisible(!slideModalVisible);
-  };
-
-  const togglePlusModal = () => {
-    setPlusModalVisible(!plusModalVisible);
-  };
-
-  const toggleModal = imageUri => {
-    setImageUri(imageUri);
-    setIsVisible(true);
-  };
-
-  const closeModal = () => {
-    setIsVisible(false);
-  };
-
-  const toggleChatRoomNameChangeModal = () => {
-    setRoomNameChangeModal(!roomNameChangeModal);
-  };
-
-  const getChatRoomMembers = async () => {
-    try {
-      const chatRoomRef = firestore().collection('chatRooms').doc(chatRoomId);
-      const chatRoomSnapshot = await chatRoomRef.get();
-      if (chatRoomSnapshot.exists) {
-        const {members} = chatRoomSnapshot.data();
-        const memberDetails = [];
-        for (const memberId of members) {
-          const userSnapshot = await firestore()
-            .collection('users')
-            .doc(memberId)
-            .get();
-          if (userSnapshot.exists) {
-            const userData = userSnapshot.data();
-            memberDetails.push(userData);
-          }
-        }
-        setChatMembers(memberDetails);
-      } else {
-        console.log('Chat room does not exist.');
-      }
-    } catch (error) {
-      console.error('Error fetching chat room members:', error);
-    }
-  };
-
-  const sendMessage = async () => {
-    try {
-      if (!inputMessage.trim()) {
-        return; // 아예 안눌리게 수정. input length == 0 안 되게
-      }
-
-      const currentUser = auth().currentUser; //
-
-      let senderName = 'Unknown';
-      if (currentUser) {
-        const userSnapshot = await firestore()
-          .collection('users')
-          .doc(currentUser.uid)
-          .get();
-        if (userSnapshot.exists) {
-          senderName = userSnapshot.data().nickname;
-          senderProfileImg = userSnapshot.data().profileImage;
-        }
-      }
-
-      const newMessage = {
-        text: inputMessage,
-        sender: senderName,
-        senderId: currentUser.uid,
-        timestamp: firestore.FieldValue.serverTimestamp(),
-        senderProfileImg: senderProfileImg,
-      };
-
-      await firestore()
-        .collection('chatRooms')
-        .doc(chatRoomId)
-        .collection('messages')
-        .add(newMessage);
-
-      setInputMessage(''); //
-    } catch (error) {
-      console.error('Error sending message: ', error);
-    }
-  };
-
   const updateChatRoomName = async newName => {
     try {
       await firestore()
@@ -237,46 +256,47 @@ const ChatRoom = ({route, navigation}) => {
     }
   };
 
-  const deleteChat = async () => {
+  const uploadProfileImage = async (localImagePath, chatRoomId) => {
     try {
-      const currentUser = auth().currentUser;
-      const currentUserUID = currentUser ? currentUser.uid : null;
-
-      let currentUserNickname = 'Unknown';
-      if (currentUser) {
-        const userSnapshot = await firestore()
-          .collection('users')
-          .doc(currentUser.uid)
-          .get();
-        if (userSnapshot.exists) {
-          currentUserNickname = userSnapshot.data().nickname;
-        }
-      }
-
-      const chatRoomRef = firestore().collection('chatRooms').doc(chatRoomId);
-      const chatRoomSnapshot = await chatRoomRef.get();
-      const currentMembers = chatRoomSnapshot.data().members;
-      const updatedMembers = currentMembers.filter(
-        memberUID => memberUID !== currentUserUID,
+      const fileName = localImagePath.substring(
+        localImagePath.lastIndexOf('/') + 1,
+      );
+      const path = storage().ref(
+        `chatRoomProfileImage/${chatRoomId}/${fileName}`,
       );
 
-      await chatRoomRef.update({members: updatedMembers});
+      await path.putFile(localImagePath);
 
-      const newMessage = {
-        text: `${currentUserNickname}님이 나갔습니다.`,
-        sender: '시스템',
-        timestamp: firestore.FieldValue.serverTimestamp(),
-      };
+      return await path.getDownloadURL();
+    } catch (error) {
+      console.error('Error uploading image to Firebase Storage:', error);
+      throw error;
+    }
+  };
 
+  const getProfileImage = async () => {
+    try {
+      const image = await ImagePicker.openPicker({
+        width: 300,
+        height: 400,
+        multiple: false,
+        cropping: true,
+        mediaType: 'photo',
+        cropperChooseText: '이미지 변경',
+        cropperCancelText: '취소',
+        cropperRotateButtonsHidden: true,
+      });
+
+      const imageUrl = await uploadProfileImage(image.sourceURL, chatRoomId);
       await firestore()
         .collection('chatRooms')
         .doc(chatRoomId)
-        .collection('messages')
-        .add(newMessage);
-
-      navigation.goBack();
+        .update({chatRoomImage: imageUrl});
     } catch (error) {
-      console.error('Error deleting chat:', error);
+      if (error.code === 'E_PICKER_CANCELLED') {
+        return false;
+      }
+      console.error('Error selecting or uploading image:', error);
     }
   };
 
@@ -350,7 +370,7 @@ const ChatRoom = ({route, navigation}) => {
             <Text style={styles.showProfileInfoNickname}>{item.sender}</Text>
           </View>
         )}
-        {isCurrentUser ? ( // 스위치 케이스로 처리
+        {isCurrentUser ? (
           <View style={styles.sentByUserWrapper}>
             {showTime && (
               <View style={{marginBottom: 8}}>
@@ -409,6 +429,37 @@ const ChatRoom = ({route, navigation}) => {
         )}
       </View>
     );
+  };
+
+  const handleGoBack = () => {
+    navigation.goBack();
+  };
+
+  const goToShowAllImages = () => {
+    //이름 바꾸기,
+    navigation.navigate('ShowAllImages', {messages: messages});
+    setSlideModalVisible(false);
+  };
+
+  const toggleHamburgerModal = () => {
+    setSlideModalVisible(!slideModalVisible);
+  };
+
+  const togglePlusModal = () => {
+    setPlusModalVisible(!plusModalVisible);
+  };
+
+  const toggleModal = imageUri => {
+    setImageUri(imageUri);
+    setIsVisible(true);
+  };
+
+  const closeModal = () => {
+    setIsVisible(false);
+  };
+
+  const toggleChatRoomNameChangeModal = () => {
+    setRoomNameChangeModal(!roomNameChangeModal);
   };
 
   return (
@@ -535,7 +586,7 @@ const ChatRoom = ({route, navigation}) => {
               toggleChatRoomNameChangeModal={toggleChatRoomNameChangeModal}
               updateChatRoomName={updateChatRoomName}
             />
-            <TouchableOpacity>
+            <TouchableOpacity onPress={getProfileImage}>
               <Text>채팅방 사진 변경</Text>
             </TouchableOpacity>
           </View>

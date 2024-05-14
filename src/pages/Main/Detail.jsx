@@ -117,7 +117,7 @@ const Detail = ({route, navigation}) => {
           name: detailContent.showTitle,
           members: [id],
           hobbiesId: hobbiesId,
-          chatRoomImage: [profileImage],
+          chatRoomImage: profileImage,
         });
       setSelectedUsers([]);
       console.log('채팅방 생성됨');
