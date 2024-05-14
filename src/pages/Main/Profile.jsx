@@ -14,7 +14,7 @@ import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import useStore from '../../lib/userStore';
 import {useFocusEffect} from '@react-navigation/native';
-import { StackActions } from '@react-navigation/native';
+import {StackActions} from '@react-navigation/native';
 
 const heart = require('../../assets/newIcons/heart-icon.png');
 const pencil = require('../../assets/newIcons/pencil-icon.png');
@@ -150,8 +150,6 @@ const Profile = ({navigation, route}) => {
               onPress={() =>
                 navigation.navigate('MyRecruits', {
                   uuid: userUid,
-                  nickname: users.nickname,
-                  profileImage: users.profileImage,
                 })
               }
               style={styles.myList}>

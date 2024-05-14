@@ -46,14 +46,14 @@ const MyPosts = ({navigation, route}) => {
     fetchPostData();
   }, []);
   return (
-    <ScrollView>
+    <View>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Image style={styles.arrow} source={leftArrow} />
         </TouchableOpacity>
         <Text style={styles.headtext}>내가 쓴 글</Text>
       </View>
-      <View style={styles.container}>
+      <ScrollView style={styles.container}>
         {posts.map((it, idx) => {
           return (
             <View key={idx} style={styles.post}>
@@ -97,8 +97,8 @@ const MyPosts = ({navigation, route}) => {
             </View>
           );
         })}
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 };
 

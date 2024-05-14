@@ -26,36 +26,41 @@ const formatDate = date => {
 
 const PostItem = React.memo(({item}) => {
   return (
-    <View style={styles.container}>
-      <View style={styles.post}>
-        <View style={styles.profileWrapper}>
-          <Image style={styles.image} source={{uri: item.user.profileImage}} />
-          <View style={styles.userName}>
-            <Text style={styles.name}>{item.user.nickname}</Text>
-            <Text style={styles.date}>
-              {item.post_created
-                ? formatDate(item.post_created)
-                : '날짜 정보 없음'}
-            </Text>
+    <View style={styles.containerView}>
+      <View style={styles.container}>
+        <View style={styles.post}>
+          <View style={styles.profileWrapper}>
+            <Image
+              style={styles.image}
+              source={{uri: item.user.profileImage}}
+            />
+            <View style={styles.userName}>
+              <Text style={styles.name}>{item.user.nickname}</Text>
+              <Text style={styles.date}>
+                {item.post_created
+                  ? formatDate(item.post_created)
+                  : '날짜 정보 없음'}
+              </Text>
+            </View>
           </View>
-        </View>
 
-        <Text style={styles.content}>{item.post_content}</Text>
-        <View style={styles.imageWrapper}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {item.post_files &&
-              item.post_files.map((file, index) => (
-                <Image
-                  key={index}
-                  style={styles.contentImage}
-                  source={{uri: file}}
-                />
-              ))}
-          </ScrollView>
-        </View>
-        <View style={styles.like}>
-          <Image source={heart} style={styles.heart} />
-          <Text style={styles.likeCount}>{item.likeCount}</Text>
+          <Text style={styles.content}>{item.post_content}</Text>
+          <View style={styles.imageWrapper}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {item.post_files &&
+                item.post_files.map((file, index) => (
+                  <Image
+                    key={index}
+                    style={styles.contentImage}
+                    source={{uri: file}}
+                  />
+                ))}
+            </ScrollView>
+          </View>
+          <View style={styles.like}>
+            <Image source={heart} style={styles.heart} />
+            <Text style={styles.likeCount}>{item.likeCount}</Text>
+          </View>
         </View>
       </View>
     </View>
@@ -128,6 +133,7 @@ const MyLists = ({navigation, route}) => {
 };
 
 const styles = StyleSheet.create({
+  containerView: {flex: 1},
   container: {
     marginLeft: 20,
     marginRight: 20,
