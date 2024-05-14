@@ -20,7 +20,7 @@ import {useFocusEffect} from '@react-navigation/native';
 
 import PostCard from '../../components/Community/PostCard';
 import auth from '@react-native-firebase/auth';
-import {Modal} from 'react-native-modal';
+
 
 import {useNavigation} from '@react-navigation/native';
 import CommunityHeader from '../../components/Community/CommunityHeader';

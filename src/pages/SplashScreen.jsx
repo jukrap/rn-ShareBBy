@@ -19,7 +19,7 @@ const SplashScreen = ({navigation}) => {
       // 사용자 정보가 있는 경우 Zustand 스토어에 설정
       setUserData(storedUserData);
       // 다음 화면으로 이동
-      navigation.replace('BottomTab');
+      navigation.replace('Login');
     } else {
       // 사용자 정보가 없는 경우 로그인 화면으로 이동
       setTimeout(() => {

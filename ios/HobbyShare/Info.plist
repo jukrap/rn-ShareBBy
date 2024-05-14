@@ -23,11 +23,13 @@
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
+			<key>CFBundleIdentifier</key>
+			<string></string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.415237944833-63slh0au60t9duqcclbe1h64ein447qc</string>
+				<string>com.googleusercontent.apps.323952205702-tv49vddldj4i8pcii3oflihu7bad54cr</string>
 			</array>
 		</dict>
 		<dict>
@@ -55,7 +57,7 @@
 			<string>https://hobbyshare.page.link</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.gangsterdev.app.--PRODUCT-NAME-rfc1034identifier-</string>
+				<string>com.sharebby</string>
 			</array>
 		</dict>
 	</array>

@@ -18,13 +18,20 @@ import userStore from '../../lib/userStore';
 
 const {width, height} = Dimensions.get('window');
 
+const dufaultProfile = require('../../assets/images/goJoin.png');
+
 // OptimizedImageItem 컴포넌트를 메모이제이션해서 성능 향상
 const OptimizedImageItem = React.memo(({item}) => {
   const source = useMemo(() => (item.bgImg ? item.bgImg : null), [item.bgImg]);
   return source ? (
-    <Image resizeMethod='auto' source={source} style={{width: width, height: height / 4}} />
+    <Image
+      resizeMethod="auto"
+      source={source}
+      style={{width: width, height: height / 4}}
+    />
   ) : null;
 });
+
 
 const Main = ({navigation}) => {
   const [currUserData, setCurrUserData] = useState(() => []);
@@ -270,38 +277,59 @@ const Main = ({navigation}) => {
             <View style={styles.gradeUpView}>
               <View style={[styles.gradeUp, {top: 20}]}>
                 <Image
-                  source={{uri: secondPlace.imageUrl}}
+                  source={{
+                    uri:
+                      secondPlace && secondPlace.imageUrl
+                        ? secondPlace.imageUrl
+                        : dufaultProfile,
+                  }} 
                   style={{borderRadius: 25, width: 50, height: 50}}
                 />
                 <View style={styles.gradeNum}>
                   <Text style={{color: '#fff', fontWeight: 'bold'}}>2</Text>
                 </View>
                 <Text style={{fontSize: 16, fontWeight: '600'}}>
-                  {secondPlace.nickname}
+                  {secondPlace && secondPlace.nickname
+                    ? secondPlace.nickname
+                    : '기본 닉네임'}
                 </Text>
               </View>
               <View style={styles.gradeUp}>
                 <Image
-                  source={{uri: firstPlace.imageUrl}}
+                  source={{
+                    uri:
+                      firstPlace && firstPlace.imageUrl
+                        ? firstPlace.imageUrl
+                        : dufaultProfile,
+                  }}
                   style={{borderRadius: 25, width: 50, height: 50}}
                 />
                 <View style={styles.gradeNum}>
                   <Text style={{color: '#fff', fontWeight: 'bold'}}>1</Text>
                 </View>
                 <Text style={{fontSize: 16, fontWeight: '600'}}>
-                  {firstPlace.nickname}
+                  {firstPlace && firstPlace.nickname
+                    ? firstPlace.nickname
+                    : '기본 닉네임'}
                 </Text>
               </View>
               <View style={[styles.gradeUp, {top: 20}]}>
                 <Image
-                  source={{uri: thirdPlace.imageUrl}}
+                  source={{
+                    uri:
+                      thirdPlace && thirdPlace.imageUrl
+                        ? thirdPlace.imageUrl
+                        : dufaultProfile,
+                  }}
                   style={{borderRadius: 25, width: 50, height: 50}}
                 />
                 <View style={styles.gradeNum}>
                   <Text style={{color: '#fff', fontWeight: 'bold'}}>3</Text>
                 </View>
                 <Text style={{fontSize: 16, fontWeight: '600'}}>
-                  {thirdPlace.nickname}
+                  {thirdPlace && thirdPlace.nickname
+                    ? thirdPlace.nickname
+                    : '기본 닉네임'}
                 </Text>
               </View>
             </View>
@@ -314,27 +342,54 @@ const Main = ({navigation}) => {
               <View style={styles.gradeLow}>
                 <Text>4등 : </Text>
                 <Image
-                  source={{uri: foursPlace.imageUrl}}
+                  source={{
+                    uri:
+                      foursPlace && foursPlace.imageUrl
+                        ? foursPlace.imageUrl
+                        : dufaultProfile,
+                  }}
                   style={{width: 36, height: 36, borderRadius: 18}}
                 />
-                <Text>{foursPlace.nickname} </Text>
+                <Text>
+                  {foursPlace && foursPlace.nickname
+                    ? foursPlace.nickname
+                    : '기본 닉네임'}{' '}
+                </Text>
               </View>
               <View style={styles.gradeLow}>
                 <Text>5등 : </Text>
                 <Image
-                  source={{uri: fifthPlace.imageUrl}}
+                  source={{
+                    uri:
+                      fifthPlace && fifthPlace.imageUrl
+                        ? fifthPlace.imageUrl
+                        : dufaultProfile,
+                  }}
                   style={{width: 36, height: 36, borderRadius: 18}}
                 />
-                <Text>{fifthPlace.nickname} </Text>
+                <Text>
+                  {fifthPlace && fifthPlace.nickname
+                    ? fifthPlace.nickname
+                    : '기본 닉네임'}{' '}
+                </Text>
               </View>
               {sixthPlace && (
                 <View style={styles.gradeLow}>
                   <Text>6등 : </Text>
                   <Image
-                    source={{uri: sixthPlace.imageUrl}}
+                    source={{
+                      uri:
+                        sixthPlace && sixthPlace.imageUrl
+                          ? sixthPlace.imageUrl
+                          : dufaultProfile,
+                    }}
                     style={{width: 36, height: 36, borderRadius: 18}}
                   />
-                  <Text>{sixthPlace.nickname} </Text>
+                  <Text>
+                    {sixthPlace && sixthPlace.nickname
+                      ? sixthPlace.nickname
+                      : '기본 닉네임'}{' '}
+                  </Text>
                 </View>
               )}
             </View>
