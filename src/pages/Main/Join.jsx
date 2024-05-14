@@ -36,223 +36,209 @@ const layerGroups = {
   TRANSIT: false,
 };
 
-const Join = ({navigation, route}) => {
-  const mapView = useRef(null);
-  const now = dayjs();
-  const [initialRegion, setInitialRegion] = useState({
-    latitude: 37.5670135,
-    longitude: 126.978374,
-    latitudeDelta: 0.0024,
-    longitudeDelta: 0.0024,
-  });
-  const [hobbiesData, setHobbiesData] = useState([]);
+const Join = ({ navigation, route }) => {
+    const mapView = useRef(null);
+    const now = dayjs();
+    const [initialRegion, setInitialRegion] = useState({
+        latitude: 37.5670135,
+        longitude: 126.9783740,
+        latitudeDelta: 0.0024,
+        longitudeDelta: 0.0024,
+    });
+    const [hobbiesData, setHobbiesData] = useState([]);
+    const [currentData, setCurrentData] = useState([]);
 
-  useEffect(() => {
-    initSetData();
-  }, []);
+    useEffect(() => {
+        initSetData();
+        deadLineHobbiesData(hobbiesData);
+    }, []);
 
-  const initSetData = async () => {
-    const permission = await Geolocation.requestAuthorization('always');
-    console.log('permission', permission);
-    if (permission === 'granted') {
-      Geolocation.getCurrentPosition(
-        async pos => {
-          const {latitude, longitude} = pos.coords;
-          setInitialRegion({
-            latitude,
-            longitude,
-            latitudeDelta: 0.0024,
-            longitudeDelta: 0.0024,
-          });
-          const currentAddress = await userFetchAddress(latitude, longitude);
-          const splitAddress = currentAddress.split(' ', 3).join(' ');
-          const nearHobbiesData = await getNearHobbies(splitAddress);
-          setHobbiesData(nearHobbiesData);
-        },
-        error => {
-          console.log(error);
-        },
-        {
-          enableHighAccuracy: false,
-          timeout: 2000,
-        },
-      );
+    const initSetData = async () => {
+        const permission = await Geolocation.requestAuthorization("always")
+        console.log("permission", permission)
+        if (permission === "granted") {
+            Geolocation.getCurrentPosition(
+                async (pos) => {
+                    const { latitude, longitude } = pos.coords
+                    setInitialRegion({
+                        latitude,
+                        longitude,
+                        latitudeDelta: 0.0024,
+                        longitudeDelta: 0.0024,
+                    })
+                    const currentAddress = await userFetchAddress(latitude, longitude);
+                    const splitAddress = currentAddress.split(" ", 3).join(" ");
+                    const nearHobbiesData = await getNearHobbies(splitAddress);
+                    // setHobbiesData(nearHobbiesData)
+                },
+                error => {
+                    console.log(error);
+                },
+                {
+                    enableHighAccuracy: false,
+                    timeout: 2000,
+                },
+            );
+        }
     }
-  };
 
-  const handleMarkerPress = markerElements => {
-    navigation.navigate('Show', markerElements);
-  };
+    const deadLineHobbiesData = (data) => {
+        const deadlineData = data.filter(v => dayjs(v.data._data.deadline).diff(now, 'days') > 0)
+        setCurrentData(deadlineData)
+    }
 
-  const percentFun = (curr, total) => {
-    return Math.round((curr / total) * 100);
-  };
-
-  const moveCurrLocation = () => {
-    mapView?.current?.setLocationTrackingMode('Follow');
-  };
-
-  const renderMarker = useCallback(marker => {
-    return (
-      <NaverMapMarkerOverlay
-        key={marker.id}
-        latitude={marker.data._data.latitude}
-        longitude={marker.data._data.longitude}
-        onPress={() => handleMarkerPress(marker)}
-      />
-    );
-  }, []);
-
-  const renderItem = ({item}) => {
-    const diffDays = dayjs(item.data._data.deadline).diff(now, 'days');
-    const diffHours = dayjs(item.data._data.deadline).diff(now, 'hours');
-    const diffMins = dayjs(item.data._data.deadline).diff(now, 'minutes');
-
-    const moveMarkerLocation = () => {
-      const Region = {
-        latitude: item.data._data.latitude,
-        latitudeDelta: 0,
-        longitude: item.data._data.longitude,
-        longitudeDelta: 0,
-      };
-      const CameraMoveBaseParams = {
-        duration: 700,
-        easing: 'EaseOut',
-        pivot: {
-          x: 0.5,
-          y: 0.5,
-        },
-      };
-      mapView?.current?.animateRegionTo(Region, CameraMoveBaseParams);
+    const handleMarkerPress = (markerElements) => {
+        navigation.navigate('Show', markerElements);
     };
 
-    return (
-      <TouchableOpacity
-        activeOpacity={0.6}
-        style={styles.listView}
-        onPress={moveMarkerLocation}>
-        <View
-          style={{
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexDirection: 'row',
-            paddingTop: 8,
-          }}>
-          <Text style={styles.listTitle}>{item.data._data.title}</Text>
-          {percentFun(
-            item.data._data.personNumber,
-            item.data._data.peopleCount,
-          ) < 50 ? (
-            <Text style={[styles.listRcruit, {color: '#07AC7D'}]}>모집중</Text>
-          ) : percentFun(
-              item.data._data.personNumber,
-              item.data._data.peopleCount,
-            ) == 100 ? (
-            <Text style={[styles.listRcruit, {color: '#898989'}]}>
-              모집마감
-            </Text>
-          ) : (
-            <Text style={[styles.listRcruit, {color: '#E4694E'}]}>
-              마감임박
-            </Text>
-          )}
-        </View>
-        <View
-          style={{
-            justifyContent: 'space-between',
-            alignItems: 'stretch',
-            flexDirection: 'row',
-          }}>
-          <Text style={styles.listLocation}>{item.data._data.address}</Text>
-          <Text style={[styles.listRcruit, {color: '#4E8FE4'}]}>
-            {item.data._data.personNumber} \ {item.data._data.peopleCount} 명
-          </Text>
-        </View>
-        <View>
-          <Text>{item.data._data.tag}</Text>
-        </View>
-        <View
-          style={{
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexDirection: 'row',
-          }}>
-          <Text>
-            <Text style={{fontWeight: 700}}>{diffDays}</Text> 일{' '}
-            <Text style={{fontWeight: 700}}>{diffHours % 24}</Text> 시간{' '}
-            <Text style={{fontWeight: 700}}>{diffMins % 60}</Text> 분 전
-          </Text>
-          {percentFun(
-            item.data._data.personNumber,
-            item.data._data.peopleCount,
-          ) == 100 ? (
-            <TouchableOpacity
-              style={[styles.showBtn, {backgroundColor: '#898989'}]}
-              onPress={() => navigation.navigate('Show', route)}>
-              <Text
-                style={[
-                  styles.showCommText,
-                  {fontWeight: 600, fontSize: 14, color: '#FEFFFE'},
-                ]}>
-                모집마감
-              </Text>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity
-              style={styles.showBtn}
-              onPress={() => navigation.navigate('Show', item)}>
-              <Text
-                style={[
-                  styles.showCommText,
-                  {fontWeight: 600, fontSize: 14, color: '#FEFFFE'},
-                ]}>
-                참여신청
-              </Text>
-            </TouchableOpacity>
-          )}
-        </View>
-      </TouchableOpacity>
-    );
-  };
+    const percentFun = (curr, total) => {
+        return Math.round((curr / total) * 100)
+    }
 
-  return (
-    <SafeAreaView style={{flex: 1}}>
-      <View style={styles.searchView}>
-        <TouchableOpacity
-          style={{marginLeft: 'auto', paddingTop: 10}}
-          onPress={moveCurrLocation}>
-          <Image source={currGpsIcon} style={{width: 40, height: 40}} />
-        </TouchableOpacity>
-      </View>
-      <View style={{bottom: 30, position: 'absolute', zIndex: 2}}>
-        <FlatList
-          data={hobbiesData.reverse()}
-          renderItem={renderItem}
-          keyExtractor={item => item.id}
-          horizontal={true}
-          showsHorizontalScrollIndicator={false}
-          style={{paddingLeft: 8}}
-          automaticallyAdjustContentInsets={false}
-          decelerationRate="fast"
-          pagingEnabled
-          snapToInterval={width / 1.3 + 20}
-          snapToAlignment="start"
-        />
-      </View>
-      <NaverMapView
-        ref={mapView}
-        style={{flex: 1}}
-        layerGroups={layerGroups}
-        initialRegion={initialRegion}
-        locale={'ko'}
-        isShowLocationButton={false}
-        maxZoom={15}
-        minZoom={15}>
-        {hobbiesData.map(v => renderMarker(v))}
-      </NaverMapView>
-    </SafeAreaView>
-  );
-};
+    const moveCurrLocation = () => {
+        mapView?.current?.setLocationTrackingMode("Follow")
+    };
+
+    const onCameraChanged = async (event) => {
+        const {latitude, longitude} = event
+        const centerAddress = await userFetchAddress(latitude, longitude)
+        const centerGu = centerAddress.split(" ", 3).join(" ");
+        const finalHobbiesData = await getNearHobbies(centerGu);
+
+        const deadlineData = finalHobbiesData.filter(v => dayjs(v.data._data.deadline).diff(now, 'days') > 0)
+        console.log(centerGu);
+        setHobbiesData(deadlineData)
+
+    }
+
+
+    const renderMarker = useCallback((marker) => {
+        return (
+            <NaverMapMarkerOverlay
+                key={marker.id}
+                latitude={marker.data._data.latitude}
+                longitude={marker.data._data.longitude}
+                onPress={() => handleMarkerPress(marker)}
+            />
+        )
+    }, []);
+
+    const renderItem = ({ item }) => {
+        const diffDays = dayjs(item.data._data.deadline).diff(now, 'days')
+        const diffHours = dayjs(item.data._data.deadline).diff(now, 'hours')
+        const diffMins = dayjs(item.data._data.deadline).diff(now, 'minutes')
+
+        const moveMarkerLocation = () => {
+            const Region = {
+                latitude: item.data._data.latitude,
+                latitudeDelta: 0,
+                longitude: item.data._data.longitude,
+                longitudeDelta: 0,
+            }
+            const CameraMoveBaseParams = {
+                duration: 700,
+                easing: "EaseOut",
+                pivot: {
+                    x: 0.5,
+                    y: 0.5,
+                }
+            }
+            mapView?.current?.animateRegionTo(
+                Region, CameraMoveBaseParams
+            )
+        }
+
+        return (
+            <TouchableOpacity
+                activeOpacity={0.6}
+                style={styles.listView}
+                onPress={moveMarkerLocation}>
+                <View style={{ justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row', paddingTop: 8 }}>
+                    <Text style={styles.listTitle}>{item.data._data.title}</Text>
+                    {
+                        percentFun(item.data._data.personNumber, item.data._data.peopleCount) < 50 ?
+                            (
+                                <Text style={[styles.listRcruit, { color: '#07AC7D' }]}>모집중</Text>
+                            ) : percentFun(item.data._data.personNumber, item.data._data.peopleCount) == 100 ?
+                                (
+                                    <Text style={[styles.listRcruit, { color: '#898989' }]}>모집마감</Text>
+                                ) : (
+                                    <Text style={[styles.listRcruit, { color: '#E4694E' }]}>마감임박</Text>
+                                )
+                    }
+                </View>
+                <View style={{ justifyContent: 'space-between', alignItems: 'stretch', flexDirection: 'row' }}>
+                    <Text style={styles.listLocation}>{item.data._data.address}</Text>
+                    <Text style={[styles.listRcruit, { color: '#4E8FE4' }]}>{item.data._data.personNumber} \ {item.data._data.peopleCount} 명</Text>
+                </View>
+                <View>
+                    <Text>{item.data._data.tag}</Text>
+                </View>
+                <View style={{ justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row' }}>
+                    <Text><Text style={{ fontWeight: 700 }}>{diffDays}</Text> 일 <Text style={{ fontWeight: 700 }}>{diffHours % 24}</Text> 시간 <Text style={{ fontWeight: 700 }}>{diffMins % 60}</Text> 분 전</Text>
+                    {
+                        percentFun(item.data._data.personNumber, item.data._data.peopleCount) == 100 ? (
+                            <TouchableOpacity
+                                style={[styles.showBtn, { backgroundColor: '#898989' }]}
+                                onPress={() => navigation.navigate('Show', route)}>
+                                <Text style={[styles.showCommText, { fontWeight: 600, fontSize: 14, color: '#FEFFFE' }]}>모집마감</Text>
+                            </TouchableOpacity>
+                        ) : (
+                            <TouchableOpacity
+                                style={styles.showBtn}
+                                onPress={() => navigation.navigate('Show', item)}>
+                                <Text style={[styles.showCommText, { fontWeight: 600, fontSize: 14, color: '#FEFFFE' }]}>참여신청</Text>
+                            </TouchableOpacity>
+                        )
+                    }
+                </View>
+            </TouchableOpacity>
+            
+        )
+    }
+
+    return (
+        <SafeAreaView style={{ flex: 1 }}>
+            <View style={styles.searchView}>
+                <TouchableOpacity
+                    style={{ marginLeft: 'auto', paddingTop: 10 }}
+                    onPress={moveCurrLocation}>
+                    <Image source={currGpsIcon} style={{ width: 40, height: 40 }} />
+                </TouchableOpacity>
+            </View>
+            <View style={{ bottom: 30, position: 'absolute', zIndex: 2, }}>
+                <FlatList
+                    data={hobbiesData}
+                    renderItem={renderItem}
+                    keyExtractor={item => item.id}
+                    horizontal={true}
+                    showsHorizontalScrollIndicator={false}
+                    style={{ paddingLeft: 8 }}
+                    automaticallyAdjustContentInsets={false}
+                    decelerationRate="fast"
+                    pagingEnabled
+                    snapToInterval={width / 1.3 + 20}
+                    snapToAlignment="start"
+                />
+            </View>
+            <NaverMapView
+                ref={mapView}
+                style={{ flex: 1 }}
+                layerGroups={layerGroups}
+                initialRegion={initialRegion}
+                locale={'ko'}
+                isShowLocationButton={false}
+                onCameraChanged={onCameraChanged}
+                maxZoom={15}
+                minZoom={15}
+            >
+                {
+                    hobbiesData.map(v => renderMarker(v))
+                }
+            </NaverMapView>
+        </SafeAreaView>
+    )
+}
 
 const currGpsIcon = require('../../assets/icons/currGpsIcon.png');
 const searchIcon = require('../../assets/icons/searchIcon.png');
