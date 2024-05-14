@@ -963,6 +963,14 @@ PODS:
   - BVLinearGradient (2.8.3):
     - React-Core
   - DoubleConversion (1.1.6)
+  - FasterImage (1.5.2):
+    - FasterImage/Nuke (= 1.5.2)
+    - FasterImage/NukeUI (= 1.5.2)
+    - React-Core
+  - FasterImage/Nuke (1.5.2):
+    - React-Core
+  - FasterImage/NukeUI (1.5.2):
+    - React-Core
   - FBLazyVector (0.74.0)
   - Firebase/Auth (10.24.0):
     - Firebase/CoreOnly
@@ -2545,6 +2553,7 @@ DEPENDENCIES:
   - boost (from `../node_modules/react-native/third-party-podspecs/boost.podspec`)
   - BVLinearGradient (from `../node_modules/react-native-linear-gradient`)
   - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
+  - "FasterImage (from `../node_modules/@candlefinance/faster-image`)"
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
   - Firebase/Storage
   - FirebaseAuth
@@ -2672,6 +2681,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-linear-gradient"
   DoubleConversion:
     :podspec: "../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec"
+  FasterImage:
+    :path: "../node_modules/@candlefinance/faster-image"
   FBLazyVector:
     :path: "../node_modules/react-native/Libraries/FBLazyVector"
   fmt:
@@ -2826,6 +2837,7 @@ SPEC CHECKSUMS:
   BoringSSL-GRPC: 1e2348957acdbcad360b80a264a90799984b2ba6
   BVLinearGradient: 880f91a7854faff2df62518f0281afb1c60d49a3
   DoubleConversion: 76ab83afb40bddeeee456813d9c04f67f78771b5
+  FasterImage: 4242647a08a8d846bf81803f16d8e1b65dcdf82b
   FBLazyVector: 026c8f4ae67b06e088ae01baa2271ef8a26c0e8c
   Firebase: 91fefd38712feb9186ea8996af6cbdef41473442
   FirebaseAppCheckInterop: 5da5ce93e8797a215e3f677fb0654b74e736c8b8
