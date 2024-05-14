@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -7,39 +7,46 @@ import {
   Image,
   Dimensions,
   TextInput,
-  Alert,
   KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
+import Toast from '../Main/Toast';
 
 const passwordHideIcon = require('../../assets/icons/passwordHide.png');
-const {width, height} = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
-const SignUpPassword = ({onNextStep}) => {
+const SignUpPassword = ({ onNextStep }) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLengthValid, setIsLengthValid] = useState(false);
   const [isUppercaseValid, setIsUppercaseValid] = useState(false);
   const [isSpecialCharacterValid, setIsSpecialCharacterValid] = useState(false);
+  const [showToast, setShowToast] = useState(false); // 토스트 표시 여부 상태 추가
+  const [toastMessage, setToastMessage] = useState(''); // 토스트 메시지 상태 추가
+  
 
   const handleNext = () => {
     if (password.trim() === '') {
-      Alert.alert('비밀번호 입력', '비밀번호를 입력해주세요.');
+      setToastMessage('비밀번호를 입력해주세요.'); // 토스트 메시지 설정
+      setShowToast(true); // 토스트 표시
       return;
     }
     if (password !== confirmPassword) {
-      Alert.alert('비밀번호 확인', '비밀번호가 일치하지 않습니다.');
+      setToastMessage('비밀번호가 일치하지 않습니다.'); // 토스트 메시지 설정
+      setShowToast(true); // 토스트 표시
       return;
     }
     if (!isLengthValid || !isUppercaseValid || !isSpecialCharacterValid) {
-      Alert.alert('유효성 검사', '비밀번호가 조건을 충족하지 않습니다.');
+      setToastMessage('비밀번호가 조건을 충족하지 않습니다.'); // 토스트 메시지 설정
+      setShowToast(true); // 토스트 표시
       return;
     }
-    onNextStep({password});
+    onNextStep({ password });
   };
 
   // 비밀번호 유효성 검사 함수
-  const isValidPassword = password => {
+  const isValidPassword = (password) => {
     const containsUppercase = /[A-Z]/.test(password);
     const containsLowercase = /[a-z]/.test(password);
     const containsSpecialCharacter = /[!@#$%^&*(),.?":{}|<>]/.test(password);
@@ -57,10 +64,11 @@ const SignUpPassword = ({onNextStep}) => {
     );
   };
 
-  const handlePasswordChange = text => {
+  const handlePasswordChange = (text) => {
     // 한글이 포함되어 있으면 입력을 막고 알림을 표시합니다.
     if (/[\uAC00-\uD7A3]/.test(text)) {
-      Alert.alert('한글 사용 불가', '비밀번호에는 한글을 사용할 수 없습니다.');
+      setToastMessage('비밀번호에는 한글을 사용할 수 없습니다.'); // 토스트 메시지 설정
+      setShowToast(true); // 토스트 표시
       return;
     }
     setPassword(text);
@@ -71,6 +79,7 @@ const SignUpPassword = ({onNextStep}) => {
       }
     }
   };
+  
 
   const passwordShow = () => {
     setShowPassword(!showPassword);
@@ -145,6 +154,12 @@ const SignUpPassword = ({onNextStep}) => {
           </TouchableOpacity>
         </View>
       </View>
+      {/* 토스트 컴포넌트 */}
+      <Toast
+        text={toastMessage}
+        visible={showToast}
+        handleCancel={() => setShowToast(false)}
+      />
     </KeyboardAvoidingView>
   );
 };

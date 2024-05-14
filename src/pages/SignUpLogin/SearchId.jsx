@@ -7,18 +7,20 @@ import {
   SafeAreaView,
   TouchableOpacity,
   TextInput,
-  Alert,
   Image,
   Modal,
   KeyboardAvoidingView,
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore'; // firestore import 추가
+import Toast from '../../components/Main/Toast';
 
 const backIcon = require('../../assets/icons/back.png');
 
 const SignUpEmail = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [showModal, setShowModal] = useState(false); // 모달 표시 여부 상태 추가
+  const [toastMessage, setToastMessage] = useState('');
+  const [showToast, setShowToast] = useState(false);
 
   const validateEmail = email => {
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -27,7 +29,9 @@ const SignUpEmail = ({navigation}) => {
 
   const handleNext = async () => {
     if (!validateEmail(email)) {
-      Alert.alert('유효하지 않은 이메일', '올바른 이메일 형식이 아닙니다.');
+      setToastMessage('유효하지 않은 이메일입니다.');
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
       return;
     }
     try {
@@ -37,18 +41,20 @@ const SignUpEmail = ({navigation}) => {
         .where('email', '==', email)
         .get();
       if (!userQuery.empty) {
-        // 중복된 이메일이 있으면 알림 표시
-        Alert.alert('가입된 이메일', '같은 주소로 가입된 계정이 있어요!');
+        // 중복된 이메일인 경우
+        setToastMessage('중복된 이메일입니다. 다른 이메일을 사용해주세요.');
+        setShowToast(true);
+        setTimeout(() => setShowToast(false), 3000);
       } else {
         // 중복된 이메일이 없으면 모달 표시
         setShowModal(true);
       }
     } catch (error) {
-      console.error('이메일 중복 확인 오류:', error);
-      Alert.alert(
-        '이메일 중복 확인 실패',
-        '이메일 중복 확인 중 오류가 발생했습니다.',
-      );
+   // 에러가 발생한 경우
+      setToastMessage('오류가 발생했습니다. 나중에 다시 시도해주세요.');
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+      
     }
   };
 
@@ -121,6 +127,11 @@ const SignUpEmail = ({navigation}) => {
             </View>
           </View>
         </Modal>
+        <Toast
+        text={toastMessage}
+        visible={showToast}
+        handleCancel={() => setShowToast(false)}
+      />
     </SafeAreaView>
   );
 };

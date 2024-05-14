@@ -29,24 +29,20 @@ const googleIcon = require('../../assets/icons/google.png');
 const LoginTitle = require('../../assets/images/LoginTitle.png');
 
 const Login = ({navigation}) => {
-  const [showToast, setShowToast] = useState(false); 
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
   const [isEmailValid, setIsEmailValid] = useState(false);
+  const [showToast, setShowToast] = useState(false); 
 
   const setUserData = userStore(state => state.setUserData); // Zustand 스토어 custom hook 사용
   const setUserToken = userStore(state => state.setUserToken);
 
-  const handleToast = () => {
-    // 토스트를 표시하기 위한 함수입니다.
-    setShowToast(true); // 상태를 true로 설정하여 토스트를 표시합니다.
-    setTimeout(() => setShowToast(false), 3000); // 3초 후에 토스트를 숨깁니다.
-  };
+
 
   const onSignIn = async () => {
     try {
       const { user } = await signIn({ email, password });
-  
+
       // 사용자의 문서를 가져와서 전체 정보를 가져옴
       const userDoc = await firestore().collection('users').doc(user.uid).get();
       const userInfo = userDoc.data();

@@ -27,17 +27,17 @@ const ShowAllImages = ({navigation, route}) => {
     setIsVisible(false);
   };
 
+  const images = messages.filter(item => !!item.image);
+
   const renderImages = ({item}) => {
     return (
       <TouchableOpacity
         onPress={() => toggleModal(item.image)}
-        style={{marginHorizontal: 1.5}}>
-        {item.image && (
-          <Image
-            source={{uri: item.image}}
-            style={{width: width / 3 - 4, height: width / 3 - 4}}
-          />
-        )}
+        style={{marginHorizontal: 1.5, width: width / 3 - 4}}>
+        <Image
+          source={{uri: item.image}}
+          style={{width: '100%', height: width / 3 - 4}}
+        />
       </TouchableOpacity>
     );
   };
@@ -65,7 +65,7 @@ const ShowAllImages = ({navigation, route}) => {
 
       <View style={{flex: 1}}>
         <FlatList
-          data={messages}
+          data={images}
           renderItem={renderImages}
           keyExtractor={(item, index) => index.toString()}
           numColumns={3}
