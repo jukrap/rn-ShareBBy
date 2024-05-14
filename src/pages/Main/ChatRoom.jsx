@@ -100,7 +100,7 @@ const ChatRoom = ({route, navigation}) => {
         return;
       }
 
-      const currentUser = auth().currentUser; //
+      const currentUser = auth().currentUser;
 
       let senderName = 'Unknown';
       if (currentUser) {
@@ -128,7 +128,7 @@ const ChatRoom = ({route, navigation}) => {
         .collection('messages')
         .add(newMessage);
 
-      setInputMessage(''); //
+      setInputMessage('');
     } catch (error) {
       console.error('Error sending message: ', error);
     }
@@ -203,9 +203,14 @@ const ChatRoom = ({route, navigation}) => {
   const getPhotos = async () => {
     try {
       const image = await ImagePicker.openPicker({
-        width: 300,
+        width: 400,
         height: 400,
         multiple: false,
+        cropping: true,
+        mediaType: 'photo',
+        cropperChooseText: '이미지 변경',
+        cropperCancelText: '취소',
+        cropperRotateButtonsHidden: true,
       });
       const imageUrl = await uploadImage(image.sourceURL, chatRoomId);
 
@@ -277,7 +282,7 @@ const ChatRoom = ({route, navigation}) => {
   const getProfileImage = async () => {
     try {
       const image = await ImagePicker.openPicker({
-        width: 300,
+        width: 400,
         height: 400,
         multiple: false,
         cropping: true,
@@ -301,7 +306,6 @@ const ChatRoom = ({route, navigation}) => {
   };
 
   const renderItem = ({item, index}) => {
-    dayjs.locale('ko'); //
     const isSystemMessage = item.sender === '시스템';
     const isCurrentUser = item.senderId === auth().currentUser?.uid;
     const isFirstMessage = index === messages.length - 1;
@@ -436,7 +440,6 @@ const ChatRoom = ({route, navigation}) => {
   };
 
   const goToShowAllImages = () => {
-    //이름 바꾸기,
     navigation.navigate('ShowAllImages', {messages: messages});
     setSlideModalVisible(false);
   };
