@@ -9,6 +9,7 @@ import {
 import firestore from '@react-native-firebase/firestore';
 import {useEffect, useState} from 'react';
 const leftArrow = require('../../assets/newIcons/backIcon.png');
+const heart = require('../../assets/newIcons/heart-icon.png');
 const formatDate = date => {
   return new Intl.DateTimeFormat('ko-KR', {
     year: 'numeric',
@@ -36,7 +37,7 @@ const MyPosts = ({navigation, route}) => {
         return {id: doc.id, ...data};
       });
       setPosts(tmp_posts);
-      // console.log(posts);
+      // console.log('posts', posts);
     } catch (error) {
       console.error('Error fetching posts:', error.message);
     }
@@ -56,24 +57,43 @@ const MyPosts = ({navigation, route}) => {
         {posts.map((it, idx) => {
           return (
             <View key={idx} style={styles.post}>
-              <View style={styles.userName}>
+              <View style={styles.profileWrapper}>
                 <Image
-                  style={{width: 30, height: 30}}
+                  style={styles.image}
                   source={{uri: route.params.profileImage}}
                 />
-                <Text>{route.params.nickname}</Text>
+                <View style={styles.userName}>
+                  <Text style={styles.name}>{route.params.nickname}</Text>
+                  <Text style={styles.date}>
+                    {it.post_created
+                      ? formatDate(it.post_created)
+                      : '날짜 정보 없음'}
+                  </Text>
+                </View>
               </View>
-              <Text>{it.likeCount}</Text>
-              <Text>{it.post_content}</Text>
-              <Text>
-                {it.post_created
-                  ? formatDate(it.post_created)
-                  : '날짜 정보 없음'}
-              </Text>
 
-              {it.post_files.map(file => {
-                <Image source={file} />;
-              })}
+              <Text
+                // numberOfLines={3}
+                style={styles.content}>
+                {it.post_content}
+              </Text>
+              <View style={styles.imageWrapper}>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  {it.post_files.map(fileUri => {
+                    return (
+                      <Image
+                        key={fileUri.id} // 'fileUri.id'가 실제로 존재하는지 확인 필요
+                        source={{uri: fileUri}}
+                        style={styles.contentImage}
+                      />
+                    );
+                  })}
+                </ScrollView>
+              </View>
+              <View style={styles.like}>
+                <Image source={heart} style={styles.heart} />
+                <Text style={styles.likeCount}>{it.likeCount}</Text>
+              </View>
             </View>
           );
         })}
@@ -94,10 +114,62 @@ const styles = StyleSheet.create({
   container: {
     margin: 20,
   },
-  post: {},
-  userName: {
+  post: {
+    borderColor: 'grey',
+    borderWidth: 1,
+    borderRadius: 10,
+    padding: 15,
+    marginTop: 12,
+    marginBottom: 12,
+  },
+  image: {
+    width: 40,
+    height: 40,
+    borderRadius: 50,
+  },
+  name: {
+    fontSize: 16,
+    marginLeft: 10,
+    marginBottom: 2,
+    color: '#212529',
+  },
+  date: {
+    fontSize: 12,
+    marginLeft: 10,
+    fontWeight: 'bold',
+    color: '#9A9A9A',
+  },
+  profileWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  userName: {
+    justifyContent: 'flex-end',
+  },
+  content: {
+    marginTop: 15,
+    marginBottom: 15,
+    ellipsizeMode: 'tail',
+    color: '#212529',
+  },
+  imageWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  contentImage: {
+    marginRight: 10,
+    width: 200,
+    height: 200,
+  },
+  like: {
+    marginTop: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  heart: {width: 22, height: 22},
+  likeCount: {
+    marginLeft: 5,
+    fontSize: 15,
   },
 });
 
