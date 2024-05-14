@@ -348,7 +348,6 @@ const CommunityPostDetail = ({route}) => {
   };
 
   const handleDelete = () => {
-    if (posts) {
       const selectedPost = posts;
       if (
         selectedPost &&
@@ -381,10 +380,9 @@ const CommunityPostDetail = ({route}) => {
         });
         setModalVisible(true);
       }
-    }
   };
 
-  const deletePost = () => {
+  const deletePost = async () => {
     firestore()
       .collection('posts')
       .doc(postId)
@@ -567,7 +565,7 @@ const CommunityPostDetail = ({route}) => {
               source={{
                 url: postUserData?.profileImage,
                 priority: 'high',
-                cachePolicy: 'discWithCacheControl',
+                cachePolicy: 'memory',
                 failureImageUrl: defaultProfileImg,
                 resizeMode: 'cover',
                 borderRadius: 50,

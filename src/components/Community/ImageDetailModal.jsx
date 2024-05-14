@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    marginTop: 40,
+    marginTop: 56,
   },
   closeButton: {
     position: 'absolute',

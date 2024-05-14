@@ -32,12 +32,15 @@ const ImageDetailSlider = ({images, initialIndex = 0}) => {
   const renderPaginationItem = (_, index) => (
     <TouchableOpacity
       key={index}
-      style={[
-        styles.paginationItem,
-        index === currentIndex && styles.paginationItemActive,
-      ]}
       onPress={() => handlePaginationPress(index)}
-    />
+      style={styles.paginationItemContainer}>
+      <View
+        style={[
+          styles.paginationItem,
+          index === currentIndex && styles.paginationItemActive,
+        ]}
+      />
+    </TouchableOpacity>
   );
 
   const renderImageItem = ({item, index}) => (
@@ -100,21 +103,26 @@ const styles = StyleSheet.create({
   },
   paginationContainer: {
     position: 'absolute',
-    bottom: 32,
+    bottom: 56,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
   },
+  paginationItemContainer: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   paginationItem: {
-    width: 8,
-    height: 8,
+    width: 10,
+    height: 10,
     borderRadius: 4,
     backgroundColor: '#DBDBDB',
-    marginHorizontal: 8,
   },
   paginationItemActive: {
-    width: 12,
-    height: 12,
+    width: 14,
+    height: 14,
     borderRadius: 6,
     backgroundColor: '#07AC7D',
   },
