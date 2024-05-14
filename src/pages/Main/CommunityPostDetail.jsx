@@ -657,7 +657,10 @@ const CommunityPostDetail = ({route}) => {
   );
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: '#FEFFFE'}}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : null}
+      keyboardVerticalOffset={8}
+      style={{flex: 1, backgroundColor: '#FEFFFE'}}>
       <CommunityHeader title={'게시글'} />
       <FlatList
         data={comments}
@@ -676,10 +679,6 @@ const CommunityPostDetail = ({route}) => {
         ListFooterComponent={renderFooter}
         style={styles.container}
       />
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : null}
-        keyboardVerticalOffset={16}
-        style={{backgroundColor: '#FEFFFE'}}>
         <View style={styles.commentInputContainer}>
           <TextInput
             style={styles.commentInput}
@@ -698,7 +697,6 @@ const CommunityPostDetail = ({route}) => {
             />
           </TouchableOpacity>
         </View>
-      </KeyboardAvoidingView>
       <BottomSheetModal isVisible={isModalVisible} onClose={toggleModal}>
         <View style={styles.modalContent}>
           <TouchableOpacity
@@ -739,7 +737,7 @@ const CommunityPostDetail = ({route}) => {
         iconSource={modalMessage.iconSource}
         showConfirmButton={modalMessage.showConfirmButton}
       />
-    </SafeAreaView>
+      </KeyboardAvoidingView>
   );
 };
 
