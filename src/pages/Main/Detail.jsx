@@ -517,46 +517,42 @@ const dropDownOnIcon = require('../../assets/icons/dropDownOnIcon.png');
 const dropDownOffIcon = require('../../assets/icons/dropDownOffIcon.png');
 
 const countList = [
-  {
-    id: 1,
-    count: 1,
-  },
-  {
-    id: 2,
-    count: 2,
-  },
-  {
-    id: 3,
-    count: 3,
-  },
-  {
-    id: 4,
-    count: 4,
-  },
-  {
-    id: 5,
-    count: 5,
-  },
-  {
-    id: 6,
-    count: 6,
-  },
-  {
-    id: 7,
-    count: 7,
-  },
-  {
-    id: 8,
-    count: 8,
-  },
-  {
-    id: 9,
-    count: 9,
-  },
-  {
-    id: 10,
-    count: 10,
-  },
+    {
+        id: 2,
+        count: 2,
+    },
+    {
+        id: 3,
+        count: 3,
+    },
+    {
+        id: 4,
+        count: 4,
+    },
+    {
+        id: 5,
+        count: 5,
+    },
+    {
+        id: 6,
+        count: 6,
+    },
+    {
+        id: 7,
+        count: 7,
+    },
+    {
+        id: 8,
+        count: 8,
+    },
+    {
+        id: 9,
+        count: 9,
+    },
+    {
+        id: 10,
+        count: 10,
+    }
 ];
 
 const styles = StyleSheet.create({
