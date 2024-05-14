@@ -143,12 +143,11 @@ const CommunityAddPost = () => {
         });
 
       console.log('게시글 업로드 완료!');
+      setPostContent(null);
+      setSelectedImages([]);
       navigation.navigate('CommunityBoard', {
         sendToastMessage: '성공적으로 게시글이 업로드됐습니다!',
       });
-      navigation.goBack();
-      setPostContent(null);
-      setSelectedImages([]);
     } catch (error) {
       console.log(
         'Firestore에 게시물을 추가하는 중에 문제가 발생했습니다.',

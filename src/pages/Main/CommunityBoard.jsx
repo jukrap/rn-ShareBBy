@@ -37,7 +37,6 @@ const CommunityBoard = ({navigation, route}) => {
   const [refreshingOlder, setRefreshingOlder] = useState(false);
   const [refreshingNewer, setRefreshingNewer] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
-  const [selectedPostId, setSelectedPostId] = useState(null);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [modalMessage, setModalMessage] = useState({
@@ -74,18 +73,20 @@ const CommunityBoard = ({navigation, route}) => {
     }, []),
   );
 
-  useEffect(() => {
-    if (route.params?.sendToastMessage) {
-      setToastMessage({
-        message: route.params.sendToastMessage,
-        leftIcon: 'successIcon',
-        closeButton: true,
-        progressBar: true,
-      });
-      setToastVisible(true);
-    }
-  }, [route.params]);
-
+  useFocusEffect(
+    React.useCallback(() => {
+      if (route.params?.sendToastMessage) {
+        setToastMessage({
+          message: route.params.sendToastMessage,
+          leftIcon: 'successIcon',
+          closeButton: true,
+          progressBar: true,
+        });
+        setToastVisible(true);
+        navigation.setParams({sendToastMessage: null});
+      }
+    }, [route.params])
+  );
   const fetchInitialPosts = async () => {
     setLoading(true);
 
@@ -177,18 +178,16 @@ const CommunityBoard = ({navigation, route}) => {
         currentUser &&
         currentUser.uid === selectedPost.userId
       ) {
-        setSelectedPostId(postId);
         setModalMessage({
           title: '게시글 삭제',
           modalText: '해당 게시글을 삭제하겠습니까?',
           iconSource: require('../../assets/icons/warningIcon.png'),
           showConfirmButton: false,
           onConfirm: () => {
-            deletePost();
+            deletePost(postId);
             setModalVisible(false);
           },
           onCancel: () => {
-            setSelectedPostId(null);
             setModalVisible(false);
           },
         });
@@ -208,30 +207,42 @@ const CommunityBoard = ({navigation, route}) => {
     }
   };
 
-  const deletePost = () => {
-    const postId = selectedPostId;
+  const deletePost = postId => {
     firestore()
       .collection('posts')
       .doc(postId)
-      .update({
-        post_actflag: false,
-      })
-      .then(() => {
-        setToastMessage({
-          message: '게시글이 성공적으로 삭제되었습니다!',
-          leftIcon: 'successIcon',
-          closeButton: true,
-          progressBar: true,
-        });
-        setToastVisible(true);
-        setPosts(posts.filter(post => post.id !== postId));
-        setSelectedPostId(null);
+      .get()
+      .then(doc => {
+        if (doc.exists) {
+          // 문서가 존재하는 경우에만 삭제 작업 수행
+          doc.ref
+            .update({
+              post_actflag: false,
+            })
+            .then(() => {
+              // 삭제 성공 처리
+              setToastMessage({
+                message: '게시글이 성공적으로 삭제되었습니다!',
+                leftIcon: 'successIcon',
+                closeButton: true,
+                progressBar: true,
+              });
+              setToastVisible(true);
+              setPosts(posts.filter(post => post.id !== postId));
+            })
+            .catch(e => {
+              console.log('게시물을 삭제하는 중에 오류가 발생', e);
+            });
+        } else {
+          console.log('삭제하려는 게시물이 존재하지 않습니다.');
+        }
       })
       .catch(e => {
-        console.log('게시물을 삭제하는 중에 오류가 발생', e);
+        console.log('게시물 존재 여부를 확인하는 중에 오류가 발생', e);
       });
   };
-
+  
+  
   const handleEdit = postId => {
     if (posts) {
       const selectedPost = posts.find(item => item.id === postId);
