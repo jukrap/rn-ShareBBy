@@ -6,36 +6,91 @@ import {
   TouchableOpacity,
   Dimensions,
   StyleSheet,
+  ImageBackground,
 } from 'react-native';
 import ProgressiveImage from './ProgressiveImage';
+import {useFocusEffect} from '@react-navigation/native';
 import {formatDistanceToNow} from 'date-fns';
 import {ko} from 'date-fns/locale';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
+import Modal from 'react-native-modal';
+import {SwiperFlatList} from 'react-native-swiper-flatlist';
+import BottomSheetModal from './BottomSheetModal';
+import ImageDetailModal from './ImageDetailModal';
 
-const PostCard = ({item, onDelete, onPress}) => {
+const {width, height} = Dimensions.get('window');
+
+const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
   const [postUserData, setPostUserData] = useState(null);
-  const [currentUser, setCurrentUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null); //나중에 전부 통일해서 빈문자열로 교체
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(item.likeCount || 0);
+  const likeIcon = isLiked ? heartLineIcon : heartRedIcon;
+  const [commentCount, setCommentCount] = useState(item.commentCount || 0);
+  const [isLikeProcessing, setIsLikeProcessing] = useState(false);
+  const [isMoreContent, setIsMoreContent] = useState(false);
+  const [isImageModalVisible, setIsImageModalVisible] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const colors = ['tomato', 'thistle', 'skyblue', 'teal'];
 
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged(user => {
       setCurrentUser(user);
     });
 
+    fetchPostUserData();
     return () => unsubscribe();
   }, []);
 
-  const isLiked = item.post_like > 0;
-  const likeIcon = isLiked ? heartIcon : heartIcon; //오른쪽에 색 있는 하트 아이콘으로 추후 변경
-
-  // 좋아요 개수 가져오기
-  const getLikeCount = () => {
-    return item.post_like ? `${item.post_like}` : '0';
+  const toggleModal = () => {
+    setIsModalVisible(!isModalVisible);
   };
 
-  // 댓글 개수 가져오기 (TODO: 댓글 카운팅 제작)
-  const getCommentCount = () => {
-    return '0';
+  useFocusEffect(
+    React.useCallback(() => {
+      // 현재 사용자가 해당 게시글에 좋아요를 눌렀는지 확인
+      const checkLikeStatus = async () => {
+        if (currentUser) {
+          const likeDoc = await firestore()
+            .collection('likes')
+            .where('postId', '==', item.id)
+            .where('userId', '==', currentUser.uid)
+            .get();
+
+          if (!likeDoc.empty) {
+            setIsLiked(true);
+          } else {
+            setIsLiked(false);
+          }
+        }
+      };
+      checkLikeStatus();
+      updateLikeCount();
+      updateCommentCount();
+    }, [currentUser, item.id]),
+  );
+  // 좋아요 카운팅 업데이트
+  const updateLikeCount = async () => {
+    const postDoc = await firestore().collection('posts').doc(item.id).get();
+    if (postDoc.exists) {
+      const postData = postDoc.data();
+      setLikeCount(postData.likeCount || 0);
+    }
+  };
+
+  const updateCommentCount = async () => {
+    try {
+      const postDoc = await firestore().collection('posts').doc(item.id).get();
+      if (postDoc.exists) {
+        const postData = postDoc.data();
+        setCommentCount(postData.commentCount || 0);
+      }
+    } catch (error) {
+      console.log('댓글 개수를 가져오는 중에 오류가 발생했습니다:', error);
+    }
   };
 
   // 게시글 작성자 정보 가져오기
@@ -46,33 +101,87 @@ const PostCard = ({item, onDelete, onPress}) => {
         .doc(item.userId)
         .get();
       if (documentSnapshot.exists) {
-        setPostUserData(documentSnapshot.data());
+        const userData = documentSnapshot.data();
+        setPostUserData({
+          profileImage: userData.profileImage,
+          nickname: userData.nickname,
+        });
       }
     } catch (error) {
       console.log('사용자 데이터를 가져오는 중에 오류가 발생했습니다:', error);
     }
   };
 
-  useEffect(() => {
-    fetchPostUserData();
-  }, []);
+  const handleLikePress = async () => {
+    //handleIsLike로 함수명 변경
+    if (currentUser && !isLikeProcessing) {
+      setIsLikeProcessing(true);
+
+      try {
+        if (isLiked) {
+          // 좋아요 취소 처리
+          await firestore()
+            .collection('likes')
+            .where('postId', '==', item.id)
+            .where('userId', '==', currentUser.uid)
+            .get()
+            .then(querySnapshot => {
+              querySnapshot.forEach(doc => {
+                doc.ref.delete();
+              });
+            });
+
+          setIsLiked(false);
+          setLikeCount(prevCount => prevCount - 1);
+
+          await firestore()
+            .collection('posts')
+            .doc(item.id)
+            .update({
+              likeCount: firestore.FieldValue.increment(-1),
+            });
+        } else {
+          // 좋아요 추가 처리
+          await firestore().collection('likes').add({
+            postId: item.id,
+            userId: currentUser.uid,
+            createdAt: firestore.FieldValue.serverTimestamp(),
+          });
+          //try catch 깊이 좀 줄이기 (특정 부분 함수로 빼던지 하기)
+          setIsLiked(true);
+          setLikeCount(prevCount => prevCount + 1);
+
+          await firestore()
+            .collection('posts')
+            .doc(item.id)
+            .update({
+              likeCount: firestore.FieldValue.increment(1),
+            });
+        }
+      } catch (error) {
+        console.log('좋아요 처리 중 오류 발생:', error);
+      }
+
+      setIsLikeProcessing(false);
+    }
+  };
 
   return (
     <View style={styles.card}>
       <View style={styles.userInfoContainer}>
-        <View style={styles.userInfoWrapper}>
+        <TouchableOpacity
+          style={styles.userInfoWrapper}
+          onPress={() => onProfile(item.userId)}>
           <Image
             style={styles.userProfileImage}
-            source={{
-              uri:
-                postUserData?.userImg ||
-                'https://lh5.googleusercontent.com/-b0PKyNuQv5s/AAAAAAAAAAI/AAAAAAAAAAA/AMZuuclxAM4M1SCBGAO7Rp-QP6zgBEUkOQ/s96-c/photo.jpg',
-            }}
+            source={
+              postUserData && postUserData.profileImage
+                ? {uri: postUserData.profileImage}
+                : defaultProfileImg
+            }
           />
           <View style={styles.userInfoTextContainer}>
-            <Text style={styles.userNameText}>
-              {postUserData?.fname || 'Test'} {postUserData?.lname || 'User'}
-            </Text>
+            <Text style={styles.userNameText}>{postUserData?.nickname}</Text>
             <Text style={styles.postTimeText}>
               {formatDistanceToNow(item.post_created.toDate(), {
                 addSuffix: true,
@@ -80,38 +189,63 @@ const PostCard = ({item, onDelete, onPress}) => {
               })}
             </Text>
           </View>
-        </View>
+        </TouchableOpacity>
         <View style={styles.moreIconContainer}>
-          <Image style={styles.moreIcon} resizeMode="cover" source={moreIcon} />
+          <TouchableOpacity onPress={toggleModal}>
+            <Image
+              style={styles.moreIcon}
+              resizeMode="cover"
+              source={moreIcon}
+            />
+          </TouchableOpacity>
         </View>
       </View>
-      <Text style={styles.postContentText} ellipsizeMode="tail">
-        {item.post_content ? item.post_content.slice(0, 300) : ''}
-        {item.post_content && item.post_content.length > 300 && (
-          <>
-            ...{' '}
-            <Text
-              style={styles.readMoreText}
-              onPress={() => {
-                // TODO: 상세 보기 페이지로 이동하는 로직 추가
-                //navigation.navigate("PostDetail", { postId: item.id });
-              }}>
-              더보기
-            </Text>
-          </>
-        )}
-      </Text>
-      {item.post_files && item.post_files.length > 0 ? (
+      <TouchableOpacity onPress={onDetail}>
+        <Text
+          style={styles.postContentText}
+          numberOfLines={2}
+          ellipsizeMode="tail"
+          onTextLayout={({nativeEvent: {lines}}) => {
+            if (lines.length > 2) {
+              setIsMoreContent(true);
+            } else {
+              setIsMoreContent(false);
+            }
+          }}>
+          {item.post_content}
+        </Text>
+        {isMoreContent && <Text style={styles.readMoreText}>...더보기</Text>}
+      </TouchableOpacity>
+      {item?.post_files?.length > 0 ? (
+        //테두리 둥굴게, 이미지 전환을 보다 더 정확하게 하려고 했으나 안 됨
+        //사유: 파이어베이스에서 불러오는 이미지 + 라이브러리 자체가 하드 코딩되어 있음
         <View style={styles.postImageWrapper}>
-          {item.post_files.map((imageUrl, index) => (
-            <ProgressiveImage
-              key={index}
-              defaultImageSource={dummyProfileIcon}
-              source={{uri: imageUrl}}
-              style={styles.postImage}
-              resizeMode="cover"
-            />
-          ))}
+          <SwiperFlatList
+            autoplay
+            autoplayDelay={5}
+            autoplayLoop
+            showPagination
+            paginationDefaultColor="#DBDBDB"
+            paginationActiveColor="#07AC7D"
+            paginationStyleItem={styles.paginationStyleItems}
+            paginationStyleItemActive={styles.paginationStyleItemActives}
+            data={item.post_files}
+            style={styles.postSwiperFlatList}
+            renderItem={({item, index}) => (
+              <TouchableOpacity
+                onPress={() => {
+                  setCurrentImageIndex(index);
+                  setIsImageModalVisible(true);
+                }}>
+                <Image
+                  style={styles.postImage}
+                  source={{uri: item}}
+                  resizeMode="cover"
+                  defaultSource={defaultPostImg}
+                />
+              </TouchableOpacity>
+            )}
+          />
         </View>
       ) : (
         <View style={styles.divider} />
@@ -123,40 +257,78 @@ const PostCard = ({item, onDelete, onPress}) => {
               styles.interactionButton,
               isLiked && styles.activeInteractionButton,
             ]}
-            onPress={() => {}}>
-            <Image source={likeIcon} style={{width: 24, height: 24}} />
+            onPress={handleLikePress}>
+            <Image
+              source={isLiked ? heartRedIcon : heartLineIcon}
+              style={{width: 24, height: 24}}
+            />
             <Text
               style={[
                 styles.interactionText,
                 isLiked && styles.activeInteractionText,
               ]}>
-              {getLikeCount()}
+              {likeCount}
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.interactionButton} onPress={onPress}>
-            <Image source={commentIcon} style={{width: 24, height: 24}} />
-            <Text style={styles.interactionText}>{getCommentCount()}</Text>
+          <TouchableOpacity
+            style={styles.interactionButton}
+            onPress={onComment}>
+            <Image source={commentLineIcon} style={{width: 24, height: 24}} />
+            <Text style={styles.interactionText}>{commentCount}</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.rightInteractionContainer}>
-          {currentUser && currentUser.uid === item.user_id && (
-            <TouchableOpacity
-              style={styles.interactionButton}
-              onPress={() => onDelete(item.id)}>
-              <Image source={shareIcon} style={{width: 24, height: 24}} />
-            </TouchableOpacity>
-          )}
+          <TouchableOpacity style={styles.interactionButton}>
+            <Image source={shareIcon} style={{width: 24, height: 24}} />
+          </TouchableOpacity>
         </View>
       </View>
+      <BottomSheetModal isVisible={isModalVisible} onClose={toggleModal}>
+        <View style={styles.modalContent}>
+          <TouchableOpacity
+            style={styles.modalButton}
+            onPress={() => {
+              onEdit(item.id);
+              toggleModal();
+            }}>
+            <Image source={pencilIcon} style={{width: 24, height: 24}} />
+            <Text style={styles.modalButtonText}>게시글 수정</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.modalButton}
+            onPress={() => {
+              onDelete(item.id);
+              toggleModal();
+            }}>
+            <Image source={deleteIcon} style={{width: 24, height: 24}} />
+            <Text style={styles.modalButtonText}>게시글 삭제</Text>
+          </TouchableOpacity>
+        </View>
+      </BottomSheetModal>
+      {isImageModalVisible && (
+        <ImageDetailModal
+          images={item.post_files}
+          currentIndex={currentImageIndex}
+          isVisible={isImageModalVisible}
+          onClose={() => setIsImageModalVisible(false)}
+        />
+      )}
     </View>
   );
 };
 
 const moreIcon = require('../../assets/icons/moreIcon.png');
-const commentIcon = require('../../assets/icons/commentIcon.png');
-const heartIcon = require('../../assets/icons/heartIcon.png');
+const commentLineIcon = require('../../assets/icons/commentLineIcon.png');
+const commentFillIcon = require('../../assets/icons/commentFillIcon.png');
+const heartLineIcon = require('../../assets/icons/heartLineIcon.png');
+const heartRedIcon = require('../../assets/icons/heartRedIcon.png');
 const shareIcon = require('../../assets/icons/shareIcon.png');
-const dummyProfileIcon = require('../../assets/icons/dummyProfileIcon.png');
+const pencilIcon = require('../../assets/icons/pencilIcon.png');
+const deleteIcon = require('../../assets/icons/deleteIcon.png');
+const defaultPostImg = require('../../assets/images/defaultPostImg.jpg');
+const defaultProfileImg = require('../../assets/images/defaultProfileImg.jpeg');
+
+export default PostCard;
 
 const styles = StyleSheet.create({
   card: {
@@ -230,21 +402,34 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   postImageWrapper: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    marginBottom: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 24,
   },
+  postSwiperFlatList: {},
   postImage: {
-    width: '48%',
-    height: 150,
-    marginBottom: 8,
+    height: height * 0.3,
+    width,
   },
-  
+  paginationStyleItems: {
+    top: 40,
+    width: 4,
+    height: 4,
+    borderRadius: 50,
+    marginHorizontal: 2,
+  },
+  paginationStyleItemActives: {
+    top: 39,
+    width: 6,
+    height: 6,
+    borderRadius: 50,
+    marginHorizontal: 2,
+  },
   divider: {},
   interactionContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    marginTop: 8,
   },
   leftInteractionContainer: {
     flexDirection: 'row',
@@ -274,10 +459,44 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
     fontFamily: 'Pretendard',
+    color: '#A7A7A7',
+    alignSelf: 'flex-start',
+    marginBottom: 8,
+  },
+  modalContainer: {
+    justifyContent: 'flex-end',
+    margin: 0,
+  },
+  modalViewContainer: {
+    backgroundColor: 'white',
+    paddingTop: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  modalContent: {
+    padding: 16,
+  },
+  modalButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#FEFFFE',
+  },
+  modalButtonText: {
+    marginLeft: 8,
+    fontSize: 16,
+    fontFamily: 'Pretendard',
     color: '#898989',
-    textDecorationLine: 'underline',
-    paddingLeft: 20,
+  },
+  modalCloseButton: {
+    backgroundColor: '#FEFFFE',
+    padding: 16,
+    alignItems: 'center',
+  },
+  modalCloseButtonText: {
+    fontSize: 16,
+    fontFamily: 'Pretendard',
+    color: '#212529',
   },
 });
-
-export default PostCard;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   Text,
   View,
@@ -10,10 +10,10 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { signIn } from '../../lib/auth';
+import {signIn} from '../../lib/auth';
 import firestore from '@react-native-firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import useStore from '../../lib/useStore'; // Zustand 스토어 import
+import userStore from '../../lib/userStore';
 
 import {
   onGoogleButtonPress,
@@ -26,23 +26,33 @@ const googleIcon = require('../../assets/icons/google.png');
 
 const LoginTitle = require('../../assets/images/LoginTitle.png');
 
-const Login = ({ navigation }) => {
+const Login = ({navigation}) => {
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
   const [isEmailValid, setIsEmailValid] = useState(false);
 
-  const setUserToken = useStore(state => state.setUserToken); // Zustand 스토어 custom hook 사용
+  const setUserData = userStore(state => state.setUserData); // Zustand 스토어 custom hook 사용
+  const setUserToken = userStore(state => state.setUserToken);
 
   const onSignIn = async () => {
     try {
-      const { user } = await signIn({ email, password });
-      const userCollection = firestore().collection('users');
-      console.log((await userCollection.doc(user.uid).get()).data());
+      const {user} = await signIn({email, password});
+
+      // 사용자의 문서를 가져와서 전체 정보를 가져옴
+      const userDoc = await firestore().collection('users').doc(user.uid).get();
+      const userInfo = userDoc.data();
+
+      // AsyncStorage에 사용자 정보 저장
+      await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
+
+      // Zustand 스토어에 사용자 정보 설정
+      setUserData(userInfo);
+
       await AsyncStorage.setItem('userToken', user.uid);
       setUserToken(user.uid); // Zustand 스토어에 사용자 토큰 설정
+      // navigation을 여기서 호출
       navigation.navigate('BottomTab');
     } catch (e) {
-      console.error('로그인 실패:', e);
       Alert.alert('아이디 또는 비밀번호를 확인해주세요.');
     }
   };
@@ -60,7 +70,7 @@ const Login = ({ navigation }) => {
   };
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1, backgroundColor:'#fff' }}>
+    <KeyboardAvoidingView style={{flex: 1, backgroundColor: '#fff'}}>
       <View style={styles.firstContainer}>
         <View>
           <Image source={LoginTitle} />
@@ -77,7 +87,7 @@ const Login = ({ navigation }) => {
 
           <View style={styles.loginTextInput}>
             <TextInput
-              style={{ paddingLeft: 12 }}
+              style={{paddingLeft: 12}}
               value={email}
               placeholder="아이디를 입력해주세요"
               onChangeText={handleEmailChange}
@@ -90,7 +100,7 @@ const Login = ({ navigation }) => {
 
           <View style={styles.passwordTextInput}>
             <TextInput
-              style={{ paddingLeft: 12 }}
+              style={{paddingLeft: 12}}
               value={password}
               placeholder="비밀번호를 입력해주세요"
               onChangeText={setPassword}
@@ -104,10 +114,9 @@ const Login = ({ navigation }) => {
             onPress={onSignIn}
             style={[
               styles.loginButton,
-              !isEmailValid && { backgroundColor: '#A7A7A7' },
+              !isEmailValid && {backgroundColor: '#A7A7A7'},
             ]}
-            disabled={!isEmailValid}
-          >
+            disabled={!isEmailValid}>
             <Text style={styles.loginButtonText}>로그인</Text>
           </TouchableOpacity>
 
@@ -119,17 +128,15 @@ const Login = ({ navigation }) => {
               <View style={styles.searchBar} />
             </View>
             <TouchableOpacity
-              onPress={() => navigation.navigate('SearchPassword')}
-            >
+              onPress={() => navigation.navigate('SearchPassword')}>
               <Text style={styles.searchPassword}>비밀번호 찾기</Text>
             </TouchableOpacity>
           </View>
 
           <TouchableOpacity
             onPress={() => navigation.navigate('SignUp')}
-            style={styles.signInButton}
-          >
-            <Text style={styles.signInText}>Are You Ready 가입하기</Text>
+            style={styles.signInButton}>
+            <Text style={styles.signInText}>ShareBBy 가입하기</Text>
           </TouchableOpacity>
 
           <View style={styles.orContainer}>
@@ -177,7 +184,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   loginTextInput: {
-    backgroundColor: '#d9d9d9',
+    backgroundColor: '#d3d3d3',
     borderRadius: 10,
     flex: Platform.OS === 'android' ? 0.15 : 0.12,
     justifyContent: 'center',

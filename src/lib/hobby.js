@@ -1,9 +1,8 @@
-import firestore from '@react-native-firebase/firestore';
+import firestore, { query, collection, getDocs, orderBy, startAt, endAt } from '@react-native-firebase/firestore';
 
 export const hobbiesCollection = firestore().collection('hobbies');
 
-
-export function recruitHobby({
+export async function recruitHobby({
     user_id,
     nickname,
     latitude,
@@ -16,9 +15,9 @@ export function recruitHobby({
     title,
     content,
     writeTime,
+
 }) {
-    // Add a new document with a generated id.
-    return hobbiesCollection.add({
+    const res = await hobbiesCollection.add({
         user_id,
         nickname,
         latitude,
@@ -31,16 +30,20 @@ export function recruitHobby({
         title,
         content,
         writeTime,
+        personNumber: 1
     })
-        .then((docRef) => {
-            // console.log("Document written with ID: ", docRef);
-        })
-        .catch((error) => {
-            console.error("Error adding document: ", error);
-        });
+    return res._documentPath._parts[1];
 }
 
 export async function getHobbies() {
     const doc = await hobbiesCollection.get();
-    return doc._docs;
+    return doc.docs;
 }
+
+export async function getNearHobbies(userAddress) {
+    const querySnapshot = await getDocs(query(hobbiesCollection, orderBy('address'), startAt(userAddress), endAt(userAddress+'\uf8ff')));
+    return querySnapshot.docs.map((data) => ({
+        id: data._ref._documentPath._parts[1],
+        data: data
+    }));
+} 

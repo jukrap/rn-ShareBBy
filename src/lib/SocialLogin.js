@@ -7,7 +7,7 @@ import {WEB_CLIENT_ID} from '@env';
 import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import useStore from './useStore';
+import userStore from './userStore';
 
 // 네이버 로그인 초기화
 const initializeNaverLogin = async () => {
@@ -49,7 +49,7 @@ export const handleNaverLogin = async navigation => {
     await initializeNaverLogin();
     const result = await NaverLogin.login();
     if (result) {
-      useStore.setState({userToken: 'accessToken'});
+      userStore.setState({userToken: 'accessToken'});
       await getNaverProfiles(navigation);
     } else {
       Alert.alert('네이버 로그인 실패', '네이버 로그인에 실패하였습니다.');
@@ -125,6 +125,7 @@ export const onGoogleButtonPress = async navigation => {
       const profileImageUrl = await storage()
         .ref('dummyprofile.png')
         .getDownloadURL();
+
       await firestore().collection('users').doc(user.uid).set({
         id: user.uid,
         email: email,
@@ -152,7 +153,7 @@ export const kakaoLogins = async navigation => {
     const result = await KakaoLogin.login();
     if (result) {
       await getKakaoProfile(navigation);
-      useStore.setState({userToken: 'user.uid'});
+      userStore.setState({userToken: 'user.uid'});
     } else {
       Alert.alert('카카오 로그인 실패', '카카오 로그인에 실패했습니다.');
     }
@@ -192,12 +193,18 @@ const registerKakaoUser = async (profile, navigation) => {
       .ref('dummyprofile.png')
       .getDownloadURL();
 
-    await firestore().collection('users').doc(user.uid).set({
+    // 사용자 정보를 하나의 객체로 묶어서 AsyncStorage에 저장
+    const userInfo = {
       id: user.uid,
       email: profile.email,
       nickname: profile.nickname,
       profileImage: profileImageUrl,
-    });
+    };
+    await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo)); // JSON 문자열로 변환하여 저장
+
+    await firestore().collection('users').doc(user.uid).set(userInfo); // Firestore에도 저장
+
+    // 사용자 토큰 저장 및 화면 전환
     await AsyncStorage.setItem('userToken', user.uid);
     navigation.navigate('BottomTab');
   } catch (error) {

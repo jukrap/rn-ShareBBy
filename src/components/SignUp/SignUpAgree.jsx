@@ -5,13 +5,11 @@ import {
   StyleSheet,
   SafeAreaView,
   TouchableOpacity,
-  Dimensions,
 } from 'react-native';
 
 import CheckBox from './CheckBox';
 
 const SignUpAgree = ({onNextStep, navigation}) => {
-  const {width, height} = Dimensions.get('window');
   const [isNextEnabled, setIsNextEnabled] = useState(false);
   const [checkboxState, setCheckboxState] = useState({});
 
@@ -23,7 +21,6 @@ const SignUpAgree = ({onNextStep, navigation}) => {
   };
 
   const handleNextStep = () => {
-    console.log('checkboxState:', checkboxState);
     onNextStep({checkboxState});
   };
 
