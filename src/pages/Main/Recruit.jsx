@@ -12,7 +12,7 @@ const LATITUDE_DELTA = 0.05;
 const LONGITUDE_DELTA = LATITUDE_DELTA * (width / height);
 
 const Recruit = ({ navigation, route }) => {
-    const { id, nickname} = route.params
+    const { id, nickname, profileImage} = route.params
     const mapView = useRef(null);
 
     const [initialRegion, setInitialRegion] = useState({
@@ -25,8 +25,9 @@ const Recruit = ({ navigation, route }) => {
         pickAddress: '',
         pickLatitude: '',
         pickLongitude: '',
-        id : id,
-        nickname : nickname,
+        id,
+        nickname,
+        profileImage,
     });
     const [location, setLocation] = useState();
     const [hobbiesData, setHobbiesData] = useState([]);

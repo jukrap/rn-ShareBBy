@@ -23,9 +23,8 @@ const {width, height} = Dimensions.get('window');
 
 const Detail = ({route, navigation}) => {
   const userData = route.params;
-  const {pickAddress, pickLatitude, pickLongitude, id, nickname, profileImage} =
-    userData;
-
+  console.log(route.params);
+  const {pickAddress, pickLatitude, pickLongitude, id, nickname, profileImage} = userData;
   const writeTime = new Date(); // 내가 쓴 모집글 시간을 저장
   const [date, setDate] = useState(new Date());
   const [isDateModal, setIsDateModal] = useState(false);
@@ -650,5 +649,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
-
 export default Detail;
