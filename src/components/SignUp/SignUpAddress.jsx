@@ -8,6 +8,7 @@ import {
   TextInput,
   Alert,
   KeyboardAvoidingView,
+  Image
 } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
@@ -15,15 +16,20 @@ import Postcode from '@actbase/react-daum-postcode';
 import storage from '@react-native-firebase/storage';
 const {width} = Dimensions.get('window');
 
+const addressSearch = require('../../assets/icons/addressSearch.png')
+
 const SignUpAddress = ({
   navigation,
   checkboxState,
   email,
   nickname,
   password,
+  showPostcode,
+  setShowPostcode
+  
 }) => {
   const [address, setAddress] = useState('');
-  const [showPostcode, setShowPostcode] = useState(false);
+
 
   // 주소 입력 시 state 업데이트
   const handleChangeAddress = text => {
@@ -83,8 +89,9 @@ const SignUpAddress = ({
               <Text style={styles.text}>주소를 선택해주세요.</Text>
             </View>
           </View>
-
-          <View style={{flexDirection: 'row'}}>
+          <TouchableOpacity onPress={() => setShowPostcode(true)} style={{flexDirection: 'row', borderBottomWidth: 2, borderColor: '#07AC7D',  marginHorizontal:16 }}>
+            <Image style={{width:21, height:21}} source={addressSearch}/>
+            
             <TextInput
               style={styles.addressTextInput}
               placeholder="지번, 도로명, 건물명으로 검색"
@@ -95,9 +102,10 @@ const SignUpAddress = ({
               onChangeText={handleChangeAddress}
               onPress={() => setShowPostcode(true)}
             />
-          </View>
+            
+          </TouchableOpacity>
+          
         </View>
-
         <View>
           <TouchableOpacity
             style={[styles.button, {backgroundColor: '#07AC7D'}]}
@@ -136,11 +144,8 @@ const styles = StyleSheet.create({
   },
   addressTextInput: {
     width: width * 0.92,
-    borderBottomWidth: 2,
-    borderColor: '#07AC7D',
-    marginHorizontal: 16,
+    marginHorizontal: 8,
     paddingBottom: 8,
-    marginBottom: 40,
     fontSize: 16,
     fontWeight: 'bold',
   },

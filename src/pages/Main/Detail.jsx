@@ -111,7 +111,7 @@ const Detail = ({route, navigation}) => {
 
   const createGroupChat = async hobbiesId => {
     try {
-      const chatRoomRef = await firestore()
+       await firestore()
         .collection('chatRooms')
         .add({
           name: detailContent.showTitle,

@@ -36,7 +36,7 @@ const EditProfile = ({navigation, route}) => {
   };
   const UploadImage = async uri => {
     const reference = storage().ref(
-      `gs://sharebby-4d82f.appspot.com/${route.params.uuid}.png`,
+      `gs://sharebbyteam.appspot.com/${route.params.uuid}.png`,
     );
     await reference.putFile(
       Platform.OS === 'ios' ? uri.replace('file://', '') : uri,

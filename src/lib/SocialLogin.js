@@ -3,7 +3,6 @@ import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import * as KakaoLogin from '@react-native-seoul/kakao-login';
 import NaverLogin from '@react-native-seoul/naver-login';
 import auth from '@react-native-firebase/auth';
-import {WEB_CLIENT_ID} from '@env';
 import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -32,11 +31,13 @@ const initializeGoogleLogin = async () => {
       clientId =
         '415237944833-6hfq4ebokd06cku8s4datrda9l03p4cv.apps.googleusercontent.com';
     } else if (Platform.OS === 'ios') {
-      clientId = WEB_CLIENT_ID;
+      clientId =
+        '323952205702-q70ds1r3dieu2l4clkb5ohnbnonskjem.apps.googleusercontent.com';
     }
 
     await GoogleSignin.configure({
-      webClientId: clientId,
+      webClientId:
+        '323952205702-q70ds1r3dieu2l4clkb5ohnbnonskjem.apps.googleusercontent.com',
     });
   } catch (error) {
     console.error('구글 로그인 설정 오류:', error);
@@ -90,12 +91,19 @@ const getNaverProfiles = async navigation => {
         'temporary_password',
       );
 
-      await firestore().collection('users').doc(user.uid).set({
+      // 사용자 정보를 AsyncStorage에 저장
+      const userInfo = {
         id: user.uid,
         email: profileData.response.email,
         nickname: profileData.response.nickname,
         profileImage: profileImageUrl,
-      });
+      };
+      await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
+
+      // Firestore에 사용자 정보 저장
+      await firestore().collection('users').doc(user.uid).set(userInfo);
+
+      // 사용자 토큰 및 화면 전환
       await AsyncStorage.setItem('userToken', user.uid);
       navigation.navigate('BottomTab');
     } else {
@@ -106,6 +114,7 @@ const getNaverProfiles = async navigation => {
     }
   } catch (error) {
     Alert.alert('네이버 로그인 오류', '이미 사용 중인 이메일입니다.');
+    console.log(error);
   }
 };
 
@@ -126,12 +135,19 @@ export const onGoogleButtonPress = async navigation => {
         .ref('dummyprofile.png')
         .getDownloadURL();
 
-      await firestore().collection('users').doc(user.uid).set({
+      // 사용자 정보를 AsyncStorage에 저장
+      const userInfo = {
         id: user.uid,
         email: email,
         nickname: displayName,
         profileImage: profileImageUrl,
-      });
+      };
+      await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
+
+      // Firestore에 사용자 정보 저장
+      await firestore().collection('users').doc(user.uid).set(userInfo);
+
+      // 사용자 토큰 및 화면 전환
       await AsyncStorage.setItem('userToken', user.uid);
       navigation.navigate('BottomTab');
     } else {
@@ -209,5 +225,6 @@ const registerKakaoUser = async (profile, navigation) => {
     navigation.navigate('BottomTab');
   } catch (error) {
     Alert.alert('오류', '사용자 등록 및 정보 저장 중 오류가 발생했습니다.');
+    console.log(error);
   }
 };
