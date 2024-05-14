@@ -72,7 +72,7 @@ const ImageSlider = ({images, autoSlide = false, autoSlideInterval = 3000}) => {
         source={{
           url: item,
           priority: 'high',
-          cachePolicy: 'discWithCacheControl',
+          cachePolicy: 'memory',
           failureImageUrl: defaultPostImg,
           resizeMode: 'cover',
         }}
@@ -83,12 +83,15 @@ const ImageSlider = ({images, autoSlide = false, autoSlideInterval = 3000}) => {
   const renderPaginationItem = (_, index) => (
     <TouchableOpacity
       key={index}
-      style={[
-        styles.paginationItem,
-        index === currentIndex && styles.paginationItemActive,
-      ]}
       onPress={() => handlePaginationPress(index)}
-    />
+      style={styles.paginationItemContainer}>
+      <View
+        style={[
+          styles.paginationItem,
+          index === currentIndex && styles.paginationItemActive,
+        ]}
+      />
+    </TouchableOpacity>
   );
 
   return (
@@ -168,11 +171,16 @@ const styles = StyleSheet.create({
     height: 4,
     borderRadius: 50,
     backgroundColor: '#DBDBDB',
-    marginHorizontal: 3,
   },
   paginationItemActive: {
     width: 6,
     height: 6,
     backgroundColor: '#07AC7D',
+  },
+  paginationItemContainer: {
+    width: 12,
+    height: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
