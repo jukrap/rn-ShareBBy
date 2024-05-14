@@ -83,7 +83,7 @@ const Join = ({ navigation, route }) => {
     }
 
     const deadLineHobbiesData = (data) => {
-        const deadlineData = data.filter(v => dayjs(v.data._data.deadline).diff(now, 'days') >= 0)
+        const deadlineData = data.filter(v => dayjs(v.data._data.deadline).diff(now, 'days') > 0)
         setCurrentData(deadlineData)
     }
 
