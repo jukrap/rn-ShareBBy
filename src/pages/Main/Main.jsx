@@ -18,7 +18,7 @@ import userStore from '../../lib/userStore';
 
 const {width, height} = Dimensions.get('window');
 
-const dufaultProfile = require('../../assets/images/goJoin.png');
+
 
 // OptimizedImageItem 컴포넌트를 메모이제이션해서 성능 향상
 const OptimizedImageItem = React.memo(({item}) => {
@@ -262,7 +262,7 @@ const Main = ({navigation}) => {
         </View>
         <View style={styles.divisionView} />
 
-        <View style={styles.joinBox}>
+        {/* <View style={styles.joinBox}>
           <Text style={[styles.nomalText, {fontSize: 16, fontWeight: '600'}]}>
             이달의 인기왕 🔥
           </Text>
@@ -281,7 +281,7 @@ const Main = ({navigation}) => {
                     uri:
                       secondPlace && secondPlace.imageUrl
                         ? secondPlace.imageUrl
-                        : dufaultProfile,
+                        : goRecruit,
                   }} 
                   style={{borderRadius: 25, width: 50, height: 50}}
                 />
@@ -300,7 +300,7 @@ const Main = ({navigation}) => {
                     uri:
                       firstPlace && firstPlace.imageUrl
                         ? firstPlace.imageUrl
-                        : dufaultProfile,
+                        : goRecruit,
                   }}
                   style={{borderRadius: 25, width: 50, height: 50}}
                 />
@@ -319,7 +319,7 @@ const Main = ({navigation}) => {
                     uri:
                       thirdPlace && thirdPlace.imageUrl
                         ? thirdPlace.imageUrl
-                        : dufaultProfile,
+                        : goRecruit,
                   }}
                   style={{borderRadius: 25, width: 50, height: 50}}
                 />
@@ -346,7 +346,7 @@ const Main = ({navigation}) => {
                     uri:
                       foursPlace && foursPlace.imageUrl
                         ? foursPlace.imageUrl
-                        : dufaultProfile,
+                        : goRecruit,
                   }}
                   style={{width: 36, height: 36, borderRadius: 18}}
                 />
@@ -363,7 +363,7 @@ const Main = ({navigation}) => {
                     uri:
                       fifthPlace && fifthPlace.imageUrl
                         ? fifthPlace.imageUrl
-                        : dufaultProfile,
+                        : goRecruit,
                   }}
                   style={{width: 36, height: 36, borderRadius: 18}}
                 />
@@ -381,7 +381,7 @@ const Main = ({navigation}) => {
                       uri:
                         sixthPlace && sixthPlace.imageUrl
                           ? sixthPlace.imageUrl
-                          : dufaultProfile,
+                          : goRecruit,
                     }}
                     style={{width: 36, height: 36, borderRadius: 18}}
                   />
@@ -394,7 +394,7 @@ const Main = ({navigation}) => {
               )}
             </View>
           </View>
-        </View>
+        </View> */}
       </ScrollView>
     </SafeAreaView>
   );
