@@ -23,9 +23,13 @@ import {ko} from 'date-fns/locale';
 import Modal from 'react-native-modal';
 import {useNavigation} from '@react-navigation/native';
 import {SwiperFlatList} from 'react-native-swiper-flatlist';
+import {FasterImageView} from '@candlefinance/faster-image';
 import BottomSheetModal from '../../components/Community/BottomSheetModal';
 import CommunityHeader from '../../components/Community/CommunityHeader';
 import ImageDetailModal from '../../components/Community/ImageDetailModal';
+import ImageSlider from '../../components/Community/ImageSlider';
+import CommunityActionToast from '../../components/Community/CommunityActionToast';
+import CommunityActionModal from '../../components/Community/CommunityActionModal';
 
 const {width, height} = Dimensions.get('window');
 
@@ -48,6 +52,23 @@ const CommunityPostDetail = ({route}) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [lastVisible, setLastVisible] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalMessage, setModalMessage] = useState({
+    title: '',
+    modalText: '',
+    iconSource: null,
+    showConfirmButton: false,
+    onConfirm: null,
+    onCancel: null,
+  });
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState({
+    message: '',
+    leftIcon: '',
+    closeButton: true,
+    progressBar: true,
+  });
 
   const maxCommentContentLength = 200;
 
@@ -257,7 +278,13 @@ const CommunityPostDetail = ({route}) => {
       if (commentContent && commentContent.trim() !== '') {
         submitComment();
       } else {
-        Alert.alert('댓글 내용을 입력해주세요.');
+        setToastMessage({
+          message: '댓글 내용을 입력해주세요.',
+          leftIcon: 'cautionIcon',
+          closeButton: true,
+          progressBar: true,
+        });
+        setToastVisible(true);
       }
     }
   }, [commentContent, editingCommentId, submitComment, updateComment]);
@@ -271,11 +298,13 @@ const CommunityPostDetail = ({route}) => {
 
   const submitComment = async () => {
     if (!commentContent || commentContent.trim() === '') {
-      Alert.alert('댓글 내용을 입력해주세요.');
-      return;
-    }
-    if (!currentUser) {
-      console.log('사용자가 로그인되어 있지 않습니다.');
+      setToastMessage({
+        message: '댓글 내용을 입력해주세요.',
+        leftIcon: 'cautionIcon',
+        closeButton: true,
+        progressBar: true,
+      });
+      setToastVisible(true);
       return;
     }
 
@@ -291,7 +320,13 @@ const CommunityPostDetail = ({route}) => {
         });
 
       console.log('댓글 업로드 완료!');
-      Alert.alert('댓글 업로드!', '성공적으로 댓글이 업로드됐습니다!');
+      setToastMessage({
+        message: '댓글이 등록되었습니다.',
+        leftIcon: 'successIcon',
+        closeButton: true,
+        progressBar: true,
+      });
+      setToastVisible(true);
       setCommentContent('');
 
       // 댓글 개수 업데이트
@@ -313,34 +348,43 @@ const CommunityPostDetail = ({route}) => {
   };
 
   const handleDelete = () => {
-    const selectedPost = posts;
-    if (
-      selectedPost &&
-      currentUser &&
-      currentUser.uid === selectedPost.userId
-    ) {
-      Alert.alert(
-        '게시글 삭제',
-        '해당 게시글을 삭제하겠습니까?',
-        [
-          {
-            text: '아니오',
-            onPress: () => console.log('아니오를 클릭'),
-            style: 'cancel',
+    if (posts) {
+      const selectedPost = posts;
+      if (
+        selectedPost &&
+        currentUser &&
+        currentUser.uid === selectedPost.userId
+      ) {
+        setModalMessage({
+          title: '게시글 삭제',
+          modalText: '해당 게시글을 삭제하겠습니까?',
+          iconSource: require('../../assets/icons/warningIcon.png'),
+          showConfirmButton: false,
+          onConfirm: () => {
+            deletePost();
+            setModalVisible(false);
           },
-          {
-            text: '네',
-            onPress: () => deletePost(),
+          onCancel: () => {
+            setModalVisible(false);
           },
-        ],
-        {cancelable: false},
-      );
-    } else {
-      Alert.alert('권한 없음', '게시글 작성자만 삭제할 수 있습니다.');
+        });
+        setModalVisible(true);
+      } else {
+        setModalMessage({
+          title: '권한 없음',
+          modalText: '게시글 작성자만 삭제할 수 있습니다.',
+          iconSource: require('../../assets/icons/warningIcon.png'),
+          showConfirmButton: true,
+          onConfirm: () => {
+            setModalVisible(false);
+          },
+        });
+        setModalVisible(true);
+      }
     }
   };
 
-  const deletePost = async () => {
+  const deletePost = () => {
     firestore()
       .collection('posts')
       .doc(postId)
@@ -348,7 +392,13 @@ const CommunityPostDetail = ({route}) => {
         post_actflag: false,
       })
       .then(() => {
-        Alert.alert('게시글 삭제', '게시글이 성공적으로 삭제되었습니다!');
+        setToastMessage({
+          message: '게시글이 삭제되었습니다.',
+          leftIcon: 'successIcon',
+          closeButton: true,
+          progressBar: true,
+        });
+        setToastVisible(true);
         navigation.goBack();
       })
       .catch(e => {
@@ -365,7 +415,16 @@ const CommunityPostDetail = ({route}) => {
     ) {
       editPost();
     } else {
-      Alert.alert('권한 없음', '게시글 작성자만 수정할 수 있습니다.');
+      setModalMessage({
+        title: '권한 없음',
+        modalText: '게시글 작성자만 수정할 수 있습니다.',
+        iconSource: require('../../assets/icons/warningIcon.png'),
+        showConfirmButton: true,
+        onConfirm: () => {
+          setModalVisible(false);
+        },
+      });
+      setModalVisible(true);
     }
   };
 
@@ -381,35 +440,47 @@ const CommunityPostDetail = ({route}) => {
         currentUser &&
         currentUser.uid === selectedComment.userId
       ) {
-        Alert.alert(
-          '댓글 삭제',
-          '해당 댓글을 삭제하겠습니까?',
-          [
-            {
-              text: '아니오',
-              onPress: () => console.log('아니오를 클릭'),
-              style: 'cancel',
-            },
-            {
-              text: '네',
-              onPress: () => deleteComment(commentId),
-            },
-          ],
-          {cancelable: false},
-        );
+        setModalMessage({
+          title: '댓글 삭제',
+          modalText: '해당 댓글을 삭제하겠습니까?',
+          iconSource: require('../../assets/icons/warningIcon.png'),
+          showConfirmButton: false,
+          onConfirm: () => {
+            deleteComment(commentId);
+            setModalVisible(false);
+          },
+          onCancel: () => {
+            setModalVisible(false);
+          },
+        });
+        setModalVisible(true);
       } else {
-        Alert.alert('권한 없음', '댓글 작성자만 삭제할 수 있습니다.');
+        setModalMessage({
+          title: '권한 없음',
+          modalText: '댓글 작성자만 삭제할 수 있습니다.',
+          iconSource: require('../../assets/icons/warningIcon.png'),
+          showConfirmButton: true,
+          onConfirm: () => {
+            setModalVisible(false);
+          },
+        });
+        setModalVisible(true);
       }
     }
   };
-
   const deleteComment = async commentId => {
     try {
       await firestore().collection('comments').doc(commentId).update({
         comment_actflag: false,
       });
 
-      Alert.alert('댓글 삭제', '댓글이 성공적으로 삭제되었습니다!');
+      setToastMessage({
+        message: '댓글이 삭제되었습니다.',
+        leftIcon: 'successIcon',
+        closeButton: true,
+        progressBar: true,
+      });
+      setToastVisible(true);
 
       // 댓글 개수 업데이트
       await firestore()
@@ -437,7 +508,16 @@ const CommunityPostDetail = ({route}) => {
         setEditingCommentId(commentId);
         setCommentContent(selectedComment.comment_content);
       } else {
-        Alert.alert('권한 없음', '댓글 작성자만 수정할 수 있습니다.');
+        setModalMessage({
+          title: '권한 없음',
+          modalText: '댓글 작성자만 수정할 수 있습니다.',
+          iconSource: require('../../assets/icons/warningIcon.png'),
+          showConfirmButton: true,
+          onConfirm: () => {
+            setModalVisible(false);
+          },
+        });
+        setModalVisible(true);
       }
     }
   };
@@ -454,7 +534,13 @@ const CommunityPostDetail = ({route}) => {
       });
 
       console.log('댓글 수정 완료!');
-      Alert.alert('댓글 수정!', '성공적으로 댓글이 수정되었습니다!');
+      setToastMessage({
+        message: '성공적으로 댓글이 수정되었습니다!',
+        leftIcon: 'successIcon',
+        closeButton: true,
+        progressBar: true,
+      });
+      setToastVisible(true);
       setCommentContent('');
       setEditingCommentId(null);
       fetchComments();
@@ -476,13 +562,16 @@ const CommunityPostDetail = ({route}) => {
       <View style={styles.postInContainer}>
         <View style={styles.userInfoContainer}>
           <View style={styles.userInfoWrapper}>
-            <Image
-              style={styles.userProfileImage}
-              source={
-                postUserData.profileImage
-                  ? {uri: postUserData.profileImage}
-                  : defaultProfileImg
-              }
+            <FasterImageView
+              style={[styles.userProfileImage, {overflow: 'hidden'}]}
+              source={{
+                url: postUserData?.profileImage,
+                priority: 'high',
+                cachePolicy: 'discWithCacheControl',
+                failureImageUrl: defaultProfileImg,
+                resizeMode: 'cover',
+                borderRadius: 50,
+              }}
             />
             <View style={styles.userInfoTextContainer}>
               <Text style={styles.userNameText}>{postUserData.nickname}</Text>
@@ -507,32 +596,7 @@ const CommunityPostDetail = ({route}) => {
         <Text style={styles.postContentText}>{posts.post_content}</Text>
         {posts?.post_files?.length > 0 ? (
           <View style={styles.postImageWrapper}>
-            <SwiperFlatList
-              autoplay
-              autoplayDelay={5}
-              autoplayLoop
-              showPagination
-              paginationDefaultColor="#DBDBDB"
-              paginationActiveColor="#07AC7D"
-              paginationStyleItem={styles.paginationStyleItems}
-              paginationStyleItemActive={styles.paginationStyleItemActives}
-              data={posts.post_files}
-              style={styles.postSwiperFlatList}
-              renderItem={({item, index}) => (
-                <TouchableOpacity
-                  onPress={() => {
-                    setCurrentImageIndex(index);
-                    setIsImageModalVisible(true);
-                  }}>
-                  <Image
-                    style={styles.postImage}
-                    source={{uri: item}}
-                    resizeMode="cover"
-                    defaultSource={defaultPostImg}
-                  />
-                </TouchableOpacity>
-              )}
-            />
+            <ImageSlider images={posts.post_files} autoSlide={false} />
           </View>
         ) : (
           <View style={styles.divider} />
@@ -593,29 +657,28 @@ const CommunityPostDetail = ({route}) => {
   );
 
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : null}
+      keyboardVerticalOffset={8}
+      style={{flex: 1, backgroundColor: '#FEFFFE'}}>
       <CommunityHeader title={'게시글'} />
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={48}
-        style={{flex: 1, backgroundColor: 'white'}}>
-        <FlatList
-          data={comments}
-          ListHeaderComponent={renderPostContent}
-          ListEmptyComponent={renderEmptyComment}
-          renderItem={({item}) => (
-            <CommentCard
-              item={item}
-              onDelete={() => handleCommentDelete(item.id)}
-              onEdit={() => handleCommentEdit(item.id)}
-            />
-          )}
-          keyExtractor={(item, index) => item.id || index.toString()}
-          onEndReached={fetchMoreComments}
-          onEndReachedThreshold={0.5}
-          ListFooterComponent={renderFooter}
-          style={styles.container}
-        />
+      <FlatList
+        data={comments}
+        ListHeaderComponent={renderPostContent}
+        ListEmptyComponent={renderEmptyComment}
+        renderItem={({item}) => (
+          <CommentCard
+            item={item}
+            onDelete={() => handleCommentDelete(item.id)}
+            onEdit={() => handleCommentEdit(item.id)}
+          />
+        )}
+        keyExtractor={(item, index) => item.id || index.toString()}
+        onEndReached={fetchMoreComments}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={renderFooter}
+        style={styles.container}
+      />
         <View style={styles.commentInputContainer}>
           <TextInput
             style={styles.commentInput}
@@ -633,31 +696,48 @@ const CommunityPostDetail = ({route}) => {
               source={planeMessageIcon}
             />
           </TouchableOpacity>
-          <BottomSheetModal isVisible={isModalVisible} onClose={toggleModal}>
-            <View style={styles.modalContent}>
-              <TouchableOpacity
-                style={styles.modalButton}
-                onPress={() => {
-                  handleEdit();
-                  toggleModal();
-                }}>
-                <Image source={pencilIcon} style={{width: 24, height: 24}} />
-                <Text style={styles.modalButtonText}>게시글 수정</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.modalButton}
-                onPress={() => {
-                  handleDelete();
-                  toggleModal();
-                }}>
-                <Image source={deleteIcon} style={{width: 24, height: 24}} />
-                <Text style={styles.modalButtonText}>게시글 삭제</Text>
-              </TouchableOpacity>
-            </View>
-          </BottomSheetModal>
         </View>
+      <BottomSheetModal isVisible={isModalVisible} onClose={toggleModal}>
+        <View style={styles.modalContent}>
+          <TouchableOpacity
+            style={styles.modalButton}
+            onPress={() => {
+              handleEdit();
+              toggleModal();
+            }}>
+            <Image source={pencilIcon} style={{width: 24, height: 24}} />
+            <Text style={styles.modalButtonText}>게시글 수정</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.modalButton}
+            onPress={() => {
+              handleDelete();
+              toggleModal();
+            }}>
+            <Image source={deleteIcon} style={{width: 24, height: 24}} />
+            <Text style={styles.modalButtonText}>게시글 삭제</Text>
+          </TouchableOpacity>
+        </View>
+      </BottomSheetModal>
+      <CommunityActionToast
+        visible={toastVisible}
+        message={toastMessage.message}
+        duration={7000}
+        onClose={() => setToastVisible(false)}
+        leftIcon={toastMessage.leftIcon}
+        closeButton={toastMessage.closeButton}
+        progressBar={toastMessage.progressBar}
+      />
+      <CommunityActionModal
+        isVisible={modalVisible}
+        onConfirm={modalMessage.onConfirm}
+        onCancel={modalMessage.onCancel}
+        title={modalMessage.title}
+        modalText={modalMessage.modalText}
+        iconSource={modalMessage.iconSource}
+        showConfirmButton={modalMessage.showConfirmButton}
+      />
       </KeyboardAvoidingView>
-    </SafeAreaView>
   );
 };
 
@@ -726,9 +806,7 @@ const styles = StyleSheet.create({
   },
 
   postImageWrapper: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 32,
+    marginBottom: 8,
   },
   postSwiperFlatList: {},
   postImage: {
