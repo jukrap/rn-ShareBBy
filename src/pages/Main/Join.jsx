@@ -104,9 +104,9 @@ const Join = ({ navigation, route }) => {
         const centerAddress = await userFetchAddress(latitude, longitude)
         const centerGu = centerAddress.split(" ", 3).join(" ");
         const finalHobbiesData = await getNearHobbies(centerGu);
-        // console.log(finalHobbiesData);
+
         const deadlineData = finalHobbiesData.filter(v => dayjs(v.data._data.deadline).diff(now, 'days') > 0)
-        console.log(deadlineData);
+        console.log(centerGu);
         setHobbiesData(deadlineData)
 
     }
@@ -233,7 +233,7 @@ const Join = ({ navigation, route }) => {
                 minZoom={15}
             >
                 {
-                    currentData.map(v => renderMarker(v))
+                    hobbiesData.map(v => renderMarker(v))
                 }
             </NaverMapView>
         </SafeAreaView>
