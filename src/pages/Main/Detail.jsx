@@ -18,6 +18,7 @@ import firestore from '@react-native-firebase/firestore';
 
 import {recruitHobby, getHobbies} from '../../lib/hobby';
 import Tobbar from '../../components/Main/TobTab';
+import { StackActions } from '@react-navigation/native';
 
 const {width, height} = Dimensions.get('window');
 
@@ -120,6 +121,7 @@ const Detail = ({route, navigation}) => {
         });
       setSelectedUsers([]);
       console.log('채팅방 생성됨');
+      navigation.dispatch(StackActions.popToTop());
       navigation.navigate('BottomTab', {screen: '채팅'});
     } catch (error) {
       console.error('Error: ', error);
