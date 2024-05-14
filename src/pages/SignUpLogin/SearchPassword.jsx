@@ -13,11 +13,14 @@ import {
 
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore'; // firestore import 추가
+import Toast from '../../components/Main/Toast';
 
 const backIcon = require('../../assets/icons/back.png');
 
 const SearchPassword = ({navigation}) => {
   const [email, setEmail] = useState('');
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
 
   const handleResetPassword = async () => {
     if (!validateEmail(email)) {
@@ -31,18 +34,22 @@ const SearchPassword = ({navigation}) => {
         .where('email', '==', email)
         .get();
       if (userSnapshot.empty) {
-        Alert.alert('이메일 없음', '해당 이메일 주소가 존재하지 않습니다.');
+        setToastMessage('해당 이메일 주소가 존재하지 않습니다.');
+        setShowToast(true);
+        setTimeout(() => setShowToast(false), 3000);
         return;
       }
       // 이메일이 존재하면 비밀번호 재설정 이메일 전송
       await auth().sendPasswordResetEmail(email);
-      Alert.alert('이메일 전송 성공', '비밀번호 재설정 이메일을 전송했습니다.');
+      setToastMessage('비밀번호 재설정 이메일을 전송했습니다.');
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
     } catch (error) {
       console.error('비밀번호 재설정 이메일 전송 오류:', error);
-      Alert.alert(
-        '이메일 전송 실패',
-        '비밀번호 재설정 이메일 전송 중 오류가 발생했습니다.',
-      );
+
+      setToastMessage('비밀번호 재설정 이메일 전송 중 오류가 발생했습니다.');
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
     }
   };
 
@@ -53,41 +60,48 @@ const SearchPassword = ({navigation}) => {
 
   return (
     <SafeAreaView style={{flex: 1}}>
-    <KeyboardAvoidingView
-    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    keyboardVerticalOffset={1}
-    style={{flex:1}}>
-      <TouchableOpacity
-        style={styles.backIcon}
-        onPress={() => navigation.goBack()}>
-        <Image source={backIcon} />
-      </TouchableOpacity>
-      <View style={{justifyContent: 'space-between', flex: 1}}>
-        <View>
-          <View style={styles.textContainer}>
-            <Text style={styles.text}>비밀번호 찾기</Text>
-            <Text style={styles.secondText}>
-              비밀번호를 찾기 위해 이메일 인증을 진행해 주세요.
-            </Text>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={1}
+        style={{flex: 1}}>
+        <TouchableOpacity
+          style={styles.backIcon}
+          onPress={() => navigation.goBack()}>
+          <Image source={backIcon} />
+        </TouchableOpacity>
+        <View style={{justifyContent: 'space-between', flex: 1}}>
+          <View>
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>비밀번호 찾기</Text>
+              <Text style={styles.secondText}>
+                비밀번호를 찾기 위해 이메일 인증을 진행해 주세요.
+              </Text>
+            </View>
+            <TextInput
+              style={styles.input}
+              placeholder="이메일을 입력해주세요."
+              placeholderTextColor={'#A7A7A7'}
+              onChangeText={setEmail}
+              value={email}
+              autoFocus={true}
+              autoCompleteType="email"
+              autoCapitalize="none"
+              keyboardType="email-address"
+            />
           </View>
-          <TextInput
-          style={styles.input}
-          placeholder="이메일을 입력해주세요."
-          placeholderTextColor={'#A7A7A7'}
-          onChangeText={setEmail}
-          value={email}
-          autoFocus={true}
-          autoCompleteType="email"
-          autoCapitalize="none"
-          keyboardType="email-address"
-          />
+          <View>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={handleResetPassword}>
+              <Text style={styles.buttonText}>인증 요청</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-        <View>
-          <TouchableOpacity style={styles.button} onPress={handleResetPassword}>
-            <Text style={styles.buttonText}>인증 요청</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+        <Toast
+          text={toastMessage}
+          visible={showToast}
+          handleCancel={() => setShowToast(false)}
+        />
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

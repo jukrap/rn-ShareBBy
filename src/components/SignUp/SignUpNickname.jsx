@@ -8,12 +8,16 @@ import {
   TextInput,
   Alert,
   KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
+import Toast from '../Main/Toast'; // Toast 컴포넌트 import
 
 const SignUpNickname = ({onNextStep}) => {
   const {width, height} = Dimensions.get('window');
   const [nickname, setNickname] = useState('');
+  const [showToast, setShowToast] = useState(false); // 토스트 표시 여부 상태 추가
+  const [toastMessage, setToastMessage] = useState(''); // 토스트 메시지 상태 추가
 
   const handleNext = async () => {
     try {
@@ -22,36 +26,44 @@ const SignUpNickname = ({onNextStep}) => {
         .where('nickname', '==', nickname)
         .get();
 
-      if (nickname.trim().length === 0) {
-        Alert.alert('닉네임 입력', '닉네임을 입력해주세요.');
-        return;
-      }
-      if (nickname.length > 12) {
-        Alert.alert('닉네임 길이 초과', '닉네임은 12글자 이내로 작성해주세요.');
-        return;
-      }
-      if (/[!@#$%^&*(),.?":{}|<>]/.test(nickname)) {
-        Alert.alert('특수문자 사용 안됨', '특수문자를 사용할 수 없습니다.');
-        return;
-      }
+      if (!validateNickname(nickname)) return;
+
       if (!userQuery.empty) {
-        Alert.alert('중복된 닉네임', '이미 사용 중인 닉네임입니다.');
+        setToastMessage('이미 사용 중인 닉네임입니다.'); // 토스트 메시지 설정
+        setShowToast(true); // 토스트 표시
       } else {
         onNextStep({nickname});
       }
     } catch (error) {
       console.error('닉네임 중복 확인 오류:', error);
-      Alert.alert(
-        '닉네임 중복 확인 실패',
-        '닉네임 중복 확인 중 오류가 발생했습니다.',
-      );
+      setToastMessage('닉네임 중복 확인 중 오류가 발생했습니다.'); // 토스트 메시지 설정
+      setShowToast(true); // 토스트 표시
     }
+  };
+
+  const validateNickname = (nickname) => {
+    if (nickname.trim().length === 0) {
+      setToastMessage('닉네임을 입력해주세요.'); // 토스트 메시지 설정
+      setShowToast(true); // 토스트 표시
+      return false;
+    }
+    if (nickname.length > 12) {
+      setToastMessage('닉네임은 12글자 이내로 작성해주세요.'); // 토스트 메시지 설정
+      setShowToast(true); // 토스트 표시
+      return false;
+    }
+    if (/[!@#$%^&*(),.?":{}|<>]/.test(nickname)) {
+      setToastMessage('특수문자를 사용할 수 없습니다.'); // 토스트 메시지 설정
+      setShowToast(true); // 토스트 표시
+      return false;
+    }
+    return true;
   };
 
   const handleInfo = () => {
     Alert.alert(
       '닉네임 안내',
-      '띄어쓰기 포함 12글자 이하로 입력해 주세요.',
+      '띄어쓰기 포함 12글자 이내로 입력해 주세요.'
     );
   };
 
@@ -114,6 +126,12 @@ const SignUpNickname = ({onNextStep}) => {
           </TouchableOpacity>
         </View>
       </View>
+      {/* 토스트 컴포넌트 */}
+      <Toast
+        text={toastMessage}
+        visible={showToast}
+        handleCancel={() => setShowToast(false)}
+      />
     </KeyboardAvoidingView>
   );
 };
