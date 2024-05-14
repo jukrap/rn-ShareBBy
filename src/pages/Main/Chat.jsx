@@ -11,7 +11,6 @@ import {
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import {useNavigation} from '@react-navigation/native';
-import userStore from '../../lib/userStore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import dayjs from 'dayjs';
 import ChatListTime from '../../components/Chat/ChatListTime';
@@ -22,8 +21,6 @@ const {width, height} = Dimensions.get('window');
 const Chat = () => {
   const [chatRooms, setChatRooms] = useState([]);
   const [lastChat, setLastChat] = useState({});
-  const [userImages, setUserImages] = useState({});
-
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -55,7 +52,6 @@ const Chat = () => {
         .filter(room => room.members.includes(userToken)); //합쳐보기 방법 고민 필요
 
       const latestChats = {};
-      const userImagePromises = {};
 
       for (const room of chatRoomList) {
         const messageSnapshot = await firestore()
@@ -73,31 +69,8 @@ const Chat = () => {
             timestamp: latestMessage.timestamp.toDate(),
           };
         }
-        userImagePromises[room.id] = firestore()
-          .collection('hobbies')
-          .doc(room.hobbiesId)
-          .get()
-          .then(hobbyData => {
-            const userId = hobbyData.data().user_id;
-            return firestore()
-              .collection('users')
-              .doc(userId)
-              .get()
-
-              .then(userData => {
-                return userData.data().profileImage;
-              });
-          });
       }
-      const userImagesResult = await Promise.all(
-        Object.values(userImagePromises),
-      );
-      const userImageState = {};
-      chatRoomList.forEach((room, index) => {
-        userImageState[room.id] = userImagesResult[index];
-      });
-      setUserImages(userImageState);
-
+      chatRoomList.forEach((room, index) => {});
       setChatRooms(chatRoomList);
       setLastChat(latestChats);
     } catch (error) {
@@ -141,8 +114,6 @@ const Chat = () => {
     });
   };
   const renderGroups = ({item}) => {
-    const userImage = userImages[item.id];
-
     const goToChatRoom = () => {
       navigation.navigate('ChatRoom', {
         chatRoomId: item.id,
@@ -167,10 +138,9 @@ const Chat = () => {
             style={{width: 48, height: 48, borderRadius: 8}}
             source={
               item.chatRoomImage
-                ? {uri: item.chatRoomImage[0]}
+                ? {uri: item.chatRoomImage}
                 : DefaultProfileIcon
             }
-
           />
         </View>
         <View
