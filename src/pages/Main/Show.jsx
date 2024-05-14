@@ -114,7 +114,6 @@ const Show = ({ navigation, route }) => {
             setIsToast(true);
         } else {
             inputUserId(userToken, id)
-            
             console.log('채팅방 페이지로 이동');
         }
     }

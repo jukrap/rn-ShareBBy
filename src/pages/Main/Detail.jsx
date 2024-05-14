@@ -345,10 +345,6 @@ const dropDownOffIcon = require('../../assets/icons/dropDownOffIcon.png');
 
 const countList = [
     {
-        id: 1,
-        count: 1,
-    },
-    {
         id: 2,
         count: 2,
     },

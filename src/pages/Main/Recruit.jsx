@@ -141,7 +141,7 @@ const Recruit = ({ navigation, route }) => {
                 key={marker._data.id} 
                 latitude={marker._data.latitude}
                 longitude={marker._data.longitude}
-                onPress={() => handleMarkerPress(marker)}
+                onPress={() => handleMapPress(marker)}
                 />
         )
     },[]);

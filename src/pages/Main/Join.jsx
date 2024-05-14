@@ -31,9 +31,11 @@ const Join = ({ navigation, route }) => {
         longitudeDelta: 0.0024,
     });
     const [hobbiesData, setHobbiesData] = useState([]);
+    const [currentData, setCurrentData] = useState([]);
 
     useEffect(() => {
         initSetData();
+        deadLineHobbiesData(hobbiesData);
     }, []);
 
     const initSetData = async () => {
@@ -52,7 +54,7 @@ const Join = ({ navigation, route }) => {
                     const currentAddress = await userFetchAddress(latitude, longitude);
                     const splitAddress = currentAddress.split(" ", 3).join(" ");
                     const nearHobbiesData = await getNearHobbies(splitAddress);
-                    setHobbiesData(nearHobbiesData)
+                    // setHobbiesData(nearHobbiesData)
                 },
                 error => {
                     console.log(error);
@@ -63,6 +65,11 @@ const Join = ({ navigation, route }) => {
                 },
             );
         }
+    }
+
+    const deadLineHobbiesData = (data) => {
+        const deadlineData = data.filter(v => dayjs(v.data._data.deadline).diff(now, 'days') >= 0)
+        setCurrentData(deadlineData)
     }
 
     const handleMarkerPress = (markerElements) => {
@@ -76,6 +83,18 @@ const Join = ({ navigation, route }) => {
     const moveCurrLocation = () => {
         mapView?.current?.setLocationTrackingMode("Follow")
     };
+
+    const onCameraChanged = async (event) => {
+        const {latitude, longitude} = event
+        const centerAddress = await userFetchAddress(latitude, longitude)
+        const centerGu = centerAddress.split(" ", 3).join(" ");
+        const finalHobbiesData = await getNearHobbies(centerGu);
+        // console.log(finalHobbiesData);
+        const deadlineData = finalHobbiesData.filter(v => dayjs(v.data._data.deadline).diff(now, 'days') > 0)
+        console.log(deadlineData);
+        setHobbiesData(deadlineData)
+
+    }
 
 
     const renderMarker = useCallback((marker) => {
@@ -159,6 +178,7 @@ const Join = ({ navigation, route }) => {
                     }
                 </View>
             </TouchableOpacity>
+            
         )
     }
 
@@ -173,7 +193,7 @@ const Join = ({ navigation, route }) => {
             </View>
             <View style={{ bottom: 30, position: 'absolute', zIndex: 2, }}>
                 <FlatList
-                    data={hobbiesData.reverse()}
+                    data={hobbiesData}
                     renderItem={renderItem}
                     keyExtractor={item => item.id}
                     horizontal={true}
@@ -193,10 +213,13 @@ const Join = ({ navigation, route }) => {
                 initialRegion={initialRegion}
                 locale={'ko'}
                 isShowLocationButton={false}
+                onCameraChanged={onCameraChanged}
                 maxZoom={15}
                 minZoom={15}
             >
-                {hobbiesData.map((v) => renderMarker(v))}
+                {
+                    currentData.map(v => renderMarker(v))
+                }
             </NaverMapView>
         </SafeAreaView>
     )
