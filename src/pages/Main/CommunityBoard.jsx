@@ -20,14 +20,16 @@ import {useFocusEffect} from '@react-navigation/native';
 
 import PostCard from '../../components/Community/PostCard';
 import auth from '@react-native-firebase/auth';
-import {Modal} from 'react-native-modal';
+
 
 import {useNavigation} from '@react-navigation/native';
 import CommunityHeader from '../../components/Community/CommunityHeader';
+import CommunityActionToast from '../../components/Community/CommunityActionToast';
+import CommunityActionModal from '../../components/Community/CommunityActionModal';
 
 const {width, height} = Dimensions.get('window');
 
-const CommunityBoard = ({navigation}) => {
+const CommunityBoard = ({navigation, route}) => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [oldestVisible, setOldestVisible] = useState(null);
@@ -35,6 +37,23 @@ const CommunityBoard = ({navigation}) => {
   const [refreshingOlder, setRefreshingOlder] = useState(false);
   const [refreshingNewer, setRefreshingNewer] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalMessage, setModalMessage] = useState({
+    title: '',
+    modalText: '',
+    iconSource: null,
+    showConfirmButton: false,
+    onConfirm: null,
+    onCancel: null,
+  });
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState({
+    message: '',
+    leftIcon: '',
+    closeButton: true,
+    progressBar: true,
+  });
 
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged(user => {
@@ -54,6 +73,20 @@ const CommunityBoard = ({navigation}) => {
     }, []),
   );
 
+  useFocusEffect(
+    React.useCallback(() => {
+      if (route.params?.sendToastMessage) {
+        setToastMessage({
+          message: route.params.sendToastMessage,
+          leftIcon: 'successIcon',
+          closeButton: true,
+          progressBar: true,
+        });
+        setToastVisible(true);
+        navigation.setParams({sendToastMessage: null});
+      }
+    }, [route.params])
+  );
   const fetchInitialPosts = async () => {
     setLoading(true);
 
@@ -129,6 +162,23 @@ const CommunityBoard = ({navigation}) => {
         setPosts([...newerPosts, ...posts]);
         setNewestVisible(querySnapshot.docs[0]);
         setRefreshingNewer(false);
+        if (querySnapshot.size > 0) {
+          setToastMessage({
+            message: `${querySnapshot.size}개의 새로운 게시글을 불러왔습니다!`,
+            leftIcon: 'successIcon',
+            closeButton: true,
+            progressBar: true,
+          });
+          setToastVisible(true);
+        } else {
+          setToastMessage({
+            message: '새로운 게시글이 없습니다.',
+            leftIcon: 'otherIcon',
+            closeButton: true,
+            progressBar: true,
+          });
+          setToastVisible(true);
+        }
       } catch (e) {
         console.log(e);
         setRefreshingNewer(false);
@@ -145,24 +195,31 @@ const CommunityBoard = ({navigation}) => {
         currentUser &&
         currentUser.uid === selectedPost.userId
       ) {
-        Alert.alert(
-          '게시글 삭제',
-          '해당 게시글을 삭제하겠습니까?',
-          [
-            {
-              text: '아니오',
-              onPress: () => console.log('아니오를 클릭'),
-              style: 'cancel',
-            },
-            {
-              text: '네',
-              onPress: () => deletePost(postId),
-            },
-          ],
-          {cancelable: false},
-        );
+        setModalMessage({
+          title: '게시글 삭제',
+          modalText: '해당 게시글을 삭제하겠습니까?',
+          iconSource: require('../../assets/icons/warningIcon.png'),
+          showConfirmButton: false,
+          onConfirm: () => {
+            deletePost(postId);
+            setModalVisible(false);
+          },
+          onCancel: () => {
+            setModalVisible(false);
+          },
+        });
+        setModalVisible(true);
       } else {
-        Alert.alert('권한 없음', '게시글 작성자만 삭제할 수 있습니다.');
+        setModalMessage({
+          title: '권한 없음',
+          modalText: '게시글 작성자만 수정/삭제할 수 있습니다.',
+          iconSource: require('../../assets/icons/warningIcon.png'),
+          showConfirmButton: true,
+          onConfirm: () => {
+            setModalVisible(false);
+          },
+        });
+        setModalVisible(true);
       }
     }
   };
@@ -171,18 +228,38 @@ const CommunityBoard = ({navigation}) => {
     firestore()
       .collection('posts')
       .doc(postId)
-      .update({
-        post_actflag: false,
-      })
-      .then(() => {
-        Alert.alert('게시글 삭제', '게시글이 성공적으로 삭제되었습니다!');
-        fetchPost();
+      .get()
+      .then(doc => {
+        if (doc.exists) {
+          // 문서가 존재하는 경우에만 삭제 작업 수행
+          doc.ref
+            .update({
+              post_actflag: false,
+            })
+            .then(() => {
+              // 삭제 성공 처리
+              setToastMessage({
+                message: '게시글이 성공적으로 삭제되었습니다!',
+                leftIcon: 'successIcon',
+                closeButton: true,
+                progressBar: true,
+              });
+              setToastVisible(true);
+              setPosts(posts.filter(post => post.id !== postId));
+            })
+            .catch(e => {
+              console.log('게시물을 삭제하는 중에 오류가 발생', e);
+            });
+        } else {
+          console.log('삭제하려는 게시물이 존재하지 않습니다.');
+        }
       })
       .catch(e => {
-        console.log('게시물을 삭제하는 중에 오류가 발생', e);
+        console.log('게시물 존재 여부를 확인하는 중에 오류가 발생', e);
       });
   };
-
+  
+  
   const handleEdit = postId => {
     if (posts) {
       const selectedPost = posts.find(item => item.id === postId);
@@ -194,7 +271,16 @@ const CommunityBoard = ({navigation}) => {
       ) {
         editPost(postId);
       } else {
-        Alert.alert('권한 없음', '게시글 작성자만 수정할 수 있습니다.');
+        setModalMessage({
+          title: '권한 없음',
+          modalText: '게시글 작성자만 수정/삭제할 수 있습니다.',
+          iconSource: require('../../assets/icons/warningIcon.png'),
+          showConfirmButton: true,
+          onConfirm: () => {
+            setModalVisible(false);
+          },
+        });
+        setModalVisible(true);
       }
     }
   };
@@ -246,8 +332,8 @@ const CommunityBoard = ({navigation}) => {
   };
 
   return (
-    <SafeAreaView style={{flex: 1}}>
-      <View style={{flex: 1, backgroundColor: '#FEFFFE'}}>
+    <SafeAreaView style={{flex: 1, backgroundColor: '#FEFFFE'}}>
+      <View style={{flex: 1}}>
         <CommunityHeader
           showBackButton={false}
           rightIcon={pencilIcon}
@@ -256,8 +342,10 @@ const CommunityBoard = ({navigation}) => {
         />
         <View style={styles.Container}>
           {loading ? (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color="#07AC7D" />
+            <View style={styles.loadingOverlay}>
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#07AC7D" />
+              </View>
             </View>
           ) : (
             <FlatList
@@ -284,6 +372,24 @@ const CommunityBoard = ({navigation}) => {
           )}
         </View>
       </View>
+      <CommunityActionToast
+        visible={toastVisible}
+        message={toastMessage.message}
+        duration={7000}
+        onClose={() => setToastVisible(false)}
+        leftIcon={toastMessage.leftIcon}
+        closeButton={toastMessage.closeButton}
+        progressBar={toastMessage.progressBar}
+      />
+      <CommunityActionModal
+        isVisible={modalVisible}
+        onConfirm={modalMessage.onConfirm}
+        onCancel={modalMessage.onCancel}
+        title={modalMessage.title}
+        modalText={modalMessage.modalText}
+        iconSource={modalMessage.iconSource}
+        showConfirmButton={modalMessage.showConfirmButton}
+      />
     </SafeAreaView>
   );
 };
@@ -369,5 +475,16 @@ const styles = StyleSheet.create({
     fontFamily: 'Pretendard',
     letterSpacing: 0,
     fontWeight: '600',
+  },
+  loadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
   },
 });

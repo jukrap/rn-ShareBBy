@@ -22,8 +22,16 @@ const SignUpNickname = ({onNextStep}) => {
         .where('nickname', '==', nickname)
         .get();
 
-      if (nickname.trim() === '') {
+      if (nickname.trim().length === 0) {
         Alert.alert('닉네임 입력', '닉네임을 입력해주세요.');
+        return;
+      }
+      if (nickname.length > 12) {
+        Alert.alert('닉네임 길이 초과', '닉네임은 12글자 이내로 작성해주세요.');
+        return;
+      }
+      if (/[!@#$%^&*(),.?":{}|<>]/.test(nickname)) {
+        Alert.alert('특수문자 사용 안됨', '특수문자를 사용할 수 없습니다.');
         return;
       }
       if (!userQuery.empty) {
@@ -40,6 +48,13 @@ const SignUpNickname = ({onNextStep}) => {
     }
   };
 
+  const handleInfo = () => {
+    Alert.alert(
+      '닉네임 안내',
+      '띄어쓰기 포함 12글자 이하로 입력해 주세요.',
+    );
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : null}
@@ -51,15 +66,17 @@ const SignUpNickname = ({onNextStep}) => {
             <View style={styles.textContainer}>
               <Text style={styles.text}>닉네임을 </Text>
               <Text style={styles.text}>입력해주세요.</Text>
-              <Text
-                style={{
-                  color: '#A7A7A7',
-                  fontWeight: 'bold',
-                  fontSize: 16,
-                  marginTop: 45,
-                }}>
-                띄어쓰기 포함 촤대 15자까지 가능합니다.
-              </Text>
+              <TouchableOpacity onPress={handleInfo}>
+                <Text
+                  style={{
+                    color: '#A7A7A7',
+                    fontWeight: 'bold',
+                    fontSize: 16,
+                    marginTop: 45,
+                  }}>
+                  띄어쓰기 포함 12글자 이내로 입력해 주세요.
+                </Text>
+              </TouchableOpacity>
             </View>
           </View>
 
@@ -81,9 +98,7 @@ const SignUpNickname = ({onNextStep}) => {
               autoCapitalize="none"
               value={nickname}
               onChangeText={text => {
-                if (text.length <= 15) {
-                  setNickname(text);
-                }
+                setNickname(text);
               }}
             />
           </View>

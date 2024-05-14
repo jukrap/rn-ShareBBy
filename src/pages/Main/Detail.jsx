@@ -18,14 +18,14 @@ import firestore from '@react-native-firebase/firestore';
 
 import {recruitHobby, getHobbies} from '../../lib/hobby';
 import Tobbar from '../../components/Main/TobTab';
+import { StackActions } from '@react-navigation/native';
 
 const {width, height} = Dimensions.get('window');
 
 const Detail = ({route, navigation}) => {
   const userData = route.params;
-  const {pickAddress, pickLatitude, pickLongitude, id, nickname, profileImage} =
-    userData;
-
+  console.log(route.params);
+  const {pickAddress, pickLatitude, pickLongitude, id, nickname, profileImage} = userData;
   const writeTime = new Date(); // 내가 쓴 모집글 시간을 저장
   const [date, setDate] = useState(new Date());
   const [isDateModal, setIsDateModal] = useState(false);
@@ -111,7 +111,7 @@ const Detail = ({route, navigation}) => {
 
   const createGroupChat = async hobbiesId => {
     try {
-      const chatRoomRef = await firestore()
+       await firestore()
         .collection('chatRooms')
         .add({
           name: detailContent.showTitle,
@@ -121,6 +121,7 @@ const Detail = ({route, navigation}) => {
         });
       setSelectedUsers([]);
       console.log('채팅방 생성됨');
+      navigation.dispatch(StackActions.popToTop());
       navigation.navigate('BottomTab', {screen: '채팅'});
     } catch (error) {
       console.error('Error: ', error);
@@ -517,46 +518,42 @@ const dropDownOnIcon = require('../../assets/icons/dropDownOnIcon.png');
 const dropDownOffIcon = require('../../assets/icons/dropDownOffIcon.png');
 
 const countList = [
-  {
-    id: 1,
-    count: 1,
-  },
-  {
-    id: 2,
-    count: 2,
-  },
-  {
-    id: 3,
-    count: 3,
-  },
-  {
-    id: 4,
-    count: 4,
-  },
-  {
-    id: 5,
-    count: 5,
-  },
-  {
-    id: 6,
-    count: 6,
-  },
-  {
-    id: 7,
-    count: 7,
-  },
-  {
-    id: 8,
-    count: 8,
-  },
-  {
-    id: 9,
-    count: 9,
-  },
-  {
-    id: 10,
-    count: 10,
-  },
+    {
+        id: 2,
+        count: 2,
+    },
+    {
+        id: 3,
+        count: 3,
+    },
+    {
+        id: 4,
+        count: 4,
+    },
+    {
+        id: 5,
+        count: 5,
+    },
+    {
+        id: 6,
+        count: 6,
+    },
+    {
+        id: 7,
+        count: 7,
+    },
+    {
+        id: 8,
+        count: 8,
+    },
+    {
+        id: 9,
+        count: 9,
+    },
+    {
+        id: 10,
+        count: 10,
+    }
 ];
 
 const styles = StyleSheet.create({
@@ -654,5 +651,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
-
 export default Detail;

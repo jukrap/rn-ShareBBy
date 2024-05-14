@@ -12,8 +12,6 @@ const useStepNavigation = (navigation, setShowPostcode) => {
   const handlePreviousStep = () => {
     if (step === 1) {
       navigation.navigate('Login');
-    } else if (step === 5 && setShowPostcode) {
-      setShowPostcode(false);
     } else {
       setStep(prevStep => prevStep - 1);
     }

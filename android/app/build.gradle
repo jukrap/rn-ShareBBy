@@ -74,9 +74,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.gangsterdev.app"
+    namespace "com.hobbyshare"
     defaultConfig {
-        applicationId "com.gangsterdev.app"
+        applicationId "com.hobbyshare"
 
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion

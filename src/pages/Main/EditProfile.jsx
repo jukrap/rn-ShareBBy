@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   TextInput,
   KeyboardAvoidingView,
-
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import ImagePicker from 'react-native-image-crop-picker';
@@ -36,7 +35,7 @@ const EditProfile = ({navigation, route}) => {
   };
   const UploadImage = async uri => {
     const reference = storage().ref(
-      `gs://sharebby-4d82f.appspot.com/${route.params.uuid}.png`,
+      `gs://sharebbyteam.appspot.com/${route.params.uuid}.png`,
     );
     await reference.putFile(
       Platform.OS === 'ios' ? uri.replace('file://', '') : uri,
@@ -45,7 +44,7 @@ const EditProfile = ({navigation, route}) => {
       const userDocRef = await usersCollection.doc(route.params.uuid);
 
       await userDocRef.update({
-        profileImage: `https://firebasestorage.googleapis.com/v0/b/sharebby-4d82f.appspot.com/o/gs%3A%2Fsharebby-4d82f.appspot.com%2F${route.params.uuid}.png?alt=media&token=92ecd5cd-c85c-4d52-ada9-948f13d362d7`,
+        profileImage: `https://firebasestorage.googleapis.com/v0/b/sharebbyteam.appspot.com/o/gs%3A%2Fsharebbyteam.appspot.com%2F${route.params.uuid}.png?alt=media&token=6e683a2e-273d-4bda-aedc-f135833642c8`,
       });
     } catch (error) {
       console.log(error.message);
@@ -69,9 +68,9 @@ const EditProfile = ({navigation, route}) => {
   };
   return (
     <KeyboardAvoidingView
-    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    keyboardVerticalOffset={1}
-    style={styles.container}>
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={1}
+      style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Image style={styles.arrow} source={leftArrow} />
