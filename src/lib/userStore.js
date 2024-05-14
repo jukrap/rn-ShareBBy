@@ -8,10 +8,10 @@ const userStore = create(set => ({
     set({userToken: token});
   },
   clearUserToken: () => set({userToken: null}),
-  user: null,
-  setUser: userInfo => {
+  userData: null,
+  setUserData: userInfo => {
     console.log('Setting user:', userInfo); // 로그 출력
-    set({user: userInfo});
+    set({userData: userInfo});
   },
 }));
 

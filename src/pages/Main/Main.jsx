@@ -14,23 +14,93 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
 
+import userStore from '../../lib/userStore';
+
 const {width, height} = Dimensions.get('window');
 
 // OptimizedImageItem 컴포넌트를 메모이제이션해서 성능 향상
 const OptimizedImageItem = React.memo(({item}) => {
-  const source = useMemo(() => item.bgImg, [item.bgImg]);
-  return (
+  const source = useMemo(() => (item.bgImg ? item.bgImg : null), [item.bgImg]);
+  return source ? (
     <Image source={source} style={{width: width, height: height / 4}} />
-  );
+  ) : null;
 });
 
 const Main = ({navigation}) => {
-  const [optionClick, setOptionClick] = useState('');
-  const [currUserData, setCurrUserData] = useState([]);
+  const [currUserData, setCurrUserData] = useState(() => []);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [imageUrl, setImageUrl] = useState(null);
   const [eventBanner, setEventBanner] = useState([]);
   const bannerRef = useRef('');
+  const userData = userStore(state => state.userData);
+  const [firstPlace, setFirstPlace] = useState('');
+  const [secondPlace, setSecondPlace] = useState('');
+  const [thirdPlace, setThirdPlace] = useState('');
+  const [foursPlace, setFourthPlace] = useState('');
+  const [fifthPlace, setFifthPlace] = useState('');
+  const [sixthPlace, setSixthPlace] = useState('');
+
+  useEffect(() => {
+    const fetchMostLikedFriends = async () => {
+      try {
+        const postsRef = firestore().collection('posts');
+        const querySnapshot = await postsRef.get();
+
+        const likeCountsByUser = {};
+        querySnapshot.forEach(doc => {
+          const data = doc.data();
+          const uid = data.userId;
+          const like = data.likeCount || 0;
+          likeCountsByUser[uid] = (likeCountsByUser[uid] || 0) + like;
+        });
+
+        const sortedUsers = Object.entries(likeCountsByUser).sort(
+          (a, b) => b[1] - a[1],
+        );
+
+        const topSixUsers = sortedUsers.slice(0, 6);
+
+        // 사용자 정보 가져오는 함수
+        const getUserData = async (userId, likeCount) => {
+          if (!userId) return null;
+          const userDoc = await firestore()
+            .collection('users')
+            .doc(userId)
+            .get();
+          return {
+            uid: userId,
+            like: likeCount,
+            nickname: userDoc.data()?.nickname || '',
+            imageUrl: userDoc.data()?.profileImage || '',
+          };
+        };
+
+        const [
+          firstPlaceData,
+          secondPlaceData,
+          thirdPlaceData,
+          fourthPlaceData,
+          fifthPlaceData,
+          sixthPlaceData,
+        ] = await Promise.all(
+          topSixUsers.map(([userId, likeCount]) =>
+            getUserData(userId, likeCount),
+          ),
+        );
+
+        setFirstPlace(firstPlaceData);
+        setSecondPlace(secondPlaceData);
+        setThirdPlace(thirdPlaceData);
+        setFourthPlace(fourthPlaceData);
+        setFifthPlace(fifthPlaceData);
+        setSixthPlace(sixthPlaceData);
+      } catch (error) {
+        console.error('오류 발생:', error);
+      }
+    };
+
+    fetchMostLikedFriends();
+  }, []);
 
   // 사용자 데이터를 가져오는 useEffect
   useEffect(() => {
@@ -43,6 +113,7 @@ const Main = ({navigation}) => {
           const userData = currUser.data();
           setCurrUserData(userData);
           setImageUrl(userData.profileImage);
+          userStore.setState({userData});
         } else {
           console.log('사용자를 찾을 수 없음');
         }
@@ -52,7 +123,7 @@ const Main = ({navigation}) => {
     };
 
     fetchData();
-  }, []);
+  }, []); // userData가 변경될 때마다 fetchData 함수가 실행됨
 
   // 이벤트 배너 이미지를 가져오는 useEffect , 파이어스토어 테이블 만들기
   useEffect(() => {
@@ -103,33 +174,6 @@ const Main = ({navigation}) => {
     };
   }, [currentIndex, eventBanner.length]);
 
-  // 옵션 클릭 이벤트 핸들러
-  const handleOptionClick = id => {
-    setOptionClick(id);
-  };
-
-  // 옵션 아이템 렌더링 함수
-  const optionItem = ({item}) => {
-    return (
-      <TouchableOpacity
-        style={{
-          justifyContent: 'center',
-          paddingLeft: 35,
-          paddingRight: 10,
-          paddingVertical: 20,
-        }}
-        onPress={() => handleOptionClick(item.id)}>
-        <Text
-          style={{
-            fontWeight: '600',
-            color: optionClick === item.id ? '#07AC7D' : '#A7A7A7',
-          }}>
-          {item.option}
-        </Text>
-      </TouchableOpacity>
-    );
-  };
-
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: '#fff'}}>
       <View style={styles.topbarView}>
@@ -143,14 +187,7 @@ const Main = ({navigation}) => {
           flexDirection: 'row',
           borderBottomWidth: 1,
           borderBottomColor: '#DBDBDB',
-        }}>
-        <FlatList
-          data={topOption}
-          renderItem={optionItem}
-          keyExtractor={item => item.id.toString()}
-          horizontal
-        />
-      </View>
+        }}></View>
       <ScrollView style={{height: '50%'}}>
         <View>
           <FlatList
@@ -220,43 +257,52 @@ const Main = ({navigation}) => {
 
         <View style={styles.joinBox}>
           <Text style={[styles.nomalText, {fontSize: 16, fontWeight: '600'}]}>
-            이달의 참여왕은? 🔥
+            이달의 인기왕 🔥
           </Text>
           <Text
             style={[
               styles.nomalText,
               {fontSize: 14, fontWeight: '600', color: '#7B7B7B'},
             ]}>
-            현재 가장 많이 취미활동에 참여한 유저는 누구일까요?
+            현재 게시글에 가장 많은 좋아요를 받은 유저는 누구일까요?
           </Text>
           <View style={{gap: 10, marginTop: 10}}>
             <View style={styles.gradeUpView}>
               <View style={[styles.gradeUp, {top: 20}]}>
                 <Image
-                  source={dummyProfileIcon}
-                  style={{width: 55, height: 55}}
+                  source={{uri: secondPlace.imageUrl}}
+                  style={{borderRadius: 25, width: 50, height: 50}}
                 />
                 <View style={styles.gradeNum}>
                   <Text style={{color: '#fff', fontWeight: 'bold'}}>2</Text>
                 </View>
-                <Text style={{fontSize: 16, fontWeight: '600'}}>장혜림</Text>
+                <Text style={{fontSize: 16, fontWeight: '600'}}>
+                  {secondPlace.nickname}
+                </Text>
               </View>
               <View style={styles.gradeUp}>
-                <Image source={dummyProfileIcon} />
+                <Image
+                  source={{uri: firstPlace.imageUrl}}
+                  style={{borderRadius: 25, width: 50, height: 50}}
+                />
                 <View style={styles.gradeNum}>
                   <Text style={{color: '#fff', fontWeight: 'bold'}}>1</Text>
                 </View>
-                <Text style={{fontSize: 16, fontWeight: '600'}}>김한솔</Text>
+                <Text style={{fontSize: 16, fontWeight: '600'}}>
+                  {firstPlace.nickname}
+                </Text>
               </View>
               <View style={[styles.gradeUp, {top: 20}]}>
                 <Image
-                  source={dummyProfileIcon}
-                  style={{width: 55, height: 55}}
+                  source={{uri: thirdPlace.imageUrl}}
+                  style={{borderRadius: 25, width: 50, height: 50}}
                 />
                 <View style={styles.gradeNum}>
                   <Text style={{color: '#fff', fontWeight: 'bold'}}>3</Text>
                 </View>
-                <Text style={{fontSize: 16, fontWeight: '600'}}>김선구</Text>
+                <Text style={{fontSize: 16, fontWeight: '600'}}>
+                  {thirdPlace.nickname}
+                </Text>
               </View>
             </View>
             <View
@@ -266,29 +312,31 @@ const Main = ({navigation}) => {
                 borderTopColor: '#DBDBDB',
               }}>
               <View style={styles.gradeLow}>
-                <Text>4등</Text>
+                <Text>4등 : </Text>
                 <Image
-                  source={dummyProfileIcon}
-                  style={{width: 36, height: 36}}
+                  source={{uri: foursPlace.imageUrl}}
+                  style={{width: 36, height: 36, borderRadius: 18}}
                 />
-                <Text>김준엽</Text>
+                <Text>{foursPlace.nickname} </Text>
               </View>
               <View style={styles.gradeLow}>
-                <Text>5등</Text>
+                <Text>5등 : </Text>
                 <Image
-                  source={dummyProfileIcon}
-                  style={{width: 36, height: 36}}
+                  source={{uri: fifthPlace.imageUrl}}
+                  style={{width: 36, height: 36, borderRadius: 18}}
                 />
-                <Text>박주철</Text>
+                <Text>{fifthPlace.nickname} </Text>
               </View>
-              <View style={styles.gradeLow}>
-                <Text>6등</Text>
-                <Image
-                  source={dummyProfileIcon}
-                  style={{width: 36, height: 36}}
-                />
-                <Text>이나겸</Text>
-              </View>
+              {sixthPlace && (
+                <View style={styles.gradeLow}>
+                  <Text>6등 : </Text>
+                  <Image
+                    source={{uri: sixthPlace.imageUrl}}
+                    style={{width: 36, height: 36, borderRadius: 18}}
+                  />
+                  <Text>{sixthPlace.nickname} </Text>
+                </View>
+              )}
             </View>
           </View>
         </View>
@@ -299,30 +347,7 @@ const Main = ({navigation}) => {
 
 const goJoin = require('../../assets/images/goJoin.png');
 const goRecruit = require('../../assets/images/goRecruit.png');
-const dummyProfileIcon = require('../../assets/icons/dummyProfileIcon.png');
 
-const topOption = [
-  {
-    id: 0,
-    option: '홈',
-  },
-  {
-    id: 1,
-    option: '취미활동',
-  },
-  {
-    id: 2,
-    option: '순위',
-  },
-  {
-    id: 3,
-    option: '체험단',
-  },
-  {
-    id: 4,
-    option: '친구초대',
-  },
-];
 const styles = StyleSheet.create({
   topbarView: {
     height: 44,

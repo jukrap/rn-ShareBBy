@@ -1,25 +1,40 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
-import { SafeAreaView, View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput, Dimensions, Image, FlatList } from "react-native";
-import { NaverMapView, NaverMapMarkerOverlay, TrackingMode } from "@mj-studio/react-native-naver-map";
-import Geolocation from "react-native-geolocation-service";
+import React, {useEffect, useRef, useState, useCallback} from 'react';
+import {
+  SafeAreaView,
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  TextInput,
+  Dimensions,
+  Image,
+  FlatList,
+} from 'react-native';
+import {
+  NaverMapView,
+  NaverMapMarkerOverlay,
+  TrackingMode,
+} from '@mj-studio/react-native-naver-map';
+import Geolocation from 'react-native-geolocation-service';
 import dayjs from 'dayjs';
 import firestore from '@react-native-firebase/firestore';
 
-import { getNearHobbies } from "../../lib/hobby";
-import userFetchAddress from "../../hooks/userFetchAddress";
+import {getNearHobbies} from '../../lib/hobby';
+import userFetchAddress from '../../hooks/userFetchAddress';
 
-const { width, height } = Dimensions.get('window');
+const {width, height} = Dimensions.get('window');
 
 const LATITUDE_DELTA = 0.05;
 const LONGITUDE_DELTA = LATITUDE_DELTA * (width / height);
 const layerGroups = {
-    BUILDING: true,
-    BICYCLE: false,
-    CADASTRAL: false,
-    MOUNTAIN: false,
-    TRAFFIC: false,
-    TRANSIT: false,
-}
+  BUILDING: true,
+  BICYCLE: false,
+  CADASTRAL: false,
+  MOUNTAIN: false,
+  TRAFFIC: false,
+  TRANSIT: false,
+};
 
 const Join = ({ navigation, route }) => {
     const mapView = useRef(null);
@@ -229,117 +244,115 @@ const currGpsIcon = require('../../assets/icons/currGpsIcon.png');
 const searchIcon = require('../../assets/icons/searchIcon.png');
 
 const styles = StyleSheet.create({
-    searchView: {
-        width: width,
-        paddingHorizontal: 16,
-        marginTop: 20,
-        position: 'absolute',
-        zIndex: 2,
-        top: 60,
-        paddingBottom: 10
+  searchView: {
+    width: width,
+    paddingHorizontal: 16,
+    marginTop: 20,
+    position: 'absolute',
+    zIndex: 2,
+    top: 60,
+    paddingBottom: 10,
+  },
+  searchOpacity: {
+    height: 40,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    flexDirection: 'row',
+    paddingHorizontal: 24,
+    paddingVertical: 10,
+    gap: 15,
+    borderRadius: 10,
+    backgroundColor: '#fff',
+    shadowColor: '#A7A7A7',
+    shadowOffset: {
+      width: 1,
+      height: 2,
     },
-    searchOpacity: {
-        height: 40,
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-        flexDirection: 'row',
-        paddingHorizontal: 24,
-        paddingVertical: 10,
-        gap: 15,
-        borderRadius: 10,
-        backgroundColor: '#fff',
-        shadowColor: '#A7A7A7',
-        shadowOffset: {
-            width: 1,
-            height: 2,
-        },
-        shadowOpacity: 0.5,
-        shadowRadius: 4,
-        elevation: 5,
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  pressLocaView: {
+    marginHorizontal: 30,
+    borderRadius: 10,
+    backgroundColor: '#fff',
+    overflow: 'hidden',
+  },
+  pressText: {
+    marginBottom: 6,
+    fontSize: 16,
+  },
+  pressOptionView: {
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  pressOptionBtn: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
+  },
+  pressOptionText: {
+    fontSize: 16,
+    color: '#FFF',
+  },
+  nomalText: {
+    color: '#000',
+    fontFamily: 'Pretendard',
+    fontSize: 12,
+  },
+  howText: {
+    color: '#fff',
+    fontFamily: 'Pretendard',
+    fontSize: 10,
+  },
+  icon: {
+    width: 24,
+    height: 24,
+  },
+  listView: {
+    width: width / 1.3,
+    height: width / 2.4,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    gap: 10,
+    marginHorizontal: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#07AC7D',
+    backgroundColor: '#fff',
+    shadowColor: '#A7A7A7',
+    shadowOffset: {
+      width: 4,
+      height: 1,
     },
-    pressLocaView: {
-        marginHorizontal: 30,
-        borderRadius: 10,
-        backgroundColor: '#fff',
-        overflow: 'hidden',
-    },
-    pressText: {
-        marginBottom: 6,
-        fontSize: 16
-    },
-    pressOptionView: {
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        flexDirection: 'row',
-    },
-    pressOptionBtn: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 16,
-    },
-    pressOptionText: {
-        fontSize: 16,
-        color: '#FFF'
-    },
-    nomalText: {
-        color: '#000',
-        fontFamily: 'Pretendard',
-        fontSize: 12,
-    },
-    howText: {
-        color: '#fff',
-        fontFamily: 'Pretendard',
-        fontSize: 10,
-    },
-    icon: {
-        width: 24,
-        height: 24
-    },
-    listView: {
-        width: width / 1.3,
-        height: width / 2.4,
-        paddingHorizontal: 16,
-        paddingVertical: 12,
-        gap: 10,
-        marginHorizontal: 10,
-        borderRadius: 8,
-        borderWidth: 1,
-        borderColor: '#07AC7D',
-        backgroundColor: '#fff',
-        shadowColor: '#A7A7A7',
-        shadowOffset: {
-            width: 4,
-            height: 1,
-        },
-        shadowOpacity: 0.8,
-        shadowRadius: 4,
-    },
-    listTitle: {
-        color: '#000',
-        fontFamily: 'Pretendard',
-        fontSize: 16,
-        fontWeight: '600',
-    },
-    listRcruit: {
-        fontFamily: 'Pretendard',
-        fontSize: 12,
-        fontWeight: 700,
-    },
-    listLocation: {
-        color: '#07AC7D',
-        width: 200,
-        fontFamily: 'Pretendard',
-        fontWeight: 400,
-    },
-    showBtn: {
-        paddingHorizontal: 12,
-        paddingVertical: 8,
-        borderRadius: 8,
-        backgroundColor: '#07AC7D',
-    }
-
-})
+    shadowOpacity: 0.8,
+    shadowRadius: 4,
+  },
+  listTitle: {
+    color: '#000',
+    fontFamily: 'Pretendard',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  listRcruit: {
+    fontFamily: 'Pretendard',
+    fontSize: 12,
+    fontWeight: 700,
+  },
+  listLocation: {
+    color: '#07AC7D',
+    width: 200,
+    fontFamily: 'Pretendard',
+    fontWeight: 400,
+  },
+  showBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    backgroundColor: '#07AC7D',
+  },
+});
 
 export default Join;
-

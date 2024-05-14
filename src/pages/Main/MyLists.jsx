@@ -3,13 +3,14 @@ import {
   View,
   Text,
   Image,
+  ScrollView,
   TouchableOpacity,
   FlatList,
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import React, {useEffect, useState} from 'react';
 const leftArrow = require('../../assets/newIcons/backIcon.png');
-
+const heart = require('../../assets/newIcons/heart-icon.png');
 const formatDate = date => {
   return new Intl.DateTimeFormat('ko-KR', {
     year: 'numeric',
@@ -25,22 +26,38 @@ const formatDate = date => {
 
 const PostItem = React.memo(({item}) => {
   return (
-    <View>
-      <Text>{item.user.nickname}</Text>
-      <Image
-        style={{width: 30, height: 30}}
-        source={{uri: item.user.profileImage}}
-      />
-      <Text>{item.likeCount}</Text>
-      <Text>{item.post_content}</Text>
-      <Text>
-        {item.post_created ? formatDate(item.post_created) : '날짜 정보 없음'}
-      </Text>
+    <View style={styles.container}>
+      <View style={styles.post}>
+        <View style={styles.profileWrapper}>
+          <Image style={styles.image} source={{uri: item.user.profileImage}} />
+          <View style={styles.userName}>
+            <Text style={styles.name}>{item.user.nickname}</Text>
+            <Text style={styles.date}>
+              {item.post_created
+                ? formatDate(item.post_created)
+                : '날짜 정보 없음'}
+            </Text>
+          </View>
+        </View>
 
-      {item.post_files &&
-        item.post_files.map((file, index) => (
-          <Image key={index} source={file} />
-        ))}
+        <Text style={styles.content}>{item.post_content}</Text>
+        <View style={styles.imageWrapper}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {item.post_files &&
+              item.post_files.map((file, index) => (
+                <Image
+                  key={index}
+                  style={styles.contentImage}
+                  source={{uri: file}}
+                />
+              ))}
+          </ScrollView>
+        </View>
+        <View style={styles.like}>
+          <Image source={heart} style={styles.heart} />
+          <Text style={styles.likeCount}>{item.likeCount}</Text>
+        </View>
+      </View>
     </View>
   );
 });
@@ -80,6 +97,9 @@ const MyLists = ({navigation, route}) => {
     const tmpPosts = postsSnapshots.map((snapshot, index) => {
       const post = {...snapshot.data(), id: snapshot.id};
       post.user = users[post.userId];
+      if (post.post_created && post.post_created.toDate) {
+        post.post_created = post.post_created.toDate(); // Date 객체로 변환
+      }
       return post;
     });
 
@@ -108,17 +128,77 @@ const MyLists = ({navigation, route}) => {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    marginLeft: 20,
+    marginRight: 20,
+  },
+  profileWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  post: {
+    borderColor: 'grey',
+    borderWidth: 1,
+    borderRadius: 10,
+    padding: 15,
+    marginTop: 12,
+    marginBottom: 12,
+  },
+
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 20,
     marginTop: 60,
+    marginBottom: 20,
   },
   arrow: {width: 22, height: 22},
   headtext: {fontSize: 20, fontWeight: 'bold', marginLeft: 10},
+  profileWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  image: {
+    width: 40,
+    height: 40,
+    borderRadius: 50,
+  },
+  userName: {
+    justifyContent: 'flex-end',
+  },
+  name: {
+    fontSize: 16,
+    marginLeft: 10,
+    marginBottom: 2,
+    color: '#212529',
+  },
+  date: {
+    fontSize: 12,
+    marginLeft: 10,
+    fontWeight: 'bold',
+    color: '#9A9A9A',
+  },
+  content: {
+    marginTop: 15,
+    marginBottom: 15,
+    ellipsizeMode: 'tail',
+    color: '#212529',
+  },
+  contentImage: {
+    marginRight: 10,
+    width: 200,
+    height: 200,
+  },
+  like: {
+    marginTop: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  heart: {width: 22, height: 22},
+  likeCount: {
+    marginLeft: 5,
+    fontSize: 15,
+  },
 });
 
 export default MyLists;
-//uzq1FIrkr95yNtSjItn9 - KMSMOZANJ5S9E836RCFoJUQg5pv1
-//iRVj0TcYnixGcTahLkfd - S2ChJimGIVTh5pUnolYQNErL8iU2
-//rOWgF2HJIrzHNepqBESa - KMSMOZANJ5S9E836RCFoJUQg5pv1

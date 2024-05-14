@@ -9,7 +9,6 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
   Image,
-  Dimensions,
 } from 'react-native';
 import Modal from 'react-native-modal';
 
@@ -21,95 +20,31 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/ko';
 
 import ChatRoomNameChangeModal from '../../components/Chat/Modal/ChatRoomNameChangeModal';
+import ImageDetail from '../../components/Chat/Modal/ImageDetail';
 import PlusModal from '../../components/Chat/Modal/PlusModal';
 import PhotoList from '../../components/Chat/PhotoList';
 import ChatMemberList from '../../components/Chat/ChatMemberList';
 
+import {
+  BackIcon,
+  ExitIcon,
+  HamburgerIcon,
+  PlusIcon,
+  RightIcon,
+} from '../../assets/assets';
+
 const ChatRoom = ({route, navigation}) => {
-  const {chatRoomId, chatRoomName} = route.params;
+  const {chatRoomId, chatRoomName, hobbiesId} = route.params;
+
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
-  const [isHamburgerModalVisible, setIsHamburgerModalVisible] = useState(false);
-  const [isPlusModalVisible, setIsPlusModalVisible] = useState(false);
+  const [slideModalVisible, setSlideModalVisible] = useState(false);
+  const [plusModalVisible, setPlusModalVisible] = useState(false);
   const [chatOutModalVisible, setChatOutModalVisible] = useState(false);
-  const [chatRoomNameChangeModalVisible, setChatRoomNameChangeModalVisible] =
-    useState(false);
+  const [roomNameChangeModal, setRoomNameChangeModal] = useState(false);
   const [chatMembers, setChatMembers] = useState([]);
-  const [pickImage, setPickImage] = useState('');
-
-  //사진 올리기 기능 아직 구현 안 돼서 임시로 dummy data
-  const photoList = [
-    {
-      id: 1,
-      imageUrl:
-        'https://firebasestorage.googleapis.com/v0/b/sharebby-4d82f.appspot.com/o/dummyprofile.png?alt=media&token=a34d85db-3310-4052-84f0-f0bdfc9e88c8',
-    },
-    {
-      id: 2,
-      imageUrl:
-        'https://firebasestorage.googleapis.com/v0/b/sharebby-4d82f.appspot.com/o/dummyprofile.png?alt=media&token=a34d85db-3310-4052-84f0-f0bdfc9e88c8',
-    },
-    {
-      id: 3,
-      imageUrl:
-        'https://firebasestorage.googleapis.com/v0/b/sharebby-4d82f.appspot.com/o/dummyprofile.png?alt=media&token=a34d85db-3310-4052-84f0-f0bdfc9e88c8',
-    },
-    {
-      id: 4,
-      imageUrl:
-        'https://firebasestorage.googleapis.com/v0/b/sharebby-4d82f.appspot.com/o/dummyprofile.png?alt=media&token=a34d85db-3310-4052-84f0-f0bdfc9e88c8',
-    },
-  ];
-
-  const uploadImage = async (localImagePath, chatRoomId) => {
-    try {
-      const fileName = localImagePath.substring(
-        localImagePath.lastIndexOf('/') + 1,
-      );
-      const reference = storage().ref(
-        `chatRoomImages/${chatRoomId}/${fileName}`,
-      );
-
-      await reference.putFile(localImagePath);
-
-      const url = await reference.getDownloadURL();
-      return url;
-    } catch (error) {
-      console.error('Error uploading image to Firebase Storage:', error);
-      throw error;
-    }
-  };
-
-  const getPhotos = async () => {
-    try {
-      const image = await ImagePicker.openPicker({
-        width: 300,
-        height: 400,
-        multiple: false,
-      });
-      const imageUrl = await uploadImage(image.sourceURL, chatRoomId);
-      setPickImage(imageUrl);
-      sendMessage();
-      togglePlusModal();
-    } catch (error) {
-      console.error('Error selecting or uploading image:', error);
-    }
-  };
-
-  const handleGoBack = () => {
-    navigation.goBack();
-  };
-
-  //modal
-  const toggleHamburgerModal = () => {
-    setIsHamburgerModalVisible(!isHamburgerModalVisible);
-  };
-  const togglePlusModal = () => {
-    setIsPlusModalVisible(!isPlusModalVisible);
-  };
-  const toggleChatRoomNameChangeModal = () => {
-    setChatRoomNameChangeModalVisible(!chatRoomNameChangeModalVisible);
-  };
+  const [isVisible, setIsVisible] = useState(false);
+  const [imageUri, setImageUri] = useState('');
 
   useEffect(() => {
     const messageListener = firestore()
@@ -126,9 +61,12 @@ const ChatRoom = ({route, navigation}) => {
           setMessages(newMessages);
         }
       });
-
     return () => messageListener();
   }, [chatRoomId]);
+
+  useEffect(() => {
+    getChatRoomMembers();
+  }, []);
 
   const getChatRoomMembers = async () => {
     try {
@@ -156,17 +94,13 @@ const ChatRoom = ({route, navigation}) => {
     }
   };
 
-  useEffect(() => {
-    getChatRoomMembers();
-  }, [chatRoomId]);
-
   const sendMessage = async () => {
     try {
-      if (!inputMessage.trim() && !pickImage) {
+      if (!inputMessage.trim()) {
         return;
       }
 
-      const currentUser = auth().currentUser;
+      const currentUser = auth().currentUser; //
 
       let senderName = 'Unknown';
       if (currentUser) {
@@ -186,7 +120,6 @@ const ChatRoom = ({route, navigation}) => {
         senderId: currentUser.uid,
         timestamp: firestore.FieldValue.serverTimestamp(),
         senderProfileImg: senderProfileImg,
-        image: pickImage,
       };
 
       await firestore()
@@ -195,23 +128,9 @@ const ChatRoom = ({route, navigation}) => {
         .collection('messages')
         .add(newMessage);
 
-      setInputMessage('');
-      setPickImage('');
+      setInputMessage(''); //
     } catch (error) {
       console.error('Error sending message: ', error);
-    }
-  };
-
-  const updateChatRoomName = async newName => {
-    try {
-      await firestore()
-        .collection('chatRooms')
-        .doc(chatRoomId)
-        .update({name: newName});
-      toggleChatRoomNameChangeModal();
-      navigation.goBack();
-    } catch (error) {
-      console.error('Error updating chat room name:', error);
     }
   };
 
@@ -252,14 +171,137 @@ const ChatRoom = ({route, navigation}) => {
         .collection('messages')
         .add(newMessage);
 
+      await firestore()
+        .collection('hobbies')
+        .doc(hobbiesId)
+        .update({
+          personNumber: firestore.FieldValue.increment(-1),
+        });
+
       navigation.goBack();
     } catch (error) {
       console.error('Error deleting chat:', error);
     }
   };
 
+  const uploadImage = async (localImagePath, chatRoomId) => {
+    try {
+      const fileName = localImagePath.substring(
+        localImagePath.lastIndexOf('/') + 1,
+      );
+      const path = storage().ref(`chatRoomImages/${chatRoomId}/${fileName}`);
+
+      await path.putFile(localImagePath);
+
+      return await path.getDownloadURL();
+    } catch (error) {
+      console.error('Error uploading image to Firebase Storage:', error);
+      throw error;
+    }
+  };
+
+  const getPhotos = async () => {
+    try {
+      const image = await ImagePicker.openPicker({
+        width: 300,
+        height: 400,
+        multiple: false,
+      });
+      const imageUrl = await uploadImage(image.sourceURL, chatRoomId);
+
+      const currentUser = auth().currentUser;
+
+      let currentUserNickname = 'Unknown';
+      if (currentUser) {
+        const userSnapshot = await firestore()
+          .collection('users')
+          .doc(currentUser.uid)
+          .get();
+        if (userSnapshot.exists) {
+          currentUserNickname = userSnapshot.data().nickname;
+          senderProfileImg = userSnapshot.data().profileImage;
+        }
+      }
+
+      const newMessage = {
+        sender: currentUserNickname,
+        senderId: currentUser.uid,
+        timestamp: firestore.FieldValue.serverTimestamp(),
+        senderProfileImg: senderProfileImg,
+        image: imageUrl,
+      };
+
+      await firestore()
+        .collection('chatRooms')
+        .doc(chatRoomId)
+        .collection('messages')
+        .add(newMessage);
+
+      togglePlusModal();
+    } catch (error) {
+      console.error('Error selecting or uploading image:', error);
+    }
+  };
+
+  const updateChatRoomName = async newName => {
+    try {
+      await firestore()
+        .collection('chatRooms')
+        .doc(chatRoomId)
+        .update({name: newName});
+      toggleChatRoomNameChangeModal();
+      navigation.goBack();
+    } catch (error) {
+      console.error('Error updating chat room name:', error);
+    }
+  };
+
+  const uploadProfileImage = async (localImagePath, chatRoomId) => {
+    try {
+      const fileName = localImagePath.substring(
+        localImagePath.lastIndexOf('/') + 1,
+      );
+      const path = storage().ref(
+        `chatRoomProfileImage/${chatRoomId}/${fileName}`,
+      );
+
+      await path.putFile(localImagePath);
+
+      return await path.getDownloadURL();
+    } catch (error) {
+      console.error('Error uploading image to Firebase Storage:', error);
+      throw error;
+    }
+  };
+
+  const getProfileImage = async () => {
+    try {
+      const image = await ImagePicker.openPicker({
+        width: 300,
+        height: 400,
+        multiple: false,
+        cropping: true,
+        mediaType: 'photo',
+        cropperChooseText: '이미지 변경',
+        cropperCancelText: '취소',
+        cropperRotateButtonsHidden: true,
+      });
+
+      const imageUrl = await uploadProfileImage(image.sourceURL, chatRoomId);
+      await firestore()
+        .collection('chatRooms')
+        .doc(chatRoomId)
+        .update({chatRoomImage: imageUrl});
+    } catch (error) {
+      if (error.code === 'E_PICKER_CANCELLED') {
+        return false;
+      }
+      console.error('Error selecting or uploading image:', error);
+    }
+  };
+
   const renderItem = ({item, index}) => {
-    dayjs.locale('ko');
+    dayjs.locale('ko'); //
     const isSystemMessage = item.sender === '시스템';
     const isCurrentUser = item.senderId === auth().currentUser?.uid;
     const isFirstMessage = index === messages.length - 1;
@@ -275,17 +317,33 @@ const ChatRoom = ({route, navigation}) => {
 
     const showDateSeparator = isFirstMessage || isDifferentDay;
 
-    const showTime =
-      index === 0 ||
-      item.senderId !== messages[index - 1]?.senderId ||
-      isDifferentDay ||
-      (index > 0 &&
+    switch (true) {
+      case index === 0:
+        showTime = true;
+        break;
+
+      case item.senderId !== messages[index - 1]?.senderId:
+        showTime = true;
+        break;
+
+      case isDifferentDay:
+        showTime = true;
+        break;
+
+      case index > 0 &&
         item.timestamp &&
         messages[index - 1]?.timestamp &&
         !dayjs(item.timestamp.toDate()).isSame(
           dayjs(messages[index - 1].timestamp.toDate()),
           'minute',
-        ));
+        ):
+        showTime = true;
+        break;
+
+      default:
+        showTime = false;
+        break;
+    }
 
     const showProfileInfo =
       ((showDateSeparator && item.senderId !== auth().currentUser?.uid) ||
@@ -325,10 +383,12 @@ const ChatRoom = ({route, navigation}) => {
             )}
 
             {item.image ? (
-              <Image
-                source={{uri: item.image}}
-                style={{width: 150, height: 150, borderRadius: 8}}
-              />
+              <TouchableOpacity onPress={() => toggleModal(item.image)}>
+                <Image
+                  source={{uri: item.image}}
+                  style={{width: 150, height: 150, borderRadius: 8}}
+                />
+              </TouchableOpacity>
             ) : (
               <View style={styles.sentByUserMessage}>
                 <Text>{item.text}</Text>
@@ -342,20 +402,15 @@ const ChatRoom = ({route, navigation}) => {
             </Text>
             {showTime && <View style={{marginBottom: 8}}></View>}
           </View>
-        ) : isSystemMessage ? (
-          <View style={{justifyContent: 'center', alignItems: 'center'}}>
-            <Text style={{paddingVertical: 22, color: '#aaa', fontSize: 12}}>
-              {item.text}
-            </Text>
-            {showTime && <View style={{marginBottom: 8}}></View>}
-          </View>
         ) : (
           <View style={styles.sentByOtherWrapper}>
             {item.image ? (
-              <Image
-                source={{uri: item.image}}
-                style={{width: 150, height: 150, borderRadius: 8}}
-              />
+              <TouchableOpacity onPress={() => toggleModal(item.image)}>
+                <Image
+                  source={{uri: item.image}}
+                  style={{width: 150, height: 150, borderRadius: 8}}
+                />
+              </TouchableOpacity>
             ) : (
               <View style={styles.sentByOtherMessage}>
                 <Text>{item.text}</Text>
@@ -376,38 +431,61 @@ const ChatRoom = ({route, navigation}) => {
     );
   };
 
+  const handleGoBack = () => {
+    navigation.goBack();
+  };
+
+  const goToShowAllImages = () => {
+    //이름 바꾸기,
+    navigation.navigate('ShowAllImages', {messages: messages});
+    setSlideModalVisible(false);
+  };
+
+  const toggleHamburgerModal = () => {
+    setSlideModalVisible(!slideModalVisible);
+  };
+
+  const togglePlusModal = () => {
+    setPlusModalVisible(!plusModalVisible);
+  };
+
+  const toggleModal = imageUri => {
+    setImageUri(imageUri);
+    setIsVisible(true);
+  };
+
+  const closeModal = () => {
+    setIsVisible(false);
+  };
+
+  const toggleChatRoomNameChangeModal = () => {
+    setRoomNameChangeModal(!roomNameChangeModal);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.topBar}>
         <TouchableOpacity onPress={handleGoBack}>
-          <Image
-            style={{width: 30, height: 30}}
-            source={require('../../assets/icons/back.png')}
-          />
+          <Image source={BackIcon} style={{width: 24, height: 24}} />
         </TouchableOpacity>
         <Text style={styles.roomName}>{chatRoomName}</Text>
         <TouchableOpacity onPress={toggleHamburgerModal}>
-          <Image
-            style={{width: 40, height: 40}}
-            source={require('../../assets/icons/HamburgerMenu.png')}
-          />
+          <Image style={{width: 24, height: 24}} source={HamburgerIcon} />
         </TouchableOpacity>
       </View>
       <FlatList
         data={messages}
         renderItem={renderItem}
-        keyExtractor={(item, index) => index.toString()}
+        keyExtractor={item => item.id}
         inverted
       />
+
       <KeyboardAvoidingView
         behavior="padding"
         keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0}
         style={styles.inputContainer}>
         <TouchableOpacity onPress={togglePlusModal}>
-          <Image
-            style={{width: 24, height: 24}}
-            source={require('../../assets/icons/plus.png')}
-          />
+          <Image style={{width: 18, height: 18}} source={PlusIcon} />
         </TouchableOpacity>
         <TextInput
           style={styles.textInput}
@@ -421,136 +499,125 @@ const ChatRoom = ({route, navigation}) => {
           multiline={true}
         />
         <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
-          <Image
-            style={{width: 25, height: 25}}
-            source={require('../../assets/icons/right-arrow.png')}
-          />
+          <Image style={{width: 20, height: 20}} source={RightIcon} />
         </TouchableOpacity>
       </KeyboardAvoidingView>
 
       <Modal
-        isVisible={isHamburgerModalVisible}
+        isVisible={slideModalVisible}
         animationIn="slideInRight"
         animationOut="slideOutRight"
-        backdropOpacity={0.5}
+        backdropOpacity={0.2}
         onBackdropPress={toggleHamburgerModal}
-        style={{margin: 0, justifyContent: 'flex-end'}}>
-        <SafeAreaView style={{flex: 1, alignItems: 'flex-end'}}>
-          <View style={styles.modalContent}>
-            <View
+        style={{
+          flex: 1,
+          margin: 0,
+          justifyContent: 'flex-end',
+          alignItems: 'flex-end',
+        }}>
+        <View style={styles.modalContent}>
+          <View style={{flex: 0.25}}></View>
+          <View
+            style={{
+              width: '100%',
+              flex: 0.6,
+              paddingHorizontal: 12,
+              paddingVertical: 8,
+              gap: 16,
+              borderBottomWidth: 1,
+              borderBottomColor: '#E0E0E0',
+            }}>
+            <TouchableOpacity
+              onPress={goToShowAllImages}
               style={{
-                width: '100%',
-                flex: 1,
-                paddingHorizontal: 8,
-                paddingVertical: 8,
-                gap: 16,
-                borderBottomWidth: 1,
-                borderBottomColor: '#E0E0E0',
-              }}>
-              <View
-                style={{
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  flexDirection: 'row',
-                  marginHorizontal: 8,
-                  paddingTop: 8,
-                }}>
-                <TouchableOpacity>
-                  <Text style={{fontSize: 16, fontWeight: '700'}}>사진</Text>
-                </TouchableOpacity>
-                <TouchableOpacity>
-                  <Image
-                    source={require('../../assets/icons/right-arrow.png')}
-                    style={{width: 16, height: 16}}
-                  />
-                </TouchableOpacity>
-              </View>
-              <View
-                style={{
-                  width: '100%',
-                  flex: 2,
-                  alignItems: 'center',
-                }}>
-                <PhotoList chatRoomId={chatRoomId} />
-              </View>
-            </View>
-
-            <View
-              style={{
-                flex: 2,
-                width: '100%',
-                borderBottomWidth: 1,
-                borderBottomColor: '#E0E0E0',
-                gap: 8,
-                paddingHorizontal: 8,
-              }}>
-              <View style={{marginBottom: 8}}>
-                <Text style={{fontSize: 16, fontWeight: '700'}}>참여 멤버</Text>
-              </View>
-              <ChatMemberList chatMembers={chatMembers} />
-            </View>
-
-            <View
-              style={{
-                width: '100%',
-                flex: 0.2,
-                borderBottomWidth: 1,
-                borderBottomColor: '#E0E0E0',
-                paddingHorizontal: 8,
-                gap: 8,
-              }}>
-              <TouchableOpacity>
-                <Text
-                  style={{fontSize: 16, fontWeight: '700', marginBottom: 8}}>
-                  공지 사항
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            <View
-              style={{
-                width: '100%',
-                flex: 1,
-                borderBottomWidth: 1,
-                borderBottomColor: '#E0E0E0',
-                paddingHorizontal: 8,
-                gap: 8,
-              }}>
-              <Text style={{fontSize: 16, fontWeight: '700', marginBottom: 8}}>
-                채팅방 설정
-              </Text>
-              <TouchableOpacity onPress={toggleChatRoomNameChangeModal}>
-                <Text>채팅방 이름 변경</Text>
-              </TouchableOpacity>
-              <ChatRoomNameChangeModal
-                isVisible={chatRoomNameChangeModalVisible}
-                toggleChatRoomNameChangeModal={toggleChatRoomNameChangeModal}
-                updateChatRoomName={updateChatRoomName}
-              />
-              <TouchableOpacity>
-                <Text>채팅방 사진 변경</Text>
-              </TouchableOpacity>
-            </View>
-
-            <View
-              style={{
-                width: '100%',
-                justifyContent: 'flex-end',
+                justifyContent: 'space-between',
                 alignItems: 'center',
-                paddingBottom: 16,
-                gap: 8,
+                flexDirection: 'row',
+                marginHorizontal: 8,
+                paddingTop: 8,
               }}>
-              <TouchableOpacity
-                onPress={() => setChatOutModalVisible(!chatOutModalVisible)}>
-                <Text style={{fontSize: 18, fontWeight: '700'}}>
-                  채팅방 나가기
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={toggleHamburgerModal}>
-                <Text>취소</Text>
-              </TouchableOpacity>
+              <Text style={{fontSize: 16, fontWeight: '700'}}>사진</Text>
+              <Image source={RightIcon} style={{width: 16, height: 16}} />
+            </TouchableOpacity>
+
+            <View
+              style={{
+                width: '100%',
+                flex: 2,
+                alignItems: 'flex-start',
+              }}>
+              <PhotoList chatRoomId={chatRoomId} />
             </View>
           </View>
+
+          <View
+            style={{
+              width: '100%',
+              flex: 0.2,
+              borderBottomWidth: 1,
+              borderBottomColor: '#E0E0E0',
+              paddingHorizontal: 12,
+              gap: 8,
+            }}>
+            <TouchableOpacity>
+              <Text style={{fontSize: 16, marginBottom: 8, fontWeight: '700'}}>
+                공지 사항
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <View
+            style={{
+              width: '100%',
+              flex: 0.5,
+              borderBottomWidth: 1,
+              borderBottomColor: '#E0E0E0',
+              paddingHorizontal: 12,
+              gap: 8,
+            }}>
+            <Text style={{fontSize: 16, marginBottom: 8, fontWeight: '700'}}>
+              채팅방 설정
+            </Text>
+            <TouchableOpacity onPress={toggleChatRoomNameChangeModal}>
+              <Text>채팅방 이름 변경</Text>
+            </TouchableOpacity>
+            <ChatRoomNameChangeModal
+              isVisible={roomNameChangeModal}
+              toggleChatRoomNameChangeModal={toggleChatRoomNameChangeModal}
+              updateChatRoomName={updateChatRoomName}
+            />
+            <TouchableOpacity onPress={getProfileImage}>
+              <Text>채팅방 사진 변경</Text>
+            </TouchableOpacity>
+          </View>
+          <View
+            style={{
+              flex: 2,
+              width: '100%',
+              borderBottomWidth: 1,
+              borderBottomColor: '#E0E0E0',
+              gap: 8,
+              paddingHorizontal: 12,
+            }}>
+            <View style={{marginBottom: 8}}>
+              <Text style={{fontSize: 16, fontWeight: '700'}}>참여 멤버</Text>
+            </View>
+            <ChatMemberList chatMembers={chatMembers} />
+          </View>
+
+          <View
+            style={{
+              width: '100%',
+              alignItems: 'flex-end',
+              paddingBottom: 24,
+              paddingHorizontal: 32,
+            }}>
+            <TouchableOpacity
+              onPress={() => setChatOutModalVisible(!chatOutModalVisible)}>
+              <Image style={{width: 18, height: 18}} source={ExitIcon} />
+            </TouchableOpacity>
+          </View>
+
           <Modal
             isVisible={chatOutModalVisible}
             animationIn={'bounceIn'}
@@ -591,13 +658,18 @@ const ChatRoom = ({route, navigation}) => {
               </View>
             </View>
           </Modal>
-        </SafeAreaView>
+        </View>
       </Modal>
 
       <PlusModal
-        isVisible={isPlusModalVisible}
+        isVisible={plusModalVisible}
         toggleModal={togglePlusModal}
         getPhotos={getPhotos}
+      />
+      <ImageDetail
+        isVisible={isVisible}
+        imageUri={imageUri}
+        closeModal={closeModal}
       />
     </SafeAreaView>
   );
@@ -650,6 +722,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 10,
     borderTopWidth: 1,
     borderTopColor: '#ccc',
     padding: 10,
@@ -698,8 +771,6 @@ const styles = StyleSheet.create({
     flex: 1,
     width: 300,
     marginBottom: 0,
-    borderTopLeftRadius: 24,
-    borderBottomLeftRadius: 24,
     backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
