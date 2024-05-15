@@ -25,11 +25,12 @@ const EditProfile = ({navigation, route}) => {
       width: 300,
       height: 400,
       multiple: false,
-    }).then(images => {
+    }).then(image => {
       // console.log('사진 업로드', images.sourceURL);
+      // const imageUrl = image.path
       setEditImage({
         IsEdit: true,
-        ImageUrl: images.sourceURL,
+        ImageUrl: image.sourceURL,
       });
     });
   };
@@ -84,7 +85,7 @@ const EditProfile = ({navigation, route}) => {
           onPress={() => getPhotos()}>
           <Image
             style={styles.image}
-            source={{uri: route.params.profileImage}}
+            source={{uri: editImage.ImageUrl || route.params.profileImage}}
           />
         </TouchableOpacity>
         <View style={styles.editProfileWrapper}>
