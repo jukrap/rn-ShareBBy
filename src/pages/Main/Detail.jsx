@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useState} from 'react';
 import {
   SafeAreaView,
   Text,
@@ -19,20 +19,27 @@ import firestore from '@react-native-firebase/firestore';
 import {recruitHobby, getHobbies} from '../../lib/hobby';
 import Tobbar from '../../components/Main/TobTab';
 import { StackActions } from '@react-navigation/native';
+import Toast from "../../components/Main/Toast";
 
 const {width, height} = Dimensions.get('window');
 
+const ErrorMessage = {
+    detailAddress : '상세주소를 입력해주세요!',
+    showTag : '태그를 입력해주세요!',
+    peopleCount : '인원수를 선택해주세요!',
+    showTitle : '타이틀을 입력해주세요!',
+    showContent : '내용을 입력해주세요!',
+}
+
 const Detail = ({route, navigation}) => {
   const userData = route.params;
-  console.log(route.params);
+
   const {pickAddress, pickLatitude, pickLongitude, id, nickname, profileImage} = userData;
   const writeTime = new Date(); // 내가 쓴 모집글 시간을 저장
   const [date, setDate] = useState(new Date());
   const [isDateModal, setIsDateModal] = useState(false);
   const [isPeopleModal, setIsPeopleModal] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState([]);
-
-  // const [saveDate, setSaveDate] = useState(0);
   const [detailContent, setDetailConetent] = useState({
     address: pickAddress,
     latitude: pickLatitude,
@@ -57,12 +64,20 @@ const Detail = ({route, navigation}) => {
     showContent: false,
   });
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isToastVisible, setIsToastVisible] = useState(false);
+  const [isToast, setIsToast] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleInputContent = (name, value) => {
-    setDetailConetent({
-      ...detailContent,
-      [name]: value,
-    });
+      value.length == 0 ? (
+        setErrorMessage(isErrorMsg.name)
+      ) : (
+        setErrorMessage(''),
+        setDetailConetent({
+          ...detailContent,
+          [name]: value,
+        })
+      )
   };
 
   const countTextLength = text => {
@@ -80,7 +95,7 @@ const Detail = ({route, navigation}) => {
     setIsTextClick(prev => ({
       ...prev,
       [name]: false,
-    }));
+    })); 
   };
 
   const postHobby = async () => {
@@ -127,6 +142,21 @@ const Detail = ({route, navigation}) => {
       console.error('Error: ', error);
     }
   };
+  
+  const onPressRight = () => {
+    setIsToastVisible(false)
+
+    const requiredFields = ['detailAddress', 'showTag', 'deadLine', 'peopleCount', 'showTitle', 'showContent'];
+    
+    setTimeout(() => {
+      if(detailContent.detailAddress.length === 0 || detailContent.showTag.length === 0 || detailContent.deadLine.length === 0 || detailContent.peopleCount.length === 0 || detailContent.showTitle.length === 0 || detailContent.showContent.length === 0) {
+        setIsToastVisible(true)
+      } else {
+        setIsModalVisible(!isModalVisible)
+      } 
+    }, 200)
+    
+  };
 
   const renderItem = ({item}) => {
     return (
@@ -147,9 +177,6 @@ const Detail = ({route, navigation}) => {
     );
   };
 
-  const onPressRight = () => {
-    setIsModalVisible(!isModalVisible);
-  };
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: '#FEFFFE'}}>
@@ -196,6 +223,7 @@ const Detail = ({route, navigation}) => {
               onFocus={() => handleFocus('detailAddress')}
               onBlur={() => handleBlur('detailAddress')}
             />
+            {errorMessage ? <Text>{errorMessage}</Text> : <View />}
           </View>
           <View style={styles.detailOption}>
             <View style={styles.detailIndex}>
@@ -220,6 +248,7 @@ const Detail = ({route, navigation}) => {
               onFocus={() => handleFocus('showTag')}
               onBlur={() => handleBlur('showTag')}
             />
+            <Text>{errorMessage}</Text>
           </View>
           <TouchableOpacity
             style={styles.detailOption}
@@ -345,6 +374,7 @@ const Detail = ({route, navigation}) => {
               onFocus={() => handleFocus('showTitle')}
               onBlur={() => handleBlur('showTitle')}
             />
+            <Text>{errorMessage}</Text>
           </View>
           <View style={styles.detailOption}>
             <View style={styles.detailIndex}>
@@ -377,6 +407,7 @@ const Detail = ({route, navigation}) => {
               onFocus={() => handleFocus('showContent')}
               onBlur={() => handleBlur('showContent')}
             />
+            <Text>{errorMessage}</Text>
             <View style={{marginLeft: 'auto'}}>
               <Text style={{color: '#898989'}}>{currTextlength} / 500자</Text>
             </View>
@@ -510,6 +541,12 @@ const Detail = ({route, navigation}) => {
           </View>
         </View>
       </Modal>
+      <Toast  text="모든 필드를 입력해주세요!"
+        visible={isToastVisible}
+        handleCancel={() => {
+            setIsToast(false);
+        }}
+/>
     </SafeAreaView>
   );
 };
