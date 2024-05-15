@@ -103,21 +103,50 @@ const CommunityPostDetail = ({route}) => {
     React.useCallback(() => {
       // 현재 사용자가 해당 게시글에 좋아요를 눌렀는지 확인
       const checkLikeStatus = async () => {
-        if (currentUser) {
-          const likeDoc = await firestore()
-            .collection('likes')
-            .where('postId', '==', postId)
-            .where('userId', '==', currentUser.uid)
-            .get();
+        try {
+          if (currentUser) {
+            const likeDoc = await firestore()
+              .collection('likes')
+              .where('postId', '==', postId)
+              .where('userId', '==', currentUser.uid)
+              .get();
 
-          if (!likeDoc.empty) {
-            setIsLiked(true);
+            if (!likeDoc.empty) {
+              setIsLiked(true);
+            }
           }
+        } catch (error) {
+          console.log('좋아요를 가져오는 중에 오류가 발생했습니다:', error);
         }
       };
 
       checkLikeStatus();
     }, [currentUser, postId]),
+  );
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const updatedPost = route.params?.updatedPost;
+      if (updatedPost && updatedPost.id === postId) {
+        setPosts({...posts, ...updatedPost});
+        navigation.setParams({updatedPost: null});
+      }
+    }, [route.params, postId, posts]),
+  );
+
+  useFocusEffect(
+    React.useCallback(() => {
+      if (route.params?.sendToastMessage) {
+        setToastMessage({
+          message: route.params.sendToastMessage,
+          leftIcon: 'successIcon',
+          closeButton: true,
+          progressBar: true,
+        });
+        setToastVisible(true);
+        navigation.setParams({sendToastMessage: null});
+      }
+    }, [route.params]),
   );
 
   const fetchPost = async postId => {
@@ -133,6 +162,8 @@ const CommunityPostDetail = ({route}) => {
         fetchPostUserData(postData.userId);
         setLikeCount(postData.likeCount || 0);
         setCommentCount(postData.commentCount || 0);
+      } else {
+        console.log('게시글이 존재하지 않습니다.');
       }
     } catch (error) {
       console.log('게시글을 가져오는 중에 오류가 발생했습니다:', error);
@@ -346,38 +377,38 @@ const CommunityPostDetail = ({route}) => {
   };
 
   const handleDelete = () => {
-      const selectedPost = posts;
-      if (
-        selectedPost &&
-        currentUser &&
-        currentUser.uid === selectedPost.userId
-      ) {
-        setModalMessage({
-          title: '게시글 삭제',
-          modalText: '해당 게시글을 삭제하겠습니까?',
-          iconSource: require('../../assets/icons/warningIcon.png'),
-          showConfirmButton: false,
-          onConfirm: () => {
-            deletePost();
-            setModalVisible(false);
-          },
-          onCancel: () => {
-            setModalVisible(false);
-          },
-        });
-        setModalVisible(true);
-      } else {
-        setModalMessage({
-          title: '권한 없음',
-          modalText: '게시글 작성자만 삭제할 수 있습니다.',
-          iconSource: require('../../assets/icons/warningIcon.png'),
-          showConfirmButton: true,
-          onConfirm: () => {
-            setModalVisible(false);
-          },
-        });
-        setModalVisible(true);
-      }
+    const selectedPost = posts;
+    if (
+      selectedPost &&
+      currentUser &&
+      currentUser.uid === selectedPost.userId
+    ) {
+      setModalMessage({
+        title: '게시글 삭제',
+        modalText: '해당 게시글을 삭제하겠습니까?',
+        iconSource: require('../../assets/icons/warningIcon.png'),
+        showConfirmButton: false,
+        onConfirm: () => {
+          deletePost();
+          setModalVisible(false);
+        },
+        onCancel: () => {
+          setModalVisible(false);
+        },
+      });
+      setModalVisible(true);
+    } else {
+      setModalMessage({
+        title: '권한 없음',
+        modalText: '게시글 작성자만 삭제할 수 있습니다.',
+        iconSource: require('../../assets/icons/warningIcon.png'),
+        showConfirmButton: true,
+        onConfirm: () => {
+          setModalVisible(false);
+        },
+      });
+      setModalVisible(true);
+    }
   };
 
   const deletePost = async () => {
@@ -395,13 +426,12 @@ const CommunityPostDetail = ({route}) => {
           progressBar: true,
         });
         setToastVisible(true);
-        navigation.navigate('CommunityBoard', { deletedPostId: postId });
+        navigation.navigate('CommunityBoard', {deletedPostId: postId});
       })
       .catch(e => {
         console.log('게시물을 삭제하는 중에 오류가 발생', e);
       });
   };
-  
 
   const handleEdit = () => {
     const selectedPost = posts;
@@ -426,7 +456,10 @@ const CommunityPostDetail = ({route}) => {
   };
 
   const editPost = () => {
-    navigation.navigate('CommunityEditPost', {postId});
+    navigation.navigate('CommunityEditPost', {
+      postId,
+      prevScreen: 'CommunityPostDetail',
+    });
   };
 
   const handleCommentDelete = commentId => {
@@ -676,24 +709,24 @@ const CommunityPostDetail = ({route}) => {
         ListFooterComponent={renderFooter}
         style={styles.container}
       />
-        <View style={styles.commentInputContainer}>
-          <TextInput
-            style={styles.commentInput}
-            placeholder={editingCommentId ? '댓글 수정' : '댓글 입력'}
-            multiline={true}
-            value={commentContent}
-            onChangeText={handleCommentContentChange}
+      <View style={styles.commentInputContainer}>
+        <TextInput
+          style={styles.commentInput}
+          placeholder={editingCommentId ? '댓글 수정' : '댓글 입력'}
+          multiline={true}
+          value={commentContent}
+          onChangeText={handleCommentContentChange}
+        />
+        <TouchableOpacity
+          style={styles.commentSubmitButton}
+          onPress={handleCommentSubmit}>
+          <Image
+            style={[styles.commentSubmitIcon, styles.frameItemLayout]}
+            resizeMode="cover"
+            source={planeMessageIcon}
           />
-          <TouchableOpacity
-            style={styles.commentSubmitButton}
-            onPress={handleCommentSubmit}>
-            <Image
-              style={[styles.commentSubmitIcon, styles.frameItemLayout]}
-              resizeMode="cover"
-              source={planeMessageIcon}
-            />
-          </TouchableOpacity>
-        </View>
+        </TouchableOpacity>
+      </View>
       <BottomSheetModal isVisible={isModalVisible} onClose={toggleModal}>
         <View style={styles.modalContent}>
           <TouchableOpacity
@@ -734,7 +767,7 @@ const CommunityPostDetail = ({route}) => {
         iconSource={modalMessage.iconSource}
         showConfirmButton={modalMessage.showConfirmButton}
       />
-      </KeyboardAvoidingView>
+    </KeyboardAvoidingView>
   );
 };
 

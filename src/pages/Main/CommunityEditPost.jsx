@@ -70,13 +70,16 @@ const CommunityEditPost = ({route}) => {
     // 수정할 게시글의 ID를 route params에서 가져옴
     const {postId} = route.params;
     setPostId(postId);
+    console.log('Fetching post with ID:', postId); // 로그 찍자...
 
     // Firestore에서 해당 게시글의 데이터를 가져와서 state에 저장
     const fetchPost = async () => {
       try {
         const postDoc = await firestore().collection('posts').doc(postId).get();
+        console.log('Post document:', postDoc);
         if (postDoc.exists) {
           const postData = postDoc.data();
+          console.log('Post data:', postData);
           setPostContent(postData.post_content);
           setSelectedImages({
             existingImages: postData.post_files,
@@ -118,12 +121,13 @@ const CommunityEditPost = ({route}) => {
           });
           setToastVisible(true);
     
-          navigation.navigate('CommunityBoard', {
+          navigation.navigate(route.params?.prevScreen || 'CommunityBoard', {
             updatedPost: {
               id: postId,
               post_content: postContent,
               post_files: [...selectedImages.existingImages, ...newImageUrls],
             },
+            sendToastMessage: '성공적으로 게시글이 수정됐습니다!',
           });
         } catch (error) {
         console.log('게시글을 수정하는 중 오류 발생:', error);
