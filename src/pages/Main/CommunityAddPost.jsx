@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  Alert,
   ActivityIndicator,
   TextInput,
   Image,
@@ -13,7 +12,7 @@ import {
 } from 'react-native';
 import ImagePicker from 'react-native-image-crop-picker';
 import {useNavigation, useRoute} from '@react-navigation/native';
-import Modal from 'react-native-modal';
+
 import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
@@ -22,6 +21,11 @@ import CommunityHeader from '../../components/Community/CommunityHeader';
 import BottomSheetModal from '../../components/Community/BottomSheetModal';
 import CommunityActionToast from '../../components/Community/CommunityActionToast';
 import CommunityActionModal from '../../components/Community/CommunityActionModal';
+
+const warningIcon = require('../../assets/newIcons/warningIcon.png');
+const cautionIcon = require('../../assets/newIcons/cautionIcon.png');
+const cameraIcon = require('../../assets/newIcons/cameraIcon.png');
+const pictureIcon = require('../../assets/newIcons/imageIcon.png');
 
 const CommunityAddPost = () => {
   const navigation = useNavigation();
@@ -211,7 +215,7 @@ const CommunityAddPost = () => {
       setModalMessage({
         title: '이미지 업로드 실패',
         modalText: '이미지 업로드 중 오류가 발생했습니다.',
-        iconSource: require('../../assets/icons/warningIcon.png'),
+        iconSource: warningIcon,
         showConfirmButton: true,
         onConfirm: () => {
           setModalVisible(false);
@@ -233,7 +237,7 @@ const CommunityAddPost = () => {
       setModalMessage({
         title: '이미지 업로드 제한',
         modalText: '최대 7장까지 이미지를 업로드할 수 있습니다.',
-        iconSource: require('../../assets/icons/cautionIcon.png'),
+        iconSource: cautionIcon,
         showConfirmButton: true,
         onConfirm: () => {
           setModalVisible(false);
@@ -265,7 +269,7 @@ const CommunityAddPost = () => {
       setModalMessage({
         title: '이미지 업로드 제한',
         modalText: '최대 7장까지 이미지를 업로드할 수 있습니다.',
-        iconSource: require('../../assets/icons/cautionIcon.png'),
+        iconSource: cautionIcon,
         showConfirmButton: true,
         onConfirm: () => {
           setModalVisible(false);
@@ -418,7 +422,7 @@ const CommunityAddPost = () => {
         onConfirm={() => setModalVisible(false)}
         title="이미지 업로드 실패"
         modalText={modalMessage}
-        iconSource={require('../../assets/icons/warningIcon.png')}
+        iconSource={warningIcon}
         showConfirmButton={true}
       />
     </SafeAreaView>
@@ -426,9 +430,6 @@ const CommunityAddPost = () => {
 };
 
 export default CommunityAddPost;
-
-const cameraIcon = require('../../assets/icons/cameraIcon.png');
-const pictureIcon = require('../../assets/icons/pictureIcon.png');
 
 const styles = StyleSheet.create({
   container: {

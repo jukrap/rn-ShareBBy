@@ -307,14 +307,14 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
   );
 };
 
-const moreIcon = require('../../assets/icons/moreIcon.png');
-const commentLineIcon = require('../../assets/icons/commentLineIcon.png');
-const commentFillIcon = require('../../assets/icons/commentFillIcon.png');
-const heartLineIcon = require('../../assets/icons/heartLineIcon.png');
-const heartRedIcon = require('../../assets/icons/heartRedIcon.png');
-const shareIcon = require('../../assets/icons/shareIcon.png');
-const pencilIcon = require('../../assets/icons/pencilIcon.png');
-const deleteIcon = require('../../assets/icons/deleteIcon.png');
+const moreIcon = require('../../assets/newIcons/moreIcon.png');
+const commentLineIcon = require('../../assets/newIcons/commentLineIcon.png');
+const commentFillIcon = require('../../assets/newIcons/commentFillIcon.png');
+const heartLineIcon = require('../../assets/newIcons/heart-icon.png');
+const heartRedIcon = require('../../assets/newIcons/redHeartIcon.png');
+const shareIcon = require('../../assets/newIcons/shareIcon.png');
+const pencilIcon = require('../../assets/newIcons/pencil-icon.png');
+const deleteIcon = require('../../assets/newIcons/deleteIcon.png');
 const defaultPostImg = require('../../assets/images/defaultPostImg.jpg');
 const defaultProfileImg = require('../../assets/images/defaultProfileImg.jpeg');
 

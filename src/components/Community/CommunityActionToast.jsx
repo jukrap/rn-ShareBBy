@@ -63,13 +63,13 @@ const CommunityActionToast = ({
   const getIconSource = iconName => {
     switch (iconName) {
       case 'warningIcon':
-        return require('../../assets/icons/warningIcon.png');
+        return require('../../assets/newIcons/warningIcon.png');
       case 'cautionIcon':
-        return require('../../assets/icons/cautionIcon.png');
+        return require('../../assets/newIcons/cautionIcon.png');
       case 'successIcon':
-        return require('../../assets/icons/successIcon.png');
+        return require('../../assets/newIcons/successIcon.png');
       case 'otherIcon':
-        return require('../../assets/icons/otherIcon.png');
+        return require('../../assets/newIcons/otherIcon.png');
       default:
         return null;
     }

@@ -17,7 +17,9 @@ import storage from '@react-native-firebase/storage';
 import LoginToast from './LoginToast';
 
 const {width} = Dimensions.get('window');
-const addressSearch = require('../../assets/icons/addressSearch.png');
+
+const addressSearch = require('../../assets/newIcons/addressSearch.png');
+
 
 const SignUpAddress = ({
   navigation,
