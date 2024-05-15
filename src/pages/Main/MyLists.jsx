@@ -9,8 +9,7 @@ import {
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import React, {useEffect, useState} from 'react';
-const leftArrow = require('../../assets/newIcons/backIcon.png');
-const heart = require('../../assets/newIcons/heart-icon.png');
+import {BackIcon, HeartIcon} from '../../assets/assets';
 const formatDate = date => {
   return new Intl.DateTimeFormat('ko-KR', {
     year: 'numeric',
@@ -45,20 +44,20 @@ const PostItem = React.memo(({item}) => {
           </View>
 
           <Text style={styles.content}>{item.post_content}</Text>
-          <View style={styles.imageWrapper}>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {item.post_files &&
-                item.post_files.map((file, index) => (
-                  <Image
-                    key={index}
-                    style={styles.contentImage}
-                    source={{uri: file}}
-                  />
-                ))}
-            </ScrollView>
-          </View>
+
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {item.post_files &&
+              item.post_files.map((file, index) => (
+                <Image
+                  key={index}
+                  style={styles.contentImage}
+                  source={{uri: file}}
+                />
+              ))}
+          </ScrollView>
+
           <View style={styles.like}>
-            <Image source={heart} style={styles.heart} />
+            <Image source={HeartIcon} style={styles.heart} />
             <Text style={styles.likeCount}>{item.likeCount}</Text>
           </View>
         </View>
@@ -108,6 +107,11 @@ const MyLists = ({navigation, route}) => {
       return post;
     });
 
+    tmpPosts.sort((a, b) => {
+      const dateA = a.post_created;
+      const dateB = b.post_created;
+      return dateB - dateA; // 내림차순 정렬
+    });
     setPosts(tmpPosts);
   };
 
@@ -123,7 +127,7 @@ const MyLists = ({navigation, route}) => {
       ListHeaderComponent={() => (
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Image style={styles.arrow} source={leftArrow} />
+            <Image style={styles.arrow} source={BackIcon} />
           </TouchableOpacity>
           <Text style={styles.headtext}>내가 찜한 글</Text>
         </View>
@@ -138,10 +142,6 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     marginRight: 20,
   },
-  profileWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
   post: {
     borderColor: 'grey',
     borderWidth: 1,
@@ -150,7 +150,10 @@ const styles = StyleSheet.create({
     marginTop: 12,
     marginBottom: 12,
   },
-
+  profileWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -159,10 +162,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   arrow: {width: 22, height: 22},
-  headtext: {fontSize: 20, fontWeight: 'bold', marginLeft: 10},
-  profileWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  headtext: {
+    fontWeight: 'bold',
+    fontFamily: 'Pretendard',
+    fontSize: 20,
+
+    marginLeft: 10,
   },
   image: {
     width: 40,
@@ -174,6 +179,8 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 16,
+    fontWeight: '500',
+    fontFamily: 'Pretendard',
     marginLeft: 10,
     marginBottom: 2,
     color: '#212529',
@@ -182,6 +189,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginLeft: 10,
     fontWeight: 'bold',
+    fontFamily: 'Pretendard',
     color: '#9A9A9A',
   },
   content: {
@@ -200,10 +208,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  heart: {width: 22, height: 22},
+  heart: {width: 20, height: 20},
   likeCount: {
     marginLeft: 5,
-    fontSize: 15,
+    fontSize: 12,
+    fontWeight: '500',
+    fontFamily: 'Pretendard',
   },
 });
 

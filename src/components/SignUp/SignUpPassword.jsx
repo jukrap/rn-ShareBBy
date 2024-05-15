@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -10,12 +10,13 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import Toast from '../Main/Toast';
+import LoginToast from './LoginToast';
 
-const passwordHideIcon = require('../../assets/icons/passwordHide.png');
-const { width, height } = Dimensions.get('window');
+import {PasswordHideIcon} from '../../assets/assets';
 
-const SignUpPassword = ({ onNextStep }) => {
+const {width, height} = Dimensions.get('window');
+
+const SignUpPassword = ({onNextStep}) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -24,7 +25,6 @@ const SignUpPassword = ({ onNextStep }) => {
   const [isSpecialCharacterValid, setIsSpecialCharacterValid] = useState(false);
   const [showToast, setShowToast] = useState(false); // 토스트 표시 여부 상태 추가
   const [toastMessage, setToastMessage] = useState(''); // 토스트 메시지 상태 추가
-  
 
   const handleNext = () => {
     if (password.trim() === '') {
@@ -42,11 +42,11 @@ const SignUpPassword = ({ onNextStep }) => {
       setShowToast(true); // 토스트 표시
       return;
     }
-    onNextStep({ password });
+    onNextStep({password});
   };
 
   // 비밀번호 유효성 검사 함수
-  const isValidPassword = (password) => {
+  const isValidPassword = password => {
     const containsUppercase = /[A-Z]/.test(password);
     const containsLowercase = /[a-z]/.test(password);
     const containsSpecialCharacter = /[!@#$%^&*(),.?":{}|<>]/.test(password);
@@ -64,7 +64,7 @@ const SignUpPassword = ({ onNextStep }) => {
     );
   };
 
-  const handlePasswordChange = (text) => {
+  const handlePasswordChange = text => {
     // 한글이 포함되어 있으면 입력을 막고 알림을 표시합니다.
     if (/[\uAC00-\uD7A3]/.test(text)) {
       setToastMessage('비밀번호에는 한글을 사용할 수 없습니다.'); // 토스트 메시지 설정
@@ -79,7 +79,6 @@ const SignUpPassword = ({ onNextStep }) => {
       }
     }
   };
-  
 
   const passwordShow = () => {
     setShowPassword(!showPassword);
@@ -110,7 +109,7 @@ const SignUpPassword = ({ onNextStep }) => {
             />
             <TouchableOpacity onPress={passwordShow}>
               <Image
-                source={passwordHideIcon}
+                source={PasswordHideIcon}
                 style={styles.passwordHideIcon}
               />
             </TouchableOpacity>
@@ -155,7 +154,7 @@ const SignUpPassword = ({ onNextStep }) => {
         </View>
       </View>
       {/* 토스트 컴포넌트 */}
-      <Toast
+      <LoginToast
         text={toastMessage}
         visible={showToast}
         handleCancel={() => setShowToast(false)}

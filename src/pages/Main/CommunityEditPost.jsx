@@ -3,13 +3,11 @@ import {
   View,
   Text,
   StyleSheet,
-  Alert,
   ActivityIndicator,
   TextInput,
   Image,
   TouchableOpacity,
   SafeAreaView,
-  Modal,
   Platform,
   ScrollView,
 } from 'react-native';
@@ -23,6 +21,12 @@ import CommunityHeader from '../../components/Community/CommunityHeader';
 import BottomSheetModal from '../../components/Community/BottomSheetModal';
 import CommunityActionToast from '../../components/Community/CommunityActionToast';
 import CommunityActionModal from '../../components/Community/CommunityActionModal';
+import {
+  WarningIcon,
+  CautionIcon,
+  CameraIcon,
+  ImageIcon,
+} from '../../assets/assets';
 
 const CommunityEditPost = ({route}) => {
   const navigation = useNavigation();
@@ -56,7 +60,6 @@ const CommunityEditPost = ({route}) => {
     closeButton: true,
     progressBar: true,
   });
-
 
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged(user => {
@@ -135,7 +138,7 @@ const CommunityEditPost = ({route}) => {
     } else {
       setToastMessage({
         message: '게시글 내용을 입력해주세요.',
-        leftIcon: 'cautionIcon',
+        leftIcon: 'CautionIcon',
         closeButton: true,
         progressBar: true,
       });
@@ -183,7 +186,7 @@ const CommunityEditPost = ({route}) => {
       setModalMessage({
         title: '이미지 업로드 실패',
         modalText: '이미지 업로드 중 오류가 발생했습니다.',
-        iconSource: require('../../assets/icons/warningIcon.png'),
+        iconSource: WarningIcon,
         showConfirmButton: true,
         onConfirm: () => {
           setModalVisible(false);
@@ -224,7 +227,7 @@ const CommunityEditPost = ({route}) => {
       setModalMessage({
         title: '이미지 업로드 제한',
         modalText: '최대 7장까지 이미지를 업로드할 수 있습니다.',
-        iconSource: require('../../assets/icons/cautionIcon.png'),
+        iconSource: CautionIcon,
         showConfirmButton: true,
         onConfirm: () => {
           setModalVisible(false);
@@ -261,7 +264,7 @@ const CommunityEditPost = ({route}) => {
       setModalMessage({
         title: '이미지 업로드 제한',
         modalText: '최대 7장까지 이미지를 업로드할 수 있습니다.',
-        iconSource: require('../../assets/icons/cautionIcon.png'),
+        iconSource: CautionIcon,
         showConfirmButton: true,
         onConfirm: () => {
           setModalVisible(false);
@@ -327,7 +330,7 @@ const CommunityEditPost = ({route}) => {
               <TouchableOpacity
                 style={styles.imageUploadButton}
                 onPress={openImagePicker}>
-                <Image source={cameraIcon} style={{width: 24, height: 24}} />
+                <Image source={CameraIcon} style={{width: 24, height: 24}} />
                 <Text style={styles.imageUploadButtonText}>
                   {selectedImages.existingImages.length +
                     selectedImages.newImages.length}
@@ -379,13 +382,13 @@ const CommunityEditPost = ({route}) => {
             <TouchableOpacity
               style={styles.modalButton}
               onPress={takePhotoFromCamera}>
-              <Image source={cameraIcon} style={{width: 24, height: 24}} />
+              <Image source={CameraIcon} style={{width: 24, height: 24}} />
               <Text style={styles.modalButtonText}>카메라로 촬영</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.modalButton}
               onPress={choosePhotoFromLibrary}>
-              <Image source={pictureIcon} style={{width: 24, height: 24}} />
+              <Image source={ImageIcon} style={{width: 24, height: 24}} />
               <Text style={styles.modalButtonText}>갤러리에서 선택</Text>
             </TouchableOpacity>
           </View>
@@ -414,9 +417,6 @@ const CommunityEditPost = ({route}) => {
 };
 
 export default CommunityEditPost;
-
-const cameraIcon = require('../../assets/icons/cameraIcon.png');
-const pictureIcon = require('../../assets/icons/pictureIcon.png');
 
 const styles = StyleSheet.create({
   container: {

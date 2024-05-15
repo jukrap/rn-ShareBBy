@@ -3,56 +3,49 @@ import {
   Text,
   View,
   TextInput,
-  Alert,
   Image,
   TouchableOpacity,
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
-  Modal
 } from 'react-native';
 import {signIn} from '../../lib/auth';
 import firestore from '@react-native-firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import userStore from '../../lib/userStore';
-import Toast from '../../components/Main/Toast';
+import LoginToast from '../../components/SignUp/LoginToast';
 
 import {
   onGoogleButtonPress,
   handleNaverLogin,
   kakaoLogins,
 } from '../../lib/SocialLogin';
-const naverIcon = require('../../assets/icons/naver.png');
-const kakaoIcon = require('../../assets/icons/kakao.png');
-const googleIcon = require('../../assets/icons/google.png');
-
+import {Naver, Google, Kakao} from '../../assets/assets';
 const LoginTitle = require('../../assets/images/LoginTitle.png');
 
 const Login = ({navigation}) => {
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
   const [isEmailValid, setIsEmailValid] = useState(false);
-  const [showToast, setShowToast] = useState(false); 
+  const [showToast, setShowToast] = useState(false);
 
   const setUserData = userStore(state => state.setUserData); // Zustand 스토어 custom hook 사용
   const setUserToken = userStore(state => state.setUserToken);
 
-
-
   const onSignIn = async () => {
     try {
-      const { user } = await signIn({ email, password });
+      const {user} = await signIn({email, password});
 
       // 사용자의 문서를 가져와서 전체 정보를 가져옴
       const userDoc = await firestore().collection('users').doc(user.uid).get();
       const userInfo = userDoc.data();
-  
+
       // AsyncStorage에 사용자 정보 저장
       await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
-  
+
       // Zustand 스토어에 사용자 정보 설정
       setUserData(userInfo);
-  
+
       await AsyncStorage.setItem('userToken', user.uid);
       setUserToken(user.uid); // Zustand 스토어에 사용자 토큰 설정
       // navigation을 여기서 호출
@@ -63,7 +56,6 @@ const Login = ({navigation}) => {
       setTimeout(() => setShowToast(false), 3000);
     }
   };
-  
 
   const validateEmail = email => {
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -78,7 +70,7 @@ const Login = ({navigation}) => {
   };
 
   return (
-    <KeyboardAvoidingView style={{flex: 1, backgroundColor: '#fff'}}>
+    <KeyboardAvoidingView style={{flex: 1, backgroundColor: '#fefffe'}}>
       <View style={styles.firstContainer}>
         <View>
           <Image source={LoginTitle} />
@@ -154,19 +146,23 @@ const Login = ({navigation}) => {
           </View>
           <View style={styles.loginIconCantainer}>
             <TouchableOpacity onPress={() => handleNaverLogin(navigation)}>
-              <Image source={naverIcon} />
+              <Image source={Naver} />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => kakaoLogins(navigation)}>
-              <Image source={kakaoIcon} />
+              <Image source={Kakao} />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => onGoogleButtonPress(navigation)}>
-              <Image source={googleIcon} />
+              <Image source={Google} />
             </TouchableOpacity>
           </View>
         </View>
       </View>
-      <Toast text="아이디 또는 비밀번호를 확인해주세요." visible={showToast} handleCancel={() => setShowToast(false)} />
 
+      <LoginToast
+        text="아이디 또는 비밀번호를 확인해주세요."
+        visible={showToast}
+        handleCancel={() => setShowToast(false)}
+      />
     </KeyboardAvoidingView>
   );
 };
@@ -283,7 +279,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
   },
-  
 });
 
 export default Login;

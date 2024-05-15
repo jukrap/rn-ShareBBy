@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import {useEffect, useState} from 'react';
-const leftArrow = require('../../assets/newIcons/backIcon.png');
+import {BackIcon} from '../../assets/assets';
 
 function calculateTimeDifference(targetDate) {
   const now = new Date(); // 현재 시간
@@ -18,7 +18,7 @@ function calculateTimeDifference(targetDate) {
   const timeDifference = endDate.getTime() - now.getTime();
 
   if (timeDifference <= 0) {
-    console.log('목표 시간이 이미 지났습니다.');
+    // console.log('목표 시간이 이미 지났습니다.');
     return;
   }
 
@@ -56,6 +56,11 @@ const MyRecruits = ({navigation, route}) => {
         }
         return {id: doc.id, ...data};
       });
+      tmp_recruit.sort((a, b) => {
+        const dateA = a.writeTime;
+        const dateB = b.writeTime;
+        return dateB - dateA; // 내림차순 정렬
+      });
       setHobbies(tmp_recruit);
     } catch (error) {
       console.error('Error fetching posts:', error.message);
@@ -68,48 +73,42 @@ const MyRecruits = ({navigation, route}) => {
     <View style={styles.containerView}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Image style={styles.arrow} source={leftArrow} />
+          <Image style={styles.arrow} source={BackIcon} />
         </TouchableOpacity>
         <Text style={styles.headtext}>내 모집 공고</Text>
       </View>
-      <ScrollView>
-        <View style={styles.container}>
-          {hobbies.map((it, idx) => {
-            return (
-              <View key={idx} style={styles.post}>
-                <Text style={styles.title}>{it.title}</Text>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                  }}>
-                  <View style={styles.contentWrapper}>
-                    <Text style={styles.content}>{it.content}</Text>
-                    <Text style={styles.address}>
-                      {it.address} {it.detail_address}
-                    </Text>
-                  </View>
-                  <View style={styles.recruiteWrapper}>
-                    {it.nickname === '모집중' ? (
-                      <Text style={styles.recruiteStatus}>모집중</Text>
-                    ) : (
-                      <Text style={styles.recruiteComplete}>모집완료</Text>
-                    )}
-
-                    <Text style={styles.personCount}>
-                      {it.personNumber}/{it.peopleCount}
-                    </Text>
-                  </View>
+      <ScrollView style={styles.container}>
+        {hobbies.map((it, idx) => {
+          return (
+            <View key={idx} style={styles.post}>
+              <Text style={styles.title}>{it.title}</Text>
+              <View style={styles.recruiteContainer}>
+                <View style={styles.contentWrapper}>
+                  <Text style={styles.content}>{it.content}</Text>
+                  <Text style={styles.address}>
+                    {it.address} {it.detail_address}
+                  </Text>
                 </View>
-                <Text style={styles.tag}>{it.tag}</Text>
+                <View style={styles.recruiteWrapper}>
+                  {it.nickname === '모집중' ? (
+                    <Text style={styles.recruiteStatus}>모집중</Text>
+                  ) : (
+                    <Text style={styles.recruiteComplete}>모집완료</Text>
+                  )}
 
-                <Text style={styles.deadline}>
-                  {it.deadline ? it.deadline : '시간이 종료되었습니다'}
-                </Text>
+                  <Text style={styles.personCount}>
+                    {it.personNumber}/{it.peopleCount}
+                  </Text>
+                </View>
               </View>
-            );
-          })}
-        </View>
+              <Text style={styles.tag}>{it.tag}</Text>
+
+              <Text style={styles.deadline}>
+                {it.deadline ? it.deadline : '시간이 종료되었습니다'}
+              </Text>
+            </View>
+          );
+        })}
       </ScrollView>
     </View>
   );
@@ -124,7 +123,11 @@ const styles = StyleSheet.create({
     marginTop: 60,
   },
   arrow: {width: 22, height: 22},
-  headtext: {fontSize: 20, fontWeight: 'bold', marginLeft: 10},
+  headtext: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginLeft: 10,
+  },
   container: {
     margin: 20,
   },
@@ -132,7 +135,7 @@ const styles = StyleSheet.create({
     borderColor: 'grey',
     borderWidth: 1,
     borderRadius: 10,
-    padding: 20,
+    padding: 15,
     marginTop: 12,
     marginBottom: 12,
   },
@@ -143,32 +146,32 @@ const styles = StyleSheet.create({
     color: '#212529',
     marginBottom: 10,
   },
-  contentWrapper: {},
-  personCount: {
-    fontSize: 15,
-    color: '#212529',
-    paddingTop: 10,
-    paddingBottom: 10,
+  recruiteContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
+  contentWrapper: {
+    flex: 0.95,
+  },
+
   tag: {
     fontSize: 15,
     fontWeight: 'bold',
     color: '#212529',
-    paddingTop: 10,
-    paddingBottom: 10,
+    paddingTop: 5,
   },
   deadline: {
     fontSize: 15,
     fontWeight: 'bold',
     color: '#898989',
-    paddingTop: 10,
+    paddingTop: 5,
     paddingBottom: 10,
   },
   content: {
-    fontSize: 15,
+    fontSize: 16,
     color: '#212529',
     paddingTop: 10,
-    paddingBottom: 10,
+    paddingBottom: 7,
   },
   address: {
     fontSize: 15,
@@ -181,14 +184,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   recruiteStatus: {
-    fontSize: 15,
+    fontSize: 16,
     color: '#07AC7D',
     paddingTop: 10,
-    paddingBottom: 10,
+    paddingBottom: 7,
   },
   recruiteComplete: {
-    fontSize: 15,
+    fontSize: 16,
     color: '#4E8FE4',
+    paddingTop: 10,
+    paddingBottom: 7,
+  },
+  personCount: {
+    fontSize: 15,
+    color: '#212529',
     paddingTop: 10,
     paddingBottom: 10,
   },

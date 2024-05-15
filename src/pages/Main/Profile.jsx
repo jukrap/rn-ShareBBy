@@ -14,38 +14,19 @@ import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import useStore from '../../lib/userStore';
 import {useFocusEffect} from '@react-navigation/native';
-import {StackActions} from '@react-navigation/native';
-
-const heart = require('../../assets/newIcons/heart-icon.png');
-const pencil = require('../../assets/newIcons/pencil-icon.png');
-const marker = require('../../assets/newIcons/marker-icon.png');
+import LoginModal from '../../components/SignUp/LoginModal';
+import {HeartIcon, PencilIcon, MarkerIcon} from '../../assets/assets';
 
 const {width, height} = Dimensions.get('window');
-const rightArrow = require('../../assets/icons/right-arrow.png');
+const rightArrow = require('../../assets/newIcons/rightIcon.png');
 
 const Profile = ({navigation, route}) => {
   const [users, setUsers] = useState(null);
   const [userUid, setUserUid] = useState(null);
+  const [showLogoutModal, setLogoutShowModal] = useState(null);
   const usersCollection = firestore().collection('users');
-  // const clearUserToken = useStore(state => state.clearUserToken);
   const userToken = useStore(state => state.userToken); // 토큰 상태 추가
 
-  // useEffect(() => {
-  //   const fetchUserUid = async () => {
-  //     try {
-  //       const user = auth().currentUser;
-  //       if (user) {
-  //         //set uuid
-  //         const userUID = user.uid;
-  //         setUserUid(userUID);
-  //       }
-  //     } catch (error) {
-  //       console.error('Error fetching current user: ', error);
-  //     }
-  //     console.log('call user uid', userUid);
-  //   };
-  //   fetchUserUid();
-  // }, [navigation]);
   const fetchUserUid = async () => {
     try {
       const user = auth().currentUser;
@@ -57,12 +38,11 @@ const Profile = ({navigation, route}) => {
     } catch (error) {
       console.error('Error fetching current user: ', error);
     }
-    // console.log('call user uid', userUid);
   };
   const fetchUserData = async () => {
     try {
       const querySnapshot = (await usersCollection.doc(userUid).get()).data();
-      // console.log(querySnapshot);
+
       setUsers(querySnapshot); // 사용자 데이터 상태 설정
     } catch (error) {
       console.log(error.message);
@@ -85,23 +65,31 @@ const Profile = ({navigation, route}) => {
     try {
       // Firebase에서 로그아웃
       await auth().signOut();
-
       await AsyncStorage.removeItem('userInfo');
-
-      navigation.replace('Login');
+      setLogoutShowModal(false);
+      navigation.reset({
+        index: 0,
+        routes: [{name: 'Login'}],
+      });
     } catch (error) {
       console.error('로그아웃 실패:', error);
     }
   };
 
-  console.log('User Token:', userToken);
+  const handleLogoutModalClose = () => {
+    // 모달 닫기
+    setLogoutShowModal(false);
+  };
+  const handleLogoutShowModal = () => {
+    setLogoutShowModal(true);
+  };
+
   return (
     <SafeAreaView style={styles.safeAreaViewStyle}>
       {users ? (
         <ScrollView>
           <Text style={styles.title}>마이페이지</Text>
           <View style={styles.profileHeader}>
-            {/* onPress 추가 */}
             <Image
               source={{uri: users.profileImage}}
               style={styles.profileImageStyle}
@@ -133,7 +121,7 @@ const Profile = ({navigation, route}) => {
                 })
               }
               style={styles.myList}>
-              <Image source={pencil} style={styles.icon} />
+              <Image source={PencilIcon} style={styles.icon} />
               <Text style={styles.listStyle}>내가 쓴 글</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -143,7 +131,7 @@ const Profile = ({navigation, route}) => {
                 })
               }
               style={styles.myList}>
-              <Image source={heart} style={styles.icon} />
+              <Image source={HeartIcon} style={styles.icon} />
               <Text style={styles.listStyle}>찜한 글</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -153,7 +141,7 @@ const Profile = ({navigation, route}) => {
                 })
               }
               style={styles.myList}>
-              <Image source={marker} style={styles.icon} />
+              <Image source={MarkerIcon} style={styles.icon} />
               <Text
                 // onPress={() => navigation.navigate('Home')}
                 style={styles.listStyle}>
@@ -177,7 +165,7 @@ const Profile = ({navigation, route}) => {
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={handleLogout}
+              onPress={handleLogoutShowModal}
               style={styles.noticeWrapper}>
               <Text style={styles.noticeStyle}>로그아웃</Text>
             </TouchableOpacity>
@@ -190,6 +178,16 @@ const Profile = ({navigation, route}) => {
           <Text>not users</Text>
         </ScrollView>
       )}
+      <LoginModal
+        animationType="slide"
+        visible={showLogoutModal}
+        closeModal={handleLogoutModalClose}
+        message="로그아웃"
+        message2="로그아웃 하시겠어요?"
+        LeftButton="취소"
+        RightButton="로그아웃"
+        onConfirm={handleLogout}
+      />
     </SafeAreaView>
   );
 };
@@ -208,9 +206,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   profileHeader: {
-    // paddingBottom: 15,
     justifyContent: 'flex-start',
-    // alignItems: 'center',
     paddingBottom: 10,
     flexDirection: 'row',
     marginTop: 20,
@@ -221,16 +217,19 @@ const styles = StyleSheet.create({
   },
   name: {
     flexDirection: 'row',
+    alignItems: 'center',
+    paddingBottom: 10,
   },
   nameStyle: {
     fontSize: 20,
     fontWeight: 'bold',
     color: '#212529',
-    paddingBottom: 10,
+    // paddingBottom: 10,
   },
   arrow: {
-    width: 20,
-    height: 20,
+    width: 15,
+    height: 15,
+    marginLeft: 10,
     alignItems: 'center',
   },
   emailStyle: {
@@ -242,17 +241,9 @@ const styles = StyleSheet.create({
     borderRadius: 70,
     width: 70,
     height: 70,
-
     marginRight: 22,
   },
-  profileWrapper: {
-    backgroundColor: '#fff',
 
-    // marginTop: -80,
-
-    borderTopLeftRadius: 50,
-    borderTopRightRadius: 50,
-  },
   icon: {
     width: 16,
     height: 16,
@@ -262,16 +253,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#212529',
     flexDirection: 'row',
-    // textAlign: 'center',
-    // justifyContent: 'center',
     margin: 10,
     fontWeight: 'bold',
   },
   infoStyle: {
     fontSize: 16,
-    // flexDirection: 'row',
-    // textAlign: 'center',
-    // justifyContent: 'center',
     marginTop: 10,
     marginLeft: 30,
     marginRight: 30,
@@ -283,13 +269,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     textAlign: 'center',
     alignItems: 'center',
-    // justifyContent: 'center',
   },
   noticeStyle: {
     fontSize: 15,
     fontWeight: 'bold',
     color: '#3f3f3f',
-    alignItems: 'center',
+    // alignItems: 'center',
     marginLeft: 5,
   },
   noticeWrapper: {
@@ -298,7 +283,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginTop: 10,
-    marginBottom: 10,
+    marginBottom: 12,
   },
   additionalInfo: {
     marginLeft: 30,

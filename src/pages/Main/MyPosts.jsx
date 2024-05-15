@@ -8,8 +8,7 @@ import {
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import {useEffect, useState} from 'react';
-const leftArrow = require('../../assets/newIcons/backIcon.png');
-const heart = require('../../assets/newIcons/heart-icon.png');
+import {BackIcon, HeartIcon} from '../../assets/assets';
 const formatDate = date => {
   return new Intl.DateTimeFormat('ko-KR', {
     year: 'numeric',
@@ -31,13 +30,18 @@ const MyPosts = ({navigation, route}) => {
       const snapshot = await postsCollection.where('userId', '==', uuid).get();
       const tmp_posts = snapshot.docs.map(doc => {
         const data = doc.data();
+
         if (data.post_created && data.post_created.toDate) {
           data.post_created = data.post_created.toDate(); // Date 객체로 변환
         }
         return {id: doc.id, ...data};
       });
+      tmp_posts.sort((a, b) => {
+        const dateA = a.post_created;
+        const dateB = b.post_created;
+        return dateB - dateA; // 내림차순 정렬
+      });
       setPosts(tmp_posts);
-      // console.log('posts', posts);
     } catch (error) {
       console.error('Error fetching posts:', error.message);
     }
@@ -49,7 +53,7 @@ const MyPosts = ({navigation, route}) => {
     <View>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Image style={styles.arrow} source={leftArrow} />
+          <Image style={styles.arrow} source={BackIcon} />
         </TouchableOpacity>
         <Text style={styles.headtext}>내가 쓴 글</Text>
       </View>
@@ -91,7 +95,7 @@ const MyPosts = ({navigation, route}) => {
                 </ScrollView>
               </View>
               <View style={styles.like}>
-                <Image source={heart} style={styles.heart} />
+                <Image source={HeartIcon} style={styles.heart} />
                 <Text style={styles.likeCount}>{it.likeCount}</Text>
               </View>
             </View>
@@ -110,7 +114,11 @@ const styles = StyleSheet.create({
     marginTop: 60,
   },
   arrow: {width: 22, height: 22},
-  headtext: {fontSize: 20, fontWeight: 'bold', marginLeft: 10},
+  headtext: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginLeft: 10,
+  },
   container: {
     margin: 20,
   },
@@ -166,10 +174,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  heart: {width: 22, height: 22},
+  heart: {width: 20, height: 20},
   likeCount: {
     marginLeft: 5,
-    fontSize: 15,
+    fontSize: 12,
+    fontWeight: '500',
+    fontFamily: 'Pretendard',
   },
 });
 

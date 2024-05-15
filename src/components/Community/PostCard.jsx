@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Image,
@@ -6,22 +6,17 @@ import {
   TouchableOpacity,
   Dimensions,
   StyleSheet,
-  ImageBackground,
 } from 'react-native';
-import ProgressiveImage from './ProgressiveImage';
 import {useFocusEffect} from '@react-navigation/native';
 import {formatDistanceToNow} from 'date-fns';
 import {ko} from 'date-fns/locale';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
-import Modal from 'react-native-modal';
-import {SwiperFlatList} from 'react-native-swiper-flatlist';
 import BottomSheetModal from './BottomSheetModal';
 import ImageDetailModal from './ImageDetailModal';
-
-import FastImage from 'react-native-fast-image';
 import {FasterImageView} from '@candlefinance/faster-image';
 import ImageSlider from './ImageSlider';
+import LoginToast from '../SignUp/LoginToast';
 
 const {width, height} = Dimensions.get('window');
 
@@ -31,7 +26,7 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(item.likeCount || 0);
-  const likeIcon = isLiked ? heartLineIcon : heartRedIcon;
+  const likeIcon = isLiked ? HeartIcon : RedHeartIcon;
   const [commentCount, setCommentCount] = useState(item.commentCount || 0);
   const [isLikeProcessing, setIsLikeProcessing] = useState(false);
   const [isMoreContent, setIsMoreContent] = useState(false);
@@ -54,6 +49,28 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
     fetchPostUserData();
     return () => unsubscribe();
   }, []);
+
+  const toggleReportModal = async () => {
+    try {
+      // 해당 유저 정보 가져오기
+      const userDoc = await firestore().collection('users').doc(item.userId).get();
+      if (userDoc.exists) {
+        const userData = userDoc.data();
+        let reportCount = userData.report || 0;
+        reportCount++; 
+        
+        await firestore().collection('users').doc(item.userId).update({ report: reportCount });
+        // 모달이 닫힐 때 토스트를 보여주기
+        setIsModalVisible(!isModalVisible);
+        setShowToast(true);
+
+      } else {
+        console.log("해당 유저 정보가 존재하지 않습니다.");
+      }
+    } catch (error) {
+      console.error("유저 정보를 업데이트하는 중에 오류가 발생했습니다:", error);
+    }
+  };
 
   const toggleModal = () => {
     setIsModalVisible(!isModalVisible);
@@ -188,7 +205,7 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
               url: postUserData?.profileImage,
               priority: 'high',
               cachePolicy: 'discWithCacheControl',
-              failureImageUrl: defaultProfileImg,
+              failureImageUrl: DefaultProfileIcon,
               resizeMode: 'cover',
               borderRadius: 50,
             }}
@@ -208,7 +225,7 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
             <Image
               style={styles.moreIcon}
               resizeMode="cover"
-              source={moreIcon}
+              source={MoreIcon}
             />
           </TouchableOpacity>
         </View>
@@ -247,8 +264,8 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
             ]}
             onPress={handleLikePress}>
             <Image
-              source={isLiked ? heartRedIcon : heartLineIcon}
-              style={{width: 24, height: 24}}
+              source={isLiked ? RedHeartIcon : HeartIcon}
+              style={{width: 20, height: 20}}
             />
             <Text
               style={[
@@ -261,7 +278,7 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
           <TouchableOpacity
             style={styles.interactionButton}
             onPress={onComment}>
-            <Image source={commentLineIcon} style={{width: 24, height: 24}} />
+            <Image source={CommentLineIcon} style={{width: 20, height: 20}} />
             <Text style={styles.interactionText}>{commentCount}</Text>
           </TouchableOpacity>
         </View>
@@ -269,7 +286,7 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
           <TouchableOpacity
             style={styles.interactionButton}
             onPress={handleSharePress}>
-            <Image source={shareIcon} style={{width: 24, height: 24}} />
+            <Image source={ShareIcon} style={{width: 20, height: 20}} />
           </TouchableOpacity>
         </View>
       </View>
@@ -281,7 +298,7 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
               onEdit(item.id);
               toggleModal();
             }}>
-            <Image source={pencilIcon} style={{width: 24, height: 24}} />
+            <Image source={PencilIcon} style={{width: 20, height: 20}} />
             <Text style={styles.modalButtonText}>게시글 수정</Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -290,8 +307,15 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
               onDelete(item.id);
               toggleModal();
             }}>
-            <Image source={deleteIcon} style={{width: 24, height: 24}} />
+            <Image source={DeleteIcon} style={{width: 20, height: 20}} />
             <Text style={styles.modalButtonText}>게시글 삭제</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={styles.modalButton}
+            onPress={toggleReportModal}>
+            <Image source={CautionIcon} style={{width: 20, height: 20}} />
+            <Text style={styles.modalButtonText}>신고하기</Text>
           </TouchableOpacity>
         </View>
       </BottomSheetModal>
@@ -303,21 +327,25 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
           onClose={() => setIsImageModalVisible(false)}
         />
       )}
+      <LoginToast
+          text="신고되었습니다."
+          visible={showToast}
+          handleCancel={() => setShowToast(false)}
+        />
     </View>
   );
 };
-
-const moreIcon = require('../../assets/icons/moreIcon.png');
-const commentLineIcon = require('../../assets/icons/commentLineIcon.png');
-const commentFillIcon = require('../../assets/icons/commentFillIcon.png');
-const heartLineIcon = require('../../assets/icons/heartLineIcon.png');
-const heartRedIcon = require('../../assets/icons/heartRedIcon.png');
-const shareIcon = require('../../assets/icons/shareIcon.png');
-const pencilIcon = require('../../assets/icons/pencilIcon.png');
-const deleteIcon = require('../../assets/icons/deleteIcon.png');
-const defaultPostImg = require('../../assets/images/defaultPostImg.jpg');
-const defaultProfileImg = require('../../assets/images/defaultProfileImg.jpeg');
-
+import {
+  MoreIcon,
+  CommentLineIcon,
+  HeartIcon,
+  RedHeartIcon,
+  ShareIcon,
+  PencilIcon,
+  DeleteIcon,
+  CautionIcon ,
+  DefaultProfileIcon,
+} from '../../assets/assets';
 export default PostCard;
 
 const styles = StyleSheet.create({
@@ -379,8 +407,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   moreIcon: {
-    width: 24,
-    height: 24,
+    width: 20,
+    height: 20,
   },
   postContentText: {
     fontSize: 14,

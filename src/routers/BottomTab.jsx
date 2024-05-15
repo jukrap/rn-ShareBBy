@@ -20,6 +20,9 @@ import MyPosts from '../pages/Main/MyPosts';
 import MyLists from '../pages/Main/MyLists';
 import MyRecruits from '../pages/Main/MyRecruits';
 import ShowAllImages from '../pages/Main/ShowAllImages';
+import ChatRoomNotice from '../pages/Main/ChatRoomNotice';
+import WriteNotice from '../pages/Main/WriteNotice';
+import NoticeDetail from '../pages/Main/NoticeDetail';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -43,6 +46,9 @@ const AboutChat = () => {
       <Stack.Screen name="Chat" component={Chat} />
       <Stack.Screen name="ChatRoom" component={ChatRoom} />
       <Stack.Screen name="ShowAllImages" component={ShowAllImages} />
+      <Stack.Screen name="ChatRoomNotice" component={ChatRoomNotice} />
+      <Stack.Screen name="WriteNotice" component={WriteNotice} />
+      <Stack.Screen name="NoticeDetail" component={NoticeDetail} />
     </Stack.Navigator>
   );
 };
@@ -83,13 +89,13 @@ const BottomTab = ({navigation}) => {
           let iconName;
 
           if (route.name === '홈') {
-            iconName = focused ? homeOnIcon : homeOffIcon;
+            iconName = focused ? HomeOnIcon : HomeOffIcon;
           } else if (route.name === '게시판') {
-            iconName = focused ? boardOnIcon : boardOffIcon;
+            iconName = focused ? BoardOnIcon : BoardOffIcon;
           } else if (route.name === '채팅') {
-            iconName = focused ? chatOnIcon : chatOffIcon;
+            iconName = focused ? ChatOnIcon : ChatOffIcon;
           } else if (route.name === '프로필') {
-            iconName = focused ? profileOnIcon : profileOffIcon;
+            iconName = focused ? ProfileOnIcon : ProfileOffIcon;
           }
           // 아이콘 반환
           return <Image source={iconName} style={style.icon} />;
@@ -104,20 +110,21 @@ const BottomTab = ({navigation}) => {
     </Tab.Navigator>
   );
 };
-
-const homeOnIcon = require('../assets/icons/homeOnIcon.png');
-const homeOffIcon = require('../assets/icons/homeOffIcon.png');
-const boardOnIcon = require('../assets/icons/boardOnIcon.png');
-const boardOffIcon = require('../assets/icons/boardOffIcon.png');
-const chatOnIcon = require('../assets/icons/chatOnIcon.png');
-const chatOffIcon = require('../assets/icons/chatOffIcon.png');
-const profileOnIcon = require('../assets/icons/profileOnIcon.png');
-const profileOffIcon = require('../assets/icons/profileOffIcon.png');
+import {
+  HomeOnIcon,
+  HomeOffIcon,
+  BoardOffIcon,
+  BoardOnIcon,
+  ChatOnIcon,
+  ChatOffIcon,
+  ProfileOffIcon,
+  ProfileOnIcon,
+} from '../assets/assets';
 
 export const style = StyleSheet.create({
   icon: {
-    width: 30,
-    height: 30,
+    width: 26,
+    height: 26,
   },
 });
 

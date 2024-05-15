@@ -117,6 +117,7 @@ const Chat = () => {
         chatRoomId: item.id,
         chatRoomName: item.name,
         hobbiesId: item.hobbiesId,
+        members: item.members,
       });
     };
 
@@ -170,12 +171,19 @@ const Chat = () => {
             )}
           </View>
         </View>
-        <ChatListTime
-          type={formattedTime.type}
-          month={formattedTime.month}
-          day={formattedTime.day}
-          time={formattedTime.time}
-        />
+        <View
+          style={{
+            flex: 0.8,
+            alignItems: 'flex-end',
+            justifyContent: 'flex-end',
+          }}>
+          <ChatListTime
+            type={formattedTime.type}
+            month={formattedTime.month}
+            day={formattedTime.day}
+            time={formattedTime.time}
+          />
+        </View>
       </TouchableOpacity>
     );
   };
