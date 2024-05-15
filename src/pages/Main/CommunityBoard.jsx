@@ -59,33 +59,36 @@ const CommunityBoard = ({navigation, route}) => {
 
   const [selectedSortOption, setSelectedSortOption] = useState('최신순');
   const [isSortOptionsVisible, setIsSortOptionsVisible] = useState(false);
+  const [viewMode, setViewMode] = useState('내 주변 보기');
+  const [currentUserAddress, setCurrentUserAddress] = useState('');
 
   const sortOptions = ['최신순', '추천순', '댓글순'];
 
   useEffect(() => {
+    const initialViewMode = '내 주변 보기';
+    const initialUserAddress = '';
     const unsubscribe = auth().onAuthStateChanged(user => {
       setCurrentUser(user);
     });
 
-    fetchInitialPosts();
-
+    setViewMode(initialViewMode);
+    setCurrentUserAddress(initialUserAddress);
+  
+    fetchInitialPosts(initialViewMode, initialUserAddress);
+  
     return unsubscribe;
   }, []);
-
-  useFocusEffect(
-    React.useCallback(() => {
-      fetchInitialPosts();
-
-    const loadSelectedSortOption = async () => {
-      const savedOption = await AsyncStorage.getItem('selectedSortOption');
-      if (savedOption) {
-        setSelectedSortOption(savedOption);
-        fetchPostsBySelectedOption(savedOption);
-      }
-    };
-    loadSelectedSortOption();
-    }, []),
-  );
+  
+  useEffect(() => {
+    if (currentUser) {
+      fetchCurrentUserAddress();
+    }
+  }, [currentUser]);
+  
+  useEffect(() => {
+    fetchInitialPosts(viewMode, currentUserAddress);
+  }, [viewMode, currentUserAddress]);
+  
 
   useFocusEffect(
     React.useCallback(() => {
@@ -101,23 +104,55 @@ const CommunityBoard = ({navigation, route}) => {
       }
     }, [route.params]),
   );
+  
 
-  const fetchInitialPosts = async () => {
+  const fetchCurrentUserAddress = async () => {
+    if (currentUser) {
+      try {
+        const userDoc = await firestore()
+          .collection('users')
+          .doc(currentUser.uid)
+          .get();
+
+        if (userDoc.exists) {
+          const userData = userDoc.data();
+          if (userData.address) {
+            setCurrentUserAddress(userData.address);
+          } else {
+            setCurrentUserAddress('');
+          }
+        } else {
+          setCurrentUserAddress('');
+        }
+      } catch (error) {
+        console.log('사용자 주소를 가져오는 중에 오류가 발생했습니다:', error);
+        setCurrentUserAddress('');
+      }
+    }
+  };
+
+  const fetchInitialPosts = async (viewMode, currentUserAddress) => {
     setLoading(true);
-
+  
     try {
-      const querySnapshot = await firestore()
+      let query = firestore()
         .collection('posts')
-        .where('post_actflag', '==', true)
-        .orderBy('post_created', 'desc')
-        .limit(10)
-        .get();
-
+        .where('post_actflag', '==', true);
+  
+      if (viewMode === '내 주변 보기' && currentUserAddress) {
+        const userRegion = currentUserAddress.split(' ').slice(0, 2).join(' ');
+        query = query.where('userRegion', '==', userRegion);
+      }
+  
+      query = query.orderBy('post_created', 'desc').limit(10);
+  
+      const querySnapshot = await query.get();
+  
       const initialPosts = querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
       }));
-
+  
       setPosts(initialPosts);
       setOldestVisible(querySnapshot.docs[querySnapshot.docs.length - 1]);
       setNewestVisible(querySnapshot.docs[0]);
@@ -127,6 +162,7 @@ const CommunityBoard = ({navigation, route}) => {
       setLoading(false);
     }
   };
+  
 
   const fetchOlderPosts = async () => {
     if (oldestVisible) {
@@ -136,6 +172,14 @@ const CommunityBoard = ({navigation, route}) => {
         let query = firestore()
           .collection('posts')
           .where('post_actflag', '==', true);
+
+        if (viewMode === '내 주변 보기' && currentUserAddress) {
+          const userRegion = currentUserAddress
+            .split(' ')
+            .slice(0, 2)
+            .join(' ');
+          query = query.where('userRegion', '==', userRegion);
+        }
 
         if (selectedSortOption === '최신순') {
           query = query.orderBy('post_created', 'desc');
@@ -174,6 +218,14 @@ const CommunityBoard = ({navigation, route}) => {
           .collection('posts')
           .where('post_actflag', '==', true);
 
+        if (viewMode === '내 주변 보기' && currentUserAddress) {
+          const userRegion = currentUserAddress
+            .split(' ')
+            .slice(0, 2)
+            .join(' ');
+          query = query.where('userRegion', '==', userRegion);
+        }
+
         if (selectedSortOption === '최신순') {
           query = query.orderBy('post_created', 'desc');
         } else if (selectedSortOption === '추천순') {
@@ -193,7 +245,7 @@ const CommunityBoard = ({navigation, route}) => {
         }));
 
         const uniquePosts = [...newerPosts, ...posts].reduce((acc, post) => {
-          if (!acc.find((p) => p.id === post.id)) {
+          if (!acc.find(p => p.id === post.id)) {
             acc.push(post);
           }
           return acc;
@@ -353,7 +405,6 @@ const CommunityBoard = ({navigation, route}) => {
   };
 
   const handleSortOptionChange = async option => {
-    await AsyncStorage.setItem('selectedSortOption', option);
     setSelectedSortOption(option);
     fetchPostsBySelectedOption(option);
     setIsSortOptionsVisible(false);
@@ -366,6 +417,11 @@ const CommunityBoard = ({navigation, route}) => {
       let query = firestore()
         .collection('posts')
         .where('post_actflag', '==', true);
+
+      if (viewMode === '내 주변 보기') {
+        const userRegion = currentUserAddress.split(' ').slice(0, 2).join(' ');
+        query = query.where('userRegion', '==', userRegion);
+      }
 
       if (option === '최신순') {
         query = query.orderBy('post_created', 'desc');
@@ -396,23 +452,42 @@ const CommunityBoard = ({navigation, route}) => {
     return (
       <View style={styles.headerContainer}>
         {refreshingNewer ? (
-          <ActivityIndicator
-            size="large"
-            color="#07AC7D"
-            style={{marginVertical: 16}}
-          />
+        <View style={{ flex: 1, justifyContent: 'center' }}>
+          <ActivityIndicator size="large" color="#07AC7D" style={{ marginVertical: 16 }} />
+        </View>
         ) : (
-          <TouchableOpacity
-            style={styles.sortButton}
-            onPress={() => setIsSortOptionsVisible(true)}>
-            <Text style={styles.sortButtonText}>{selectedSortOption}</Text>
-            <Image source={sortIcon} style={styles.sortIcon} />
-          </TouchableOpacity>
+          <>
+            {currentUserAddress ? (
+              <TouchableOpacity
+                style={styles.viewModeButton}
+                onPress={() =>
+                  setViewMode((prevMode) =>
+                    prevMode === '전체 보기' ? '내 주변 보기' : '전체 보기'
+                  )
+                }
+              >
+                <Text style={styles.viewModeButtonText}>{viewMode}</Text>
+              </TouchableOpacity>
+            ) : (
+              <View style={styles.viewModeButton}>
+                <Text style={[styles.viewModeButtonText, {color: '#aaa'}]}>
+                  주소 정보 없음
+                </Text>
+              </View>
+            )}
+            <TouchableOpacity
+              style={styles.sortButton}
+              onPress={() => setIsSortOptionsVisible(true)}
+            >
+              <Text style={styles.sortButtonText}>{selectedSortOption}</Text>
+              <Image source={sortIcon} style={styles.sortIcon} />
+            </TouchableOpacity>
+          </>
         )}
       </View>
     );
   };
-
+  
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: '#FEFFFE'}}>
       <View style={{flex: 1}}>
@@ -610,7 +685,7 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
     paddingHorizontal: 8,
     paddingVertical: 8,
   },
@@ -629,6 +704,16 @@ const styles = StyleSheet.create({
   sortIcon: {
     width: 24,
     height: 24,
+  },
+  viewModeButton: {
+    paddingVertical: 8,
+  },
+  viewModeButtonText: {
+    fontSize: 16,
+    fontFamily: 'Pretendard',
+    marginRight: 8,
+    marginBottom: 4,
+    color: '#07AC7D',
   },
   modalBackground: {
     flex: 1,

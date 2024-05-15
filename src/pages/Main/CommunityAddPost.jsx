@@ -13,7 +13,6 @@ import {
 } from 'react-native';
 import ImagePicker from 'react-native-image-crop-picker';
 import {useNavigation, useRoute} from '@react-navigation/native';
-import Modal from 'react-native-modal';
 import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
@@ -131,6 +130,28 @@ const CommunityAddPost = () => {
       console.log('이미지 URLs: ', imageUrls);
       console.log('게시글 내용: ', postContent);
 
+      // 현재 사용자의 주소 정보 가져오기
+      const userDoc = await firestore()
+        .collection('users')
+        .doc(currentUser.uid)
+        .get();
+
+      const userData = userDoc.data();
+      let userRegion = '';
+
+      if (userData.address) {
+        const addressParts = userData.address.split(' ');
+        if (addressParts.length >= 2) {
+          userRegion = addressParts.slice(0, 2).join(' ');
+        } else {
+          console.log('사용자 주소 정보의 형식이 올바르지 않습니다.');
+          userRegion = '주소 정보 없음';
+        }
+      } else {
+        console.log('사용자 주소 정보가 없습니다.');
+        userRegion = '주소 정보 없음';
+      }
+
       // Firestore에 게시글 추가
       await firestore()
         .collection('posts')
@@ -142,6 +163,7 @@ const CommunityAddPost = () => {
           post_actflag: true,
           likeCount: 0,
           commentCount: 0,
+          userRegion: userRegion,
         });
 
       console.log('게시글 업로드 완료!');
