@@ -37,7 +37,11 @@ const MyPosts = ({navigation, route}) => {
         }
         return {id: doc.id, ...data};
       });
-      console.log('포스트', tmp_posts);
+      tmp_posts.sort((a, b) => {
+        const dateA = a.post_created;
+        const dateB = b.post_created;
+        return dateB - dateA; // 내림차순 정렬
+      });
       setPosts(tmp_posts);
     } catch (error) {
       console.error('Error fetching posts:', error.message);
