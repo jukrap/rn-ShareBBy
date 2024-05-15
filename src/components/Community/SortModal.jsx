@@ -1,6 +1,10 @@
 import React from 'react';
 import {View, Text, TouchableOpacity, StyleSheet, Image} from 'react-native';
 import Modal from 'react-native-modal';
+import {
+  SortIcon,
+  OnCheck,
+} from '../../assets/assets';
 
 const SortModal = ({isVisible, onClose, selectedOption, options, onSelect}) => {
   return (
@@ -16,7 +20,7 @@ const SortModal = ({isVisible, onClose, selectedOption, options, onSelect}) => {
       onBackdropPress={onClose}>
       <View style={styles.modalContent}>
         <Image
-          source={require('../../assets/icons/sortIcon.png')}
+          source={SortIcon}
           style={styles.modalIcon}
           resizeMode="contain"
         />
@@ -34,7 +38,7 @@ const SortModal = ({isVisible, onClose, selectedOption, options, onSelect}) => {
               {option}
             </Text>
             {selectedOption === option && (
-              <Image source={checkIcon} style={styles.checkIcon} />
+              <Image source={OnCheck} style={styles.checkIcon} />
             )}
           </TouchableOpacity>
         ))}
@@ -50,8 +54,6 @@ const SortModal = ({isVisible, onClose, selectedOption, options, onSelect}) => {
 };
 
 export default SortModal;
-
-const checkIcon = require('../../assets/icons/onCheck.png');
 
 const styles = StyleSheet.create({
   modalContent: {

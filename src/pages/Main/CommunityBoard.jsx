@@ -7,6 +7,8 @@ import {
   FlatList,
   SafeAreaView,
   ActivityIndicator,
+  TouchableOpacity,
+  Image,
 } from 'react-native';
 
 import firestore from '@react-native-firebase/firestore';
@@ -19,7 +21,8 @@ import auth from '@react-native-firebase/auth';
 import CommunityHeader from '../../components/Community/CommunityHeader';
 import CommunityActionToast from '../../components/Community/CommunityActionToast';
 import CommunityActionModal from '../../components/Community/CommunityActionModal';
-import {WarningIcon, PencilIcon} from '../../assets/assets';
+import SortModal from '../../components/Community/SortModal';
+import {WarningIcon, PencilIcon, SortIcon} from '../../assets/assets';
 const {width, height} = Dimensions.get('window');
 
 const CommunityBoard = ({navigation, route}) => {
@@ -492,7 +495,7 @@ const CommunityBoard = ({navigation, route}) => {
               onPress={() => setIsSortOptionsVisible(true)}
             >
               <Text style={styles.sortButtonText}>{selectedSortOption}</Text>
-              <Image source={sortIcon} style={styles.sortIcon} />
+              <Image source={SortIcon} style={styles.sortIcon} />
             </TouchableOpacity>
           </>
         )}
@@ -571,11 +574,6 @@ const CommunityBoard = ({navigation, route}) => {
 };
 
 export default CommunityBoard;
-
-const searchIcon = require('../../assets/icons/searchIcon.png');
-const pencilIcon = require('../../assets/icons/pencilIcon.png');
-const dropDownIcon = require('../../assets/icons/dropDownOnIcon.png');
-const sortIcon = require('../../assets/icons/sortIcon.png');
 
 const styles = StyleSheet.create({
   Container: {
