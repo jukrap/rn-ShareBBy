@@ -9,6 +9,7 @@ export const HeartIcon = require('../assets/newIcons/heart-icon.png');
 export const ImageIcon = require('../assets/newIcons/imageIcon.png');
 export const MarkerIcon = require('../assets/newIcons/marker-icon.png');
 export const PencilIcon = require('../assets/newIcons/pencil-icon.png');
+export const GreenPencilIcon = require('../assets/newIcons/greenPencilIcon.png');
 
 //Images
 export const DefaultProfileIcon = require('../assets/images/defaultProfileImg.jpeg');
