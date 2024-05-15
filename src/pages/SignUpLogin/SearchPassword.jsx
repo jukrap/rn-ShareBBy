@@ -6,14 +6,13 @@ import {
   SafeAreaView,
   TouchableOpacity,
   TextInput,
-  Alert,
   Image,
   KeyboardAvoidingView,
 } from 'react-native';
 
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore'; // firestore import 추가
-import Toast from '../../components/Main/Toast';
+import LoginToast from '../../components/SignUp/LoginToast';
 
 const backIcon = require('../../assets/newIcons/back.png');
 
@@ -24,7 +23,9 @@ const SearchPassword = ({navigation}) => {
 
   const handleResetPassword = async () => {
     if (!validateEmail(email)) {
-      Alert.alert('유효하지 않은 이메일', '올바른 이메일 형식이 아닙니다.');
+      setToastMessage('올바른 이메일 형식이 아닙니다.');
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
       return;
     }
     try {
@@ -45,7 +46,6 @@ const SearchPassword = ({navigation}) => {
       setShowToast(true);
       setTimeout(() => setShowToast(false), 3000);
     } catch (error) {
-      console.error('비밀번호 재설정 이메일 전송 오류:', error);
 
       setToastMessage('비밀번호 재설정 이메일 전송 중 오류가 발생했습니다.');
       setShowToast(true);
@@ -59,7 +59,7 @@ const SearchPassword = ({navigation}) => {
   };
 
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <SafeAreaView style={{flex: 1 , backgroundColor:'#fefffe'}}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={1}
@@ -97,7 +97,7 @@ const SearchPassword = ({navigation}) => {
             </TouchableOpacity>
           </View>
         </View>
-        <Toast
+        <LoginToast
           text={toastMessage}
           visible={showToast}
           handleCancel={() => setShowToast(false)}

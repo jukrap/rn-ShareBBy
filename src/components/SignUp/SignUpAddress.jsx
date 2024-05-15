@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   Dimensions,
   TextInput,
-  Alert,
   KeyboardAvoidingView,
   Image,
   Modal,
@@ -15,9 +14,12 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import Postcode from '@actbase/react-daum-postcode';
 import storage from '@react-native-firebase/storage';
+import LoginToast from './LoginToast';
 
 const {width} = Dimensions.get('window');
+
 const addressSearch = require('../../assets/newIcons/addressSearch.png');
+
 
 const SignUpAddress = ({
   navigation,
@@ -30,6 +32,8 @@ const SignUpAddress = ({
 }) => {
   const [address, setAddress] = useState('');
   const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false); // 회원가입 성공 모달 상태 추가
+  const [showToast, setShowToast] = useState(false); // 토스트 표시 여부 상태 추가
+  const [toastMessage, setToastMessage] = useState(''); // 토스트 메시지 상태 추가
 
   // 주소 입력 시 state 업데이트
   const handleChangeAddress = text => {
@@ -58,7 +62,8 @@ const SignUpAddress = ({
       setIsSuccessModalVisible(true); // 회원가입 성공 시 모달 표시
     } catch (error) {
       console.error('회원가입 실패:', error);
-      Alert.alert('회원가입 실패');
+      setToastMessage('회원가입 실패 다시 시도 해주세요'); // 토스트 메시지 설정
+      setShowToast(true); // 토스트 표시
     }
   };
 
@@ -119,7 +124,7 @@ const SignUpAddress = ({
         onRequestClose={() => setIsSuccessModalVisible(false)}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalText}>😍 SharBBy 가입 성공! 😍</Text>
+            <Text style={styles.modalText}>😍 ShareBBy 가입 성공! 😍</Text>
             <TouchableOpacity
               onPress={() => {
                 setIsSuccessModalVisible(false);
@@ -130,7 +135,11 @@ const SignUpAddress = ({
           </View>
         </View>
       </Modal>
-
+      <LoginToast
+        text={toastMessage}
+        visible={showToast}
+        handleCancel={() => setShowToast(false)}
+      />
       {/* 다음 주소 검색 모달 */}
       {showPostcode && (
         <Postcode

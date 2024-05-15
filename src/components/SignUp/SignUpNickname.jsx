@@ -11,7 +11,7 @@ import {
   Platform,
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
-import Toast from '../Main/Toast'; // Toast 컴포넌트 import
+import LoginToast from './LoginToast';
 
 const SignUpNickname = ({onNextStep}) => {
   const {width, height} = Dimensions.get('window');
@@ -41,7 +41,7 @@ const SignUpNickname = ({onNextStep}) => {
     }
   };
 
-  const validateNickname = (nickname) => {
+  const validateNickname = nickname => {
     if (nickname.trim().length === 0) {
       setToastMessage('닉네임을 입력해주세요.'); // 토스트 메시지 설정
       setShowToast(true); // 토스트 표시
@@ -61,10 +61,7 @@ const SignUpNickname = ({onNextStep}) => {
   };
 
   const handleInfo = () => {
-    Alert.alert(
-      '닉네임 안내',
-      '띄어쓰기 포함 12글자 이내로 입력해 주세요.'
-    );
+    Alert.alert('닉네임 안내', '띄어쓰기 포함 12글자 이내로 입력해 주세요.');
   };
 
   return (
@@ -127,7 +124,7 @@ const SignUpNickname = ({onNextStep}) => {
         </View>
       </View>
       {/* 토스트 컴포넌트 */}
-      <Toast
+      <LoginToast
         text={toastMessage}
         visible={showToast}
         handleCancel={() => setShowToast(false)}

@@ -10,9 +10,11 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import Toast from '../Main/Toast';
+import LoginToast from './LoginToast';
+
 
 const passwordHideIcon = require('../../assets/newIcons/passwordHide.png');
+
 const {width, height} = Dimensions.get('window');
 
 const SignUpPassword = ({onNextStep}) => {
@@ -153,7 +155,7 @@ const SignUpPassword = ({onNextStep}) => {
         </View>
       </View>
       {/* 토스트 컴포넌트 */}
-      <Toast
+      <LoginToast
         text={toastMessage}
         visible={showToast}
         handleCancel={() => setShowToast(false)}

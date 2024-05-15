@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -9,14 +9,14 @@ import {
   Platform,
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
-import Toast from '../Main/Toast';
+import LoginToast from './LoginToast';
 
-const SignUpEmail = ({ onNextStep }) => {
+const SignUpEmail = ({onNextStep}) => {
   const [email, setEmail] = useState('');
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
 
-  const validateEmail = (email) => {
+  const validateEmail = email => {
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return emailPattern.test(email);
   };
@@ -26,7 +26,6 @@ const SignUpEmail = ({ onNextStep }) => {
       // 유효하지 않은 이메일인 경우
       setToastMessage('유효하지 않은 이메일입니다.');
       setShowToast(true);
-      setTimeout(() => setShowToast(false), 3000);
       return;
     }
 
@@ -40,17 +39,15 @@ const SignUpEmail = ({ onNextStep }) => {
         // 중복된 이메일인 경우
         setToastMessage('중복된 이메일입니다. 다른 이메일을 사용해주세요.');
         setShowToast(true);
-        setTimeout(() => setShowToast(false), 3000);
         return;
       } else {
         // 중복된 이메일이 없으면 다음 단계로 진행
-        onNextStep({ email });
+        onNextStep({email});
       }
     } catch (error) {
       // 에러가 발생한 경우
       setToastMessage('오류가 발생했습니다. 나중에 다시 시도해주세요.');
       setShowToast(true);
-      setTimeout(() => setShowToast(false), 3000);
     }
   };
 
@@ -85,7 +82,7 @@ const SignUpEmail = ({ onNextStep }) => {
           </TouchableOpacity>
         </View>
       </View>
-      <Toast
+      <LoginToast
         text={toastMessage}
         visible={showToast}
         handleCancel={() => setShowToast(false)}
