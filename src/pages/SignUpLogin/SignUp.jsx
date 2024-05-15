@@ -1,4 +1,4 @@
-import React,{useState} from 'react';
+import React, {useState} from 'react';
 import {
   View,
   StyleSheet,
@@ -14,12 +14,12 @@ import SignUpAddress from '../../components/SignUp/SignUpAddress.jsx';
 import ProgressBar from '../../components/SignUp/ProgressBar.jsx';
 import SignUpPassword from '../../components/SignUp/SignUpPassword.jsx';
 
-const backIcon = require('../../assets/icons/back.png');
+const backIcon = require('../../assets/newIcons/back.png');
 
-const SignUp = ({ navigation }) => {
-  const { step, handleNextStep, handlePreviousStep, userData,  } =
+const SignUp = ({navigation}) => {
+  const {step, handleNextStep, handlePreviousStep, userData} =
     useStepNavigation(navigation);
-  const { checkboxState, email, nickname, password } = userData; // userData에서 email, nickname, password 가져오기
+  const {checkboxState, email, nickname, password} = userData; // userData에서 email, nickname, password 가져오기
   const [showPostcode, setShowPostcode] = useState(false);
 
   const stepComponents = {
@@ -50,7 +50,7 @@ const SignUp = ({ navigation }) => {
         password={password}
         checkboxState={checkboxState}
         onPreviousStep={handlePreviousStep}
-        showPostcode={showPostcode} 
+        showPostcode={showPostcode}
         setShowPostcode={setShowPostcode}
       />
     ),
@@ -59,15 +59,19 @@ const SignUp = ({ navigation }) => {
   const progressPercentage = step * 20;
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#fefffe' }}>
-    <TouchableOpacity style={styles.backIcon} onPress={() => { if(showPostcode) setShowPostcode(false); else handlePreviousStep(); }}>
-  <Image source={backIcon} />
-</TouchableOpacity>
-
+    <SafeAreaView style={{flex: 1, backgroundColor: '#fefffe'}}>
+      <TouchableOpacity
+        style={styles.backIcon}
+        onPress={() => {
+          if (showPostcode) setShowPostcode(false);
+          else handlePreviousStep();
+        }}>
+        <Image source={backIcon} />
+      </TouchableOpacity>
 
       <ProgressBar percentage={progressPercentage} />
-      <View style={{ flex: 1 }}>
-        <View style={{ flex: 1 }}>{stepComponents[step]}</View>
+      <View style={{flex: 1}}>
+        <View style={{flex: 1}}>{stepComponents[step]}</View>
       </View>
     </SafeAreaView>
   );

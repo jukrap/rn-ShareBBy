@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -16,8 +16,8 @@ import firestore from '@react-native-firebase/firestore';
 import Postcode from '@actbase/react-daum-postcode';
 import storage from '@react-native-firebase/storage';
 
-const { width } = Dimensions.get('window');
-const addressSearch = require('../../assets/icons/addressSearch.png');
+const {width} = Dimensions.get('window');
+const addressSearch = require('../../assets/newIcons/addressSearch.png');
 
 const SignUpAddress = ({
   navigation,
@@ -32,15 +32,20 @@ const SignUpAddress = ({
   const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false); // 회원가입 성공 모달 상태 추가
 
   // 주소 입력 시 state 업데이트
-  const handleChangeAddress = (text) => {
+  const handleChangeAddress = text => {
     setAddress(text);
   };
 
   const onSignUp = async () => {
     try {
-      const profileImageUrl = await storage().ref('dummyprofile.png').getDownloadURL();
+      const profileImageUrl = await storage()
+        .ref('dummyprofile.png')
+        .getDownloadURL();
 
-      const userCredential = await auth().createUserWithEmailAndPassword(email, password);
+      const userCredential = await auth().createUserWithEmailAndPassword(
+        email,
+        password,
+      );
       const user = userCredential.user;
       await firestore().collection('users').doc(user.uid).set({
         id: user.uid,
@@ -58,7 +63,7 @@ const SignUpAddress = ({
   };
 
   // 다음 주소 API 모달에서 주소 선택 시 처리
-  const handleCompleteDaumPostcode = (data) => {
+  const handleCompleteDaumPostcode = data => {
     setAddress(data.address); // 선택된 주소로 state 업데이트
     setShowPostcode(false);
   };
@@ -67,9 +72,8 @@ const SignUpAddress = ({
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : null}
       keyboardVerticalOffset={150}
-      style={styles.container}
-    >
-      <View style={{ justifyContent: 'space-between', flex: 1 }}>
+      style={styles.container}>
+      <View style={{justifyContent: 'space-between', flex: 1}}>
         <View>
           <View>
             <View style={styles.textContainer}>
@@ -83,9 +87,8 @@ const SignUpAddress = ({
               borderBottomWidth: 2,
               borderColor: '#07AC7D',
               marginHorizontal: 16,
-            }}
-          >
-            <Image style={{ width: 21, height: 21 }} source={addressSearch} />
+            }}>
+            <Image style={{width: 21, height: 21}} source={addressSearch} />
             <TextInput
               style={styles.addressTextInput}
               placeholder="지번, 도로명, 건물명으로 검색"
@@ -99,10 +102,9 @@ const SignUpAddress = ({
         </View>
         <View>
           <TouchableOpacity
-            style={[styles.button, { backgroundColor: '#07AC7D' }]}
-            onPress={onSignUp}
-          >
-            <Text style={{ color: '#fff', fontSize: 16, fontWeight: 'bold' }}>
+            style={[styles.button, {backgroundColor: '#07AC7D'}]}
+            onPress={onSignUp}>
+            <Text style={{color: '#fff', fontSize: 16, fontWeight: 'bold'}}>
               회원가입 완료
             </Text>
           </TouchableOpacity>
@@ -114,8 +116,7 @@ const SignUpAddress = ({
         visible={isSuccessModalVisible}
         transparent={true}
         animationType="fade"
-        onRequestClose={() => setIsSuccessModalVisible(false)}
-      >
+        onRequestClose={() => setIsSuccessModalVisible(false)}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalText}>😍 SharBBy 가입 성공! 😍</Text>
@@ -123,8 +124,7 @@ const SignUpAddress = ({
               onPress={() => {
                 setIsSuccessModalVisible(false);
                 navigation.navigate('Login');
-              }}
-            >
+              }}>
               <Text style={styles.modalButtonText}>로그인하러 가기</Text>
             </TouchableOpacity>
           </View>
@@ -134,9 +134,9 @@ const SignUpAddress = ({
       {/* 다음 주소 검색 모달 */}
       {showPostcode && (
         <Postcode
-          style={{ flex: 1, position: 'absolute', width: '100%', height: '100%' }}
-          jsOptions={{ animated: true }}
-          onSelected={(data) => handleCompleteDaumPostcode(data)}
+          style={{flex: 1, position: 'absolute', width: '100%', height: '100%'}}
+          jsOptions={{animated: true}}
+          onSelected={data => handleCompleteDaumPostcode(data)}
         />
       )}
     </KeyboardAvoidingView>

@@ -14,7 +14,7 @@ import {
 import firestore from '@react-native-firebase/firestore'; // firestore import 추가
 import Toast from '../../components/Main/Toast';
 
-const backIcon = require('../../assets/icons/back.png');
+const backIcon = require('../../assets/newIcons/back.png');
 
 const SignUpEmail = ({navigation}) => {
   const [email, setEmail] = useState('');
@@ -50,11 +50,10 @@ const SignUpEmail = ({navigation}) => {
         setShowModal(true);
       }
     } catch (error) {
-   // 에러가 발생한 경우
+      // 에러가 발생한 경우
       setToastMessage('오류가 발생했습니다. 나중에 다시 시도해주세요.');
       setShowToast(true);
       setTimeout(() => setShowToast(false), 3000);
-      
     }
   };
 
@@ -72,9 +71,9 @@ const SignUpEmail = ({navigation}) => {
   return (
     <SafeAreaView style={{flex: 1}}>
       <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={1}
-      style={{flex:1}}>
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={1}
+        style={{flex: 1}}>
         <TouchableOpacity
           style={styles.backIcon}
           onPress={() => navigation.goBack()}>
@@ -108,26 +107,26 @@ const SignUpEmail = ({navigation}) => {
         </View>
       </KeyboardAvoidingView>
       <Modal visible={showModal} transparent animationType="slide">
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalText}>아이디 찾기 결과</Text>
-              <Text>입력하신 이메일로 가입된 계정을 찾을 수 없어요</Text>
-              <View style={styles.modalButtonContainer}>
-                <TouchableOpacity
-                  style={styles.modalButton1}
-                  onPress={handleModalClose}>
-                  <Text style={styles.modalButtonText}>취소</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.modalButton}
-                  onPress={handleSignUp}>
-                  <Text style={styles.modalButtonText}>회원가입</Text>
-                </TouchableOpacity>
-              </View>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalText}>아이디 찾기 결과</Text>
+            <Text>입력하신 이메일로 가입된 계정을 찾을 수 없어요</Text>
+            <View style={styles.modalButtonContainer}>
+              <TouchableOpacity
+                style={styles.modalButton1}
+                onPress={handleModalClose}>
+                <Text style={styles.modalButtonText}>취소</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={handleSignUp}>
+                <Text style={styles.modalButtonText}>회원가입</Text>
+              </TouchableOpacity>
             </View>
           </View>
-        </Modal>
-        <Toast
+        </View>
+      </Modal>
+      <Toast
         text={toastMessage}
         visible={showToast}
         handleCancel={() => setShowToast(false)}

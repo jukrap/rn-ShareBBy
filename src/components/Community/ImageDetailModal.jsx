@@ -29,7 +29,7 @@ const ImageDetailModal = ({images, currentIndex, isVisible, onClose}) => {
   );
 };
 
-const greenCloseIcon = require('../../assets/icons/greenCloseIcon.png');
+const greenCloseIcon = require('../../assets/newIcons/greenCloseIcon.png');
 
 const styles = StyleSheet.create({
   modal: {

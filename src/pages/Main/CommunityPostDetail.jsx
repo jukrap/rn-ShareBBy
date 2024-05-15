@@ -14,15 +14,15 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
-import storage from '@react-native-firebase/storage';
+
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import CommentCard from '../../components/Community/CommentCard';
 import {formatDistanceToNow} from 'date-fns';
 import {ko} from 'date-fns/locale';
-import Modal from 'react-native-modal';
+
 import {useNavigation} from '@react-navigation/native';
-import {SwiperFlatList} from 'react-native-swiper-flatlist';
+
 import {FasterImageView} from '@candlefinance/faster-image';
 import BottomSheetModal from '../../components/Community/BottomSheetModal';
 import CommunityHeader from '../../components/Community/CommunityHeader';
@@ -32,6 +32,18 @@ import CommunityActionToast from '../../components/Community/CommunityActionToas
 import CommunityActionModal from '../../components/Community/CommunityActionModal';
 
 const {width, height} = Dimensions.get('window');
+
+const warningIcon = require('../../assets/newIcons/warningIcon.png');
+const moreIcon = require('../../assets/newIcons/moreIcon.png');
+const commentLineIcon = require('../../assets/newIcons/commentLineIcon.png');
+const writeCommentIcon = require('../../assets/newIcons/writeCommentIcon.png');
+const heartLineIcon = require('../../assets/newIcons/heart-icon.png');
+const heartRedIcon = require('../../assets/newIcons/redHeartIcon.png');
+const shareIcon = require('../../assets/newIcons/shareIcon.png');
+const pencilIcon = require('../../assets/newIcons/pencil-icon.png');
+const deleteIcon = require('../../assets/newIcons/deleteIcon.png');
+const planeMessageIcon = require('../../assets/newIcons/sendIcon.png');
+const defaultProfileImg = require('../../assets/images/defaultProfileImg.jpeg');
 
 const CommunityPostDetail = ({route}) => {
   const navigation = useNavigation();
@@ -348,38 +360,38 @@ const CommunityPostDetail = ({route}) => {
   };
 
   const handleDelete = () => {
-      const selectedPost = posts;
-      if (
-        selectedPost &&
-        currentUser &&
-        currentUser.uid === selectedPost.userId
-      ) {
-        setModalMessage({
-          title: '게시글 삭제',
-          modalText: '해당 게시글을 삭제하겠습니까?',
-          iconSource: require('../../assets/icons/warningIcon.png'),
-          showConfirmButton: false,
-          onConfirm: () => {
-            deletePost();
-            setModalVisible(false);
-          },
-          onCancel: () => {
-            setModalVisible(false);
-          },
-        });
-        setModalVisible(true);
-      } else {
-        setModalMessage({
-          title: '권한 없음',
-          modalText: '게시글 작성자만 삭제할 수 있습니다.',
-          iconSource: require('../../assets/icons/warningIcon.png'),
-          showConfirmButton: true,
-          onConfirm: () => {
-            setModalVisible(false);
-          },
-        });
-        setModalVisible(true);
-      }
+    const selectedPost = posts;
+    if (
+      selectedPost &&
+      currentUser &&
+      currentUser.uid === selectedPost.userId
+    ) {
+      setModalMessage({
+        title: '게시글 삭제',
+        modalText: '해당 게시글을 삭제하겠습니까?',
+        iconSource: warningIcon,
+        showConfirmButton: false,
+        onConfirm: () => {
+          deletePost();
+          setModalVisible(false);
+        },
+        onCancel: () => {
+          setModalVisible(false);
+        },
+      });
+      setModalVisible(true);
+    } else {
+      setModalMessage({
+        title: '권한 없음',
+        modalText: '게시글 작성자만 삭제할 수 있습니다.',
+        iconSource: warningIcon,
+        showConfirmButton: true,
+        onConfirm: () => {
+          setModalVisible(false);
+        },
+      });
+      setModalVisible(true);
+    }
   };
 
   const deletePost = async () => {
@@ -416,7 +428,7 @@ const CommunityPostDetail = ({route}) => {
       setModalMessage({
         title: '권한 없음',
         modalText: '게시글 작성자만 수정할 수 있습니다.',
-        iconSource: require('../../assets/icons/warningIcon.png'),
+        iconSource: warningIcon,
         showConfirmButton: true,
         onConfirm: () => {
           setModalVisible(false);
@@ -441,7 +453,7 @@ const CommunityPostDetail = ({route}) => {
         setModalMessage({
           title: '댓글 삭제',
           modalText: '해당 댓글을 삭제하겠습니까?',
-          iconSource: require('../../assets/icons/warningIcon.png'),
+          iconSource: warningIcon,
           showConfirmButton: false,
           onConfirm: () => {
             deleteComment(commentId);
@@ -456,7 +468,7 @@ const CommunityPostDetail = ({route}) => {
         setModalMessage({
           title: '권한 없음',
           modalText: '댓글 작성자만 삭제할 수 있습니다.',
-          iconSource: require('../../assets/icons/warningIcon.png'),
+          iconSource: warningIcon,
           showConfirmButton: true,
           onConfirm: () => {
             setModalVisible(false);
@@ -509,7 +521,7 @@ const CommunityPostDetail = ({route}) => {
         setModalMessage({
           title: '권한 없음',
           modalText: '댓글 작성자만 수정할 수 있습니다.',
-          iconSource: require('../../assets/icons/warningIcon.png'),
+          iconSource: warningIcon,
           showConfirmButton: true,
           onConfirm: () => {
             setModalVisible(false);
@@ -677,24 +689,24 @@ const CommunityPostDetail = ({route}) => {
         ListFooterComponent={renderFooter}
         style={styles.container}
       />
-        <View style={styles.commentInputContainer}>
-          <TextInput
-            style={styles.commentInput}
-            placeholder={editingCommentId ? '댓글 수정' : '댓글 입력'}
-            multiline={true}
-            value={commentContent}
-            onChangeText={handleCommentContentChange}
+      <View style={styles.commentInputContainer}>
+        <TextInput
+          style={styles.commentInput}
+          placeholder={editingCommentId ? '댓글 수정' : '댓글 입력'}
+          multiline={true}
+          value={commentContent}
+          onChangeText={handleCommentContentChange}
+        />
+        <TouchableOpacity
+          style={styles.commentSubmitButton}
+          onPress={handleCommentSubmit}>
+          <Image
+            style={[styles.commentSubmitIcon, styles.frameItemLayout]}
+            resizeMode="cover"
+            source={planeMessageIcon}
           />
-          <TouchableOpacity
-            style={styles.commentSubmitButton}
-            onPress={handleCommentSubmit}>
-            <Image
-              style={[styles.commentSubmitIcon, styles.frameItemLayout]}
-              resizeMode="cover"
-              source={planeMessageIcon}
-            />
-          </TouchableOpacity>
-        </View>
+        </TouchableOpacity>
+      </View>
       <BottomSheetModal isVisible={isModalVisible} onClose={toggleModal}>
         <View style={styles.modalContent}>
           <TouchableOpacity
@@ -735,22 +747,9 @@ const CommunityPostDetail = ({route}) => {
         iconSource={modalMessage.iconSource}
         showConfirmButton={modalMessage.showConfirmButton}
       />
-      </KeyboardAvoidingView>
+    </KeyboardAvoidingView>
   );
 };
-
-const moreIcon = require('../../assets/icons/moreIcon.png');
-const commentLineIcon = require('../../assets/icons/commentLineIcon.png');
-const commentFillIcon = require('../../assets/icons/commentFillIcon.png');
-const writeCommentIcon = require('../../assets/icons/WriteCommentIcon.png');
-const heartLineIcon = require('../../assets/icons/heartLineIcon.png');
-const heartRedIcon = require('../../assets/icons/heartRedIcon.png');
-const shareIcon = require('../../assets/icons/shareIcon.png');
-const pencilIcon = require('../../assets/icons/pencilIcon.png');
-const deleteIcon = require('../../assets/icons/deleteIcon.png');
-const defaultPostImg = require('../../assets/images/defaultPostImg.jpg');
-const planeMessageIcon = require('../../assets/icons/planeMessageIcon.png');
-const defaultProfileImg = require('../../assets/images/defaultProfileImg.jpeg');
 
 const styles = StyleSheet.create({
   container: {

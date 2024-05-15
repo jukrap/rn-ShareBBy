@@ -119,9 +119,9 @@ const CommentCard = ({item, onDelete, onEdit}) => {
 
 export default CommentCard;
 
-const moreIcon = require('../../assets/icons/moreIcon.png');
-const pencilIcon = require('../../assets/icons/pencilIcon.png');
-const deleteIcon = require('../../assets/icons/deleteIcon.png');
+const moreIcon = require('../../assets/newIcons/moreIcon.png');
+const pencilIcon = require('../../assets/newIcons/pencil-icon.png');
+const deleteIcon = require('../../assets/newIcons/deleteIcon.png');
 const defaultProfileImg = require('../../assets/images/defaultProfileImg.jpeg');
 
 const styles = StyleSheet.create({

@@ -2,7 +2,7 @@ import React from 'react';
 import {SafeAreaView, View, Text, Image, TouchableOpacity} from 'react-native';
 import {WebView} from 'react-native-webview';
 
-const backIcon = require('../../../assets/icons/back.png');
+const backIcon = require('../../../assets/newIcons/back.png');
 
 const InformationAgree = ({navigation}) => {
   return (

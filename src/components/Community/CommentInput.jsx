@@ -85,6 +85,6 @@ const styles = StyleSheet.create({
     width: 32,
   },
 });
-const planeMessageIcon = require('../../assets/icons/planeMessageIcon.png');
+const planeMessageIcon = require('../../assets/newIcons/sendIcon.png');
 
 export default CommentInput;
