@@ -70,7 +70,7 @@ const Profile = ({navigation, route}) => {
       await auth().signOut();
       await AsyncStorage.removeItem('userInfo');
       navigation.navigate('Login');
-      setLogoutShowModal(false)
+      setLogoutShowModal(false);
     } catch (error) {
       console.error('로그아웃 실패:', error);
     }
@@ -82,8 +82,8 @@ const Profile = ({navigation, route}) => {
   };
   const handleLogoutShowModal = () => {
     setLogoutShowModal(true);
-    };
-  
+  };
+
   return (
     <SafeAreaView style={styles.safeAreaViewStyle}>
       {users ? (
@@ -229,7 +229,8 @@ const styles = StyleSheet.create({
   arrow: {
     width: 15,
     height: 15,
-    // alignItems: 'center',
+    marginLeft: 10,
+    alignItems: 'center',
   },
   emailStyle: {
     fontSize: 15,
@@ -282,7 +283,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginTop: 10,
-    marginBottom: 10,
+    marginBottom: 12,
   },
   additionalInfo: {
     marginLeft: 30,

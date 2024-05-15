@@ -1,8 +1,8 @@
 import React from 'react';
 import {SafeAreaView, View, Text, Image, TouchableOpacity} from 'react-native';
 import {WebView} from 'react-native-webview';
-
-const backIcon = require('../../../assets/newIcons/back.png');
+import {BackIcon} from '../../../assets/assets';
+// const backIcon = require('../../../assets/icons/back.png');
 
 const MarketingAgree = ({navigation}) => {
   return (
@@ -17,7 +17,7 @@ const MarketingAgree = ({navigation}) => {
         <TouchableOpacity
           onPress={() => navigation.goBack()}
           style={{flex: 0.5}}>
-          <Image source={backIcon} />
+          <Image source={BackIcon} />
         </TouchableOpacity>
         <View>
           <Text style={{color: '#fff'}}>서비스 이용약관</Text>

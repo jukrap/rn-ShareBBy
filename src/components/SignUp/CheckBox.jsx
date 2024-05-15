@@ -14,6 +14,7 @@ const OffCheckBox = require('../../assets/icons/offCheckBox.png');
 const onCheckIcon = require('../../assets/icons/onCheck.png');
 const offCheckIcon = require('../../assets/icons/offCheck.png');
 
+
 const CheckBox = ({onChange}) => {
   const navigation = useNavigation();
   const [checkboxes, setCheckboxes] = useState({
@@ -64,9 +65,9 @@ const CheckBox = ({onChange}) => {
       <TouchableWithoutFeedback onPress={() => toggleCheckBox('isChecked2')}>
         <View style={styles.container}>
           {checkboxes.isChecked2 ? (
-            <Image source={onCheckIcon} />
+            <Image source={OnCheckIcon} />
           ) : (
-            <Image source={offCheckIcon} />
+            <Image source={OffCheckIcon} />
           )}
           <Text style={styles.text2}>[필수] 만 14세 이상</Text>
           <TouchableOpacity
@@ -79,9 +80,9 @@ const CheckBox = ({onChange}) => {
       <TouchableWithoutFeedback onPress={() => toggleCheckBox('isChecked3')}>
         <View style={styles.container}>
           {checkboxes.isChecked3 ? (
-            <Image source={onCheckIcon} />
+            <Image source={OnCheckIcon} />
           ) : (
-            <Image source={offCheckIcon} />
+            <Image source={OffCheckIcon} />
           )}
           <Text style={styles.text2}>[필수] 이용약관 동의</Text>
           <TouchableOpacity
@@ -94,9 +95,9 @@ const CheckBox = ({onChange}) => {
       <TouchableWithoutFeedback onPress={() => toggleCheckBox('isChecked4')}>
         <View style={styles.container}>
           {checkboxes.isChecked4 ? (
-            <Image source={onCheckIcon} />
+            <Image source={OnCheckIcon} />
           ) : (
-            <Image source={offCheckIcon} />
+            <Image source={OffCheckIcon} />
           )}
           <Text style={styles.text2}>[필수] 개인정보 처리 방침 동의</Text>
           <TouchableOpacity
@@ -109,9 +110,9 @@ const CheckBox = ({onChange}) => {
       <TouchableWithoutFeedback onPress={() => toggleCheckBox('isChecked5')}>
         <View style={styles.container}>
           {checkboxes.isChecked5 ? (
-            <Image source={onCheckIcon} />
+            <Image source={OnCheckIcon} />
           ) : (
-            <Image source={offCheckIcon} />
+            <Image source={OffCheckIcon} />
           )}
           <Text style={styles.text2}>
             [선택] 광고성 정보 수신 및 마케팅 활용 동의

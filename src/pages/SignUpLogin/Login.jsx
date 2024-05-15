@@ -8,7 +8,6 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
-
 } from 'react-native';
 import {signIn} from '../../lib/auth';
 import firestore from '@react-native-firebase/firestore';
@@ -21,9 +20,10 @@ import {
   handleNaverLogin,
   kakaoLogins,
 } from '../../lib/SocialLogin';
-const naverIcon = require('../../assets/newIcons/naver.png');
-const kakaoIcon = require('../../assets/newIcons/kakao.png');
-const googleIcon = require('../../assets/newIcons/google.png');
+import {Naver, Google, Kakao} from '../../assets/assets';
+// const naverIcon = require('../../assets/newIcons/naver.png');
+// const kakaoIcon = require('../../assets/newIcons/kakao.png');
+// const googleIcon = require('../../assets/newIcons/google.png');
 
 const LoginTitle = require('../../assets/images/LoginTitle.png');
 
@@ -150,21 +150,23 @@ const Login = ({navigation}) => {
           </View>
           <View style={styles.loginIconCantainer}>
             <TouchableOpacity onPress={() => handleNaverLogin(navigation)}>
-              <Image source={naverIcon} />
+              <Image source={Naver} />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => kakaoLogins(navigation)}>
-              <Image source={kakaoIcon} />
+              <Image source={Kakao} />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => onGoogleButtonPress(navigation)}>
-              <Image source={googleIcon} />
+              <Image source={Google} />
             </TouchableOpacity>
           </View>
         </View>
       </View>
 
-      <LoginToast text="아이디 또는 비밀번호를 확인해주세요." visible={showToast} handleCancel={() => setShowToast(false)} />
-
-
+      <LoginToast
+        text="아이디 또는 비밀번호를 확인해주세요."
+        visible={showToast}
+        handleCancel={() => setShowToast(false)}
+      />
     </KeyboardAvoidingView>
   );
 };

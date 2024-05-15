@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 
 import ImageDetail from '../../components/Chat/Modal/ImageDetail';
-
+import {BackIcon} from '../../assets/assets';
 const ShowAllImages = ({navigation, route}) => {
   const {messages} = route.params;
   const {width, height} = Dimensions.get('window');
@@ -54,10 +54,7 @@ const ShowAllImages = ({navigation, route}) => {
           marginBottom: 32,
         }}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Image
-            source={require('../../assets/newIcons/backIcon.png')}
-            style={{width: 24, height: 24}}
-          />
+          <Image source={BackIcon} style={{width: 24, height: 24}} />
         </TouchableOpacity>
         <Text style={{fontSize: 20, fontWeight: '600'}}>앨범</Text>
         <View />

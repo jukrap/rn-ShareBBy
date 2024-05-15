@@ -243,7 +243,7 @@ const Join = ({navigation, route}) => {
         <TouchableOpacity
           style={{marginLeft: 'auto', paddingTop: 10}}
           onPress={moveCurrLocation}>
-          <Image source={currGpsIcon} style={{width: 40, height: 40}} />
+          <Image source={CurrGpsIcon} style={{width: 40, height: 40}} />
         </TouchableOpacity>
       </View>
       <View style={{bottom: 30, position: 'absolute', zIndex: 2}}>
@@ -277,7 +277,8 @@ const Join = ({navigation, route}) => {
   );
 };
 
-const currGpsIcon = require('../../assets/newIcons/currGpsIcon.png');
+import {CurrGpsIcon} from '../../assets/assets';
+// const currGpsIcon = require('../../assets/newIcons/currGpsIcon.png');
 
 const styles = StyleSheet.create({
   searchView: {

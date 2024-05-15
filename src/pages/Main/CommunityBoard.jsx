@@ -19,9 +19,9 @@ import auth from '@react-native-firebase/auth';
 import CommunityHeader from '../../components/Community/CommunityHeader';
 import CommunityActionToast from '../../components/Community/CommunityActionToast';
 import CommunityActionModal from '../../components/Community/CommunityActionModal';
-
-const warningIcon = require('../../assets/newIcons/warningIcon.png');
-const pencilIcon = require('../../assets/newIcons/pencil-icon.png');
+import {WarningIcon, PencilIcon} from '../../assets/assets';
+// const warningIcon = require('../../assets/newIcons/warningIcon.png');
+// const pencilIcon = require('../../assets/newIcons/pencil-icon.png');
 const {width, height} = Dimensions.get('window');
 
 const CommunityBoard = ({navigation, route}) => {
@@ -193,7 +193,7 @@ const CommunityBoard = ({navigation, route}) => {
         setModalMessage({
           title: '게시글 삭제',
           modalText: '해당 게시글을 삭제하겠습니까?',
-          iconSource: warningIcon,
+          iconSource: WarningIcon,
           showConfirmButton: false,
           onConfirm: () => {
             deletePost(postId);
@@ -208,7 +208,7 @@ const CommunityBoard = ({navigation, route}) => {
         setModalMessage({
           title: '권한 없음',
           modalText: '게시글 작성자만 수정/삭제할 수 있습니다.',
-          iconSource: warningIcon,
+          iconSource: WarningIcon,
           showConfirmButton: true,
           onConfirm: () => {
             setModalVisible(false);
@@ -268,7 +268,7 @@ const CommunityBoard = ({navigation, route}) => {
         setModalMessage({
           title: '권한 없음',
           modalText: '게시글 작성자만 수정/삭제할 수 있습니다.',
-          iconSource: warningIcon,
+          iconSource: WarningIcon,
           showConfirmButton: true,
           onConfirm: () => {
             setModalVisible(false);
@@ -330,7 +330,7 @@ const CommunityBoard = ({navigation, route}) => {
       <View style={{flex: 1}}>
         <CommunityHeader
           showBackButton={false}
-          rightIcon={pencilIcon}
+          rightIcon={PencilIcon}
           title={'실시간 게시판'}
           onPressRightIcon={() => navigation.navigate('CommunityAddPost')}
         />

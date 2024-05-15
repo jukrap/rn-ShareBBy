@@ -12,8 +12,8 @@ import {
 } from 'react-native';
 import LoginToast from './LoginToast';
 
-
-const passwordHideIcon = require('../../assets/newIcons/passwordHide.png');
+import {PasswordHideIcon} from '../../assets/assets';
+// const passwordHideIcon = require('../../assets/newIcons/passwordHide.png');
 
 const {width, height} = Dimensions.get('window');
 
@@ -110,7 +110,7 @@ const SignUpPassword = ({onNextStep}) => {
             />
             <TouchableOpacity onPress={passwordShow}>
               <Image
-                source={passwordHideIcon}
+                source={PasswordHideIcon}
                 style={styles.passwordHideIcon}
               />
             </TouchableOpacity>

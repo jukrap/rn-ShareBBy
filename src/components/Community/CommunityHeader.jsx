@@ -35,7 +35,7 @@ const CommunityHeader = ({
         <View style={styles.leftButtonContainer}>
           {showBackButton && (
             <TouchableOpacity onPress={handleGoBack} style={styles.leftButton}>
-              <Image source={backIcon} style={{width: 20, height: 20}} />
+              <Image source={BackIcon} style={{width: 20, height: 20}} />
             </TouchableOpacity>
           )}
           {leftIcon && (
@@ -78,8 +78,8 @@ const CommunityHeader = ({
 };
 
 export default CommunityHeader;
-
-const backIcon = require('../../assets/newIcons/backIcon.png');
+import {BackIcon} from '../../assets/assets';
+// const backIcon = require('../../assets/newIcons/backIcon.png');
 
 const styles = StyleSheet.create({
   topbarView: {

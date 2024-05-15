@@ -21,11 +21,16 @@ import CommunityHeader from '../../components/Community/CommunityHeader';
 import BottomSheetModal from '../../components/Community/BottomSheetModal';
 import CommunityActionToast from '../../components/Community/CommunityActionToast';
 import CommunityActionModal from '../../components/Community/CommunityActionModal';
-
-const warningIcon = require('../../assets/newIcons/warningIcon.png');
-const cautionIcon = require('../../assets/newIcons/cautionIcon.png');
-const cameraIcon = require('../../assets/newIcons/cameraIcon.png');
-const pictureIcon = require('../../assets/newIcons/imageIcon.png');
+import {
+  WarningIcon,
+  CautionIcon,
+  CameraIcon,
+  ImageIcon,
+} from '../../assets/assets';
+// const warningIcon = require('../../assets/newIcons/warningIcon.png');
+// const cautionIcon = require('../../assets/newIcons/cautionIcon.png');
+// const cameraIcon = require('../../assets/newIcons/cameraIcon.png');
+// const pictureIcon = require('../../assets/newIcons/imageIcon.png');
 
 const CommunityAddPost = () => {
   const navigation = useNavigation();
@@ -78,7 +83,7 @@ const CommunityAddPost = () => {
       } else {
         setToastMessage({
           message: '게시글 내용을 입력해주세요.',
-          leftIcon: 'cautionIcon',
+          leftIcon: 'CautionIcon',
           closeButton: true,
           progressBar: true,
         });
@@ -98,7 +103,7 @@ const CommunityAddPost = () => {
     } else {
       setToastMessage({
         message: '게시글 내용을 입력해주세요.',
-        leftIcon: 'cautionIcon',
+        leftIcon: 'CautionIcon',
         closeButton: true,
         progressBar: true,
       });
@@ -111,7 +116,7 @@ const CommunityAddPost = () => {
     if (!postContent || postContent.trim() === '') {
       setToastMessage({
         message: '게시글 내용을 입력해주세요.',
-        leftIcon: 'cautionIcon',
+        leftIcon: 'CautionIcon',
         closeButton: true,
         progressBar: true,
       });
@@ -215,7 +220,7 @@ const CommunityAddPost = () => {
       setModalMessage({
         title: '이미지 업로드 실패',
         modalText: '이미지 업로드 중 오류가 발생했습니다.',
-        iconSource: warningIcon,
+        iconSource: WarningIcon,
         showConfirmButton: true,
         onConfirm: () => {
           setModalVisible(false);
@@ -237,7 +242,7 @@ const CommunityAddPost = () => {
       setModalMessage({
         title: '이미지 업로드 제한',
         modalText: '최대 7장까지 이미지를 업로드할 수 있습니다.',
-        iconSource: cautionIcon,
+        iconSource: CautionIcon,
         showConfirmButton: true,
         onConfirm: () => {
           setModalVisible(false);
@@ -269,7 +274,7 @@ const CommunityAddPost = () => {
       setModalMessage({
         title: '이미지 업로드 제한',
         modalText: '최대 7장까지 이미지를 업로드할 수 있습니다.',
-        iconSource: cautionIcon,
+        iconSource: CautionIcon,
         showConfirmButton: true,
         onConfirm: () => {
           setModalVisible(false);
@@ -339,7 +344,7 @@ const CommunityAddPost = () => {
               <TouchableOpacity
                 style={styles.imageUploadButton}
                 onPress={openImagePicker}>
-                <Image source={cameraIcon} style={{width: 24, height: 24}} />
+                <Image source={CameraIcon} style={{width: 24, height: 24}} />
                 <Text style={styles.imageUploadButtonText}>
                   {selectedImages.length}
                 </Text>
@@ -386,13 +391,13 @@ const CommunityAddPost = () => {
             <TouchableOpacity
               style={styles.modalButton}
               onPress={takePhotoFromCamera}>
-              <Image source={cameraIcon} style={{width: 24, height: 24}} />
+              <Image source={CameraIcon} style={{width: 24, height: 24}} />
               <Text style={styles.modalButtonText}>카메라로 촬영</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.modalButton}
               onPress={choosePhotoFromLibrary}>
-              <Image source={pictureIcon} style={{width: 24, height: 24}} />
+              <Image source={ImageIcon} style={{width: 24, height: 24}} />
               <Text style={styles.modalButtonText}>갤러리에서 선택</Text>
             </TouchableOpacity>
           </View>
@@ -422,7 +427,7 @@ const CommunityAddPost = () => {
         onConfirm={() => setModalVisible(false)}
         title="이미지 업로드 실패"
         modalText={modalMessage}
-        iconSource={warningIcon}
+        iconSource={WarningIcon}
         showConfirmButton={true}
       />
     </SafeAreaView>

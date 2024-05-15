@@ -8,7 +8,8 @@ import {
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import {useEffect, useState} from 'react';
-const leftArrow = require('../../assets/newIcons/backIcon.png');
+import {BackIcon} from '../../assets/assets';
+// const leftArrow = require('../../assets/newIcons/backIcon.png');
 
 function calculateTimeDifference(targetDate) {
   const now = new Date(); // 현재 시간
@@ -73,44 +74,42 @@ const MyRecruits = ({navigation, route}) => {
     <View style={styles.containerView}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Image style={styles.arrow} source={leftArrow} />
+          <Image style={styles.arrow} source={BackIcon} />
         </TouchableOpacity>
         <Text style={styles.headtext}>내 모집 공고</Text>
       </View>
-      <ScrollView>
-        <View style={styles.container}>
-          {hobbies.map((it, idx) => {
-            return (
-              <View key={idx} style={styles.post}>
-                <Text style={styles.title}>{it.title}</Text>
-                <View style={styles.recruiteContainer}>
-                  <View style={styles.contentWrapper}>
-                    <Text style={styles.content}>{it.content}</Text>
-                    <Text style={styles.address}>
-                      {it.address} {it.detail_address}
-                    </Text>
-                  </View>
-                  <View style={styles.recruiteWrapper}>
-                    {it.nickname === '모집중' ? (
-                      <Text style={styles.recruiteStatus}>모집중</Text>
-                    ) : (
-                      <Text style={styles.recruiteComplete}>모집완료</Text>
-                    )}
-
-                    <Text style={styles.personCount}>
-                      {it.personNumber}/{it.peopleCount}
-                    </Text>
-                  </View>
+      <ScrollView style={styles.container}>
+        {hobbies.map((it, idx) => {
+          return (
+            <View key={idx} style={styles.post}>
+              <Text style={styles.title}>{it.title}</Text>
+              <View style={styles.recruiteContainer}>
+                <View style={styles.contentWrapper}>
+                  <Text style={styles.content}>{it.content}</Text>
+                  <Text style={styles.address}>
+                    {it.address} {it.detail_address}
+                  </Text>
                 </View>
-                <Text style={styles.tag}>{it.tag}</Text>
+                <View style={styles.recruiteWrapper}>
+                  {it.nickname === '모집중' ? (
+                    <Text style={styles.recruiteStatus}>모집중</Text>
+                  ) : (
+                    <Text style={styles.recruiteComplete}>모집완료</Text>
+                  )}
 
-                <Text style={styles.deadline}>
-                  {it.deadline ? it.deadline : '시간이 종료되었습니다'}
-                </Text>
+                  <Text style={styles.personCount}>
+                    {it.personNumber}/{it.peopleCount}
+                  </Text>
+                </View>
               </View>
-            );
-          })}
-        </View>
+              <Text style={styles.tag}>{it.tag}</Text>
+
+              <Text style={styles.deadline}>
+                {it.deadline ? it.deadline : '시간이 종료되었습니다'}
+              </Text>
+            </View>
+          );
+        })}
       </ScrollView>
     </View>
   );
@@ -125,7 +124,11 @@ const styles = StyleSheet.create({
     marginTop: 60,
   },
   arrow: {width: 22, height: 22},
-  headtext: {fontSize: 20, fontWeight: 'bold', marginLeft: 10},
+  headtext: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginLeft: 10,
+  },
   container: {
     margin: 20,
   },
@@ -133,7 +136,7 @@ const styles = StyleSheet.create({
     borderColor: 'grey',
     borderWidth: 1,
     borderRadius: 10,
-    padding: 20,
+    padding: 15,
     marginTop: 12,
     marginBottom: 12,
   },
