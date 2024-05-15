@@ -7,7 +7,13 @@ import {
   Image,
   Animated,
 } from 'react-native';
-
+import {
+  WarningIcon,
+  CautionIcon,
+  SuccessIcon,
+  OtherIcon,
+  GreenCloseIcon,
+} from '../../assets/assets';
 const CommunityActionToast = ({
   visible,
   message,
@@ -63,13 +69,17 @@ const CommunityActionToast = ({
   const getIconSource = iconName => {
     switch (iconName) {
       case 'warningIcon':
-        return require('../../assets/icons/warningIcon.png');
+        return WarningIcon;
+      // return require('../../assets/newIcons/warningIcon.png');
       case 'cautionIcon':
-        return require('../../assets/icons/cautionIcon.png');
+        return CautionIcon;
+      // return require('../../assets/newIcons/cautionIcon.png');
       case 'successIcon':
-        return require('../../assets/icons/successIcon.png');
+        return SuccessIcon;
+      // return require('../../assets/newIcons/successIcon.png');
       case 'otherIcon':
-        return require('../../assets/icons/otherIcon.png');
+        return OtherIcon;
+      // return require('../../assets/newIcons/otherIcon.png');
       default:
         return null;
     }
@@ -85,7 +95,7 @@ const CommunityActionToast = ({
       <Text style={styles.message}>{message}</Text>
       {closeButton && (
         <TouchableOpacity onPress={closeToast} style={styles.closeButton}>
-          <Image source={greenCloseIcon} style={styles.closeIcon} />
+          <Image source={GreenCloseIcon} style={styles.closeIcon} />
         </TouchableOpacity>
       )}
       {progressBar && (
@@ -98,8 +108,6 @@ const CommunityActionToast = ({
 };
 
 export default CommunityActionToast;
-
-const greenCloseIcon = require('../../assets/icons/greenCloseIcon.png');
 
 const styles = StyleSheet.create({
   container: {

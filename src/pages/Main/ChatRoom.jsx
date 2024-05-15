@@ -34,7 +34,7 @@ import {
 } from '../../assets/assets';
 
 const ChatRoom = ({route, navigation}) => {
-  const {chatRoomId, chatRoomName, hobbiesId} = route.params;
+  const {chatRoomId, chatRoomName, hobbiesId, members} = route.params;
 
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
@@ -100,7 +100,7 @@ const ChatRoom = ({route, navigation}) => {
         return;
       }
 
-      const currentUser = auth().currentUser; //
+      const currentUser = auth().currentUser;
 
       let senderName = 'Unknown';
       if (currentUser) {
@@ -128,7 +128,7 @@ const ChatRoom = ({route, navigation}) => {
         .collection('messages')
         .add(newMessage);
 
-      setInputMessage(''); //
+      setInputMessage('');
     } catch (error) {
       console.error('Error sending message: ', error);
     }
@@ -203,9 +203,14 @@ const ChatRoom = ({route, navigation}) => {
   const getPhotos = async () => {
     try {
       const image = await ImagePicker.openPicker({
-        width: 300,
+        width: 400,
         height: 400,
         multiple: false,
+        cropping: true,
+        mediaType: 'photo',
+        cropperChooseText: '이미지 변경',
+        cropperCancelText: '취소',
+        cropperRotateButtonsHidden: true,
       });
       const imageUrl = await uploadImage(image.sourceURL, chatRoomId);
 
@@ -277,7 +282,7 @@ const ChatRoom = ({route, navigation}) => {
   const getProfileImage = async () => {
     try {
       const image = await ImagePicker.openPicker({
-        width: 300,
+        width: 400,
         height: 400,
         multiple: false,
         cropping: true,
@@ -301,7 +306,6 @@ const ChatRoom = ({route, navigation}) => {
   };
 
   const renderItem = ({item, index}) => {
-    dayjs.locale('ko'); //
     const isSystemMessage = item.sender === '시스템';
     const isCurrentUser = item.senderId === auth().currentUser?.uid;
     const isFirstMessage = index === messages.length - 1;
@@ -436,8 +440,14 @@ const ChatRoom = ({route, navigation}) => {
   };
 
   const goToShowAllImages = () => {
-    //이름 바꾸기,
     navigation.navigate('ShowAllImages', {messages: messages});
+    setSlideModalVisible(false);
+  };
+
+  const goToChatRoomNotice = () => {
+    navigation.navigate('ChatRoomNotice', {
+      chatRoomId: chatRoomId,
+    });
     setSlideModalVisible(false);
   };
 
@@ -468,7 +478,12 @@ const ChatRoom = ({route, navigation}) => {
         <TouchableOpacity onPress={handleGoBack}>
           <Image source={BackIcon} style={{width: 24, height: 24}} />
         </TouchableOpacity>
-        <Text style={styles.roomName}>{chatRoomName}</Text>
+        <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
+          <Text style={styles.roomName}>{chatRoomName}</Text>
+          <Text style={{fontSize: 18, color: '#A7A7A7', fontWeight: '600'}}>
+            {members.length}
+          </Text>
+        </View>
         <TouchableOpacity onPress={toggleHamburgerModal}>
           <Image style={{width: 24, height: 24}} source={HamburgerIcon} />
         </TouchableOpacity>
@@ -559,7 +574,7 @@ const ChatRoom = ({route, navigation}) => {
               paddingHorizontal: 12,
               gap: 8,
             }}>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={goToChatRoomNotice}>
               <Text style={{fontSize: 16, marginBottom: 8, fontWeight: '700'}}>
                 공지 사항
               </Text>

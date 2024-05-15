@@ -7,7 +7,6 @@ const Toast = ({ text, visible, handleCancel, duration }) => {
     const { bottom } = useSafeAreaInsets();
 
     const toastAnimated = useCallback(() => {
-        // handleCancel();
         toastValue.setValue(0);
         Animated.spring(toastValue, {
             toValue: 1,
@@ -39,17 +38,22 @@ const Toast = ({ text, visible, handleCancel, duration }) => {
                     opacity: toastValue,
                     transform: [
                         {
-                            translateY: toastValue.interpolate({ inputRange: [0, 1], outputRange: [-(bottom + 75), -(bottom + 80)] }),
+                            translateY: toastValue.interpolate({
+                                inputRange: [0, 1],
+                                outputRange: [-(bottom + 75), -(bottom + 80)],
+                            }),
                         },
-                        { scale: toastValue.interpolate({ inputRange: [0, 1], outputRange: [0.9, 1] }) },
+                        {
+                            scale: toastValue.interpolate({
+                                inputRange: [0, 1],
+                                outputRange: [0.9, 1],
+                            }),
+                        },
                     ],
                 },
-            ]}
-        >
+            ]}>
             <View style={styles.toastContents}>
-                <Text style={styles.toastText}>
-                    {text}
-                </Text>
+                <Text style={styles.toastText}>{text}</Text>
             </View>
         </Animated.View>
     );
@@ -71,8 +75,8 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         backgroundColor: 'rgba(58,58,58,0.9)',
     },
-    toastText : {
-        color :"#fff"
+    toastText: {
+        color: '#fff',
     },
 });
 

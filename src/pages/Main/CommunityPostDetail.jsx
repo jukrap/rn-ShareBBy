@@ -14,15 +14,15 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
-import storage from '@react-native-firebase/storage';
+
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import CommentCard from '../../components/Community/CommentCard';
 import {formatDistanceToNow} from 'date-fns';
 import {ko} from 'date-fns/locale';
-import Modal from 'react-native-modal';
+
 import {useNavigation} from '@react-navigation/native';
-import {SwiperFlatList} from 'react-native-swiper-flatlist';
+
 import {FasterImageView} from '@candlefinance/faster-image';
 import BottomSheetModal from '../../components/Community/BottomSheetModal';
 import CommunityHeader from '../../components/Community/CommunityHeader';
@@ -32,6 +32,20 @@ import CommunityActionToast from '../../components/Community/CommunityActionToas
 import CommunityActionModal from '../../components/Community/CommunityActionModal';
 
 const {width, height} = Dimensions.get('window');
+
+import {
+  WarningIcon,
+  MoreIcon,
+  CommentLineIcon,
+  WritecommentIcon,
+  HeartIcon,
+  RedHeartIcon,
+  ShareIcon,
+  PencilIcon,
+  DeleteIcon,
+  SendIcon,
+  DefaultProfileIcon,
+} from '../../assets/assets';
 
 const CommunityPostDetail = ({route}) => {
   const navigation = useNavigation();
@@ -348,38 +362,38 @@ const CommunityPostDetail = ({route}) => {
   };
 
   const handleDelete = () => {
-      const selectedPost = posts;
-      if (
-        selectedPost &&
-        currentUser &&
-        currentUser.uid === selectedPost.userId
-      ) {
-        setModalMessage({
-          title: '게시글 삭제',
-          modalText: '해당 게시글을 삭제하겠습니까?',
-          iconSource: require('../../assets/icons/warningIcon.png'),
-          showConfirmButton: false,
-          onConfirm: () => {
-            deletePost();
-            setModalVisible(false);
-          },
-          onCancel: () => {
-            setModalVisible(false);
-          },
-        });
-        setModalVisible(true);
-      } else {
-        setModalMessage({
-          title: '권한 없음',
-          modalText: '게시글 작성자만 삭제할 수 있습니다.',
-          iconSource: require('../../assets/icons/warningIcon.png'),
-          showConfirmButton: true,
-          onConfirm: () => {
-            setModalVisible(false);
-          },
-        });
-        setModalVisible(true);
-      }
+    const selectedPost = posts;
+    if (
+      selectedPost &&
+      currentUser &&
+      currentUser.uid === selectedPost.userId
+    ) {
+      setModalMessage({
+        title: '게시글 삭제',
+        modalText: '해당 게시글을 삭제하겠습니까?',
+        iconSource: WarningIcon,
+        showConfirmButton: false,
+        onConfirm: () => {
+          deletePost();
+          setModalVisible(false);
+        },
+        onCancel: () => {
+          setModalVisible(false);
+        },
+      });
+      setModalVisible(true);
+    } else {
+      setModalMessage({
+        title: '권한 없음',
+        modalText: '게시글 작성자만 삭제할 수 있습니다.',
+        iconSource: WarningIcon,
+        showConfirmButton: true,
+        onConfirm: () => {
+          setModalVisible(false);
+        },
+      });
+      setModalVisible(true);
+    }
   };
 
   const deletePost = async () => {
@@ -416,7 +430,7 @@ const CommunityPostDetail = ({route}) => {
       setModalMessage({
         title: '권한 없음',
         modalText: '게시글 작성자만 수정할 수 있습니다.',
-        iconSource: require('../../assets/icons/warningIcon.png'),
+        iconSource: WarningIcon,
         showConfirmButton: true,
         onConfirm: () => {
           setModalVisible(false);
@@ -441,7 +455,7 @@ const CommunityPostDetail = ({route}) => {
         setModalMessage({
           title: '댓글 삭제',
           modalText: '해당 댓글을 삭제하겠습니까?',
-          iconSource: require('../../assets/icons/warningIcon.png'),
+          iconSource: WarningIcon,
           showConfirmButton: false,
           onConfirm: () => {
             deleteComment(commentId);
@@ -456,7 +470,7 @@ const CommunityPostDetail = ({route}) => {
         setModalMessage({
           title: '권한 없음',
           modalText: '댓글 작성자만 삭제할 수 있습니다.',
-          iconSource: require('../../assets/icons/warningIcon.png'),
+          iconSource: WarningIcon,
           showConfirmButton: true,
           onConfirm: () => {
             setModalVisible(false);
@@ -509,7 +523,7 @@ const CommunityPostDetail = ({route}) => {
         setModalMessage({
           title: '권한 없음',
           modalText: '댓글 작성자만 수정할 수 있습니다.',
-          iconSource: require('../../assets/icons/warningIcon.png'),
+          iconSource: WarningIcon,
           showConfirmButton: true,
           onConfirm: () => {
             setModalVisible(false);
@@ -566,7 +580,7 @@ const CommunityPostDetail = ({route}) => {
                 url: postUserData?.profileImage,
                 priority: 'high',
                 cachePolicy: 'memory',
-                failureImageUrl: defaultProfileImg,
+                failureImageUrl: DefaultProfileIcon,
                 resizeMode: 'cover',
                 borderRadius: 50,
               }}
@@ -586,7 +600,7 @@ const CommunityPostDetail = ({route}) => {
               <Image
                 style={styles.moreIcon}
                 resizeMode="cover"
-                source={moreIcon}
+                source={MoreIcon}
               />
             </TouchableOpacity>
           </View>
@@ -610,8 +624,8 @@ const CommunityPostDetail = ({route}) => {
               ]}
               onPress={handleLikePress}>
               <Image
-                source={isLiked ? heartRedIcon : heartLineIcon}
-                style={{width: 24, height: 24}}
+                source={isLiked ? RedHeartIcon : HeartIcon}
+                style={{width: 22, height: 22}}
               />
               <Text
                 style={[
@@ -622,13 +636,13 @@ const CommunityPostDetail = ({route}) => {
               </Text>
             </TouchableOpacity>
             <View style={styles.interactionButton} onPress={() => {}}>
-              <Image source={commentLineIcon} style={{width: 24, height: 24}} />
+              <Image source={CommentLineIcon} style={{width: 22, height: 22}} />
               <Text style={styles.interactionText}>{commentCount}</Text>
             </View>
           </View>
           <View style={styles.rightInteractionContainer}>
             <TouchableOpacity style={styles.interactionRightButton}>
-              <Image source={shareIcon} style={{width: 24, height: 24}} />
+              <Image source={ShareIcon} style={{width: 22, height: 22}} />
             </TouchableOpacity>
           </View>
         </View>
@@ -647,7 +661,7 @@ const CommunityPostDetail = ({route}) => {
 
   const renderEmptyComment = () => (
     <View style={styles.emptyCommentContainer}>
-      <Image source={writeCommentIcon} style={styles.emptyCommentIcon} />
+      <Image source={WritecommentIcon} style={styles.emptyCommentIcon} />
       <Text style={styles.emptyCommentText}>
         댓글이 없습니다. {'\n'} 첫 댓글의 주인공이 돼보세요!
       </Text>
@@ -677,24 +691,24 @@ const CommunityPostDetail = ({route}) => {
         ListFooterComponent={renderFooter}
         style={styles.container}
       />
-        <View style={styles.commentInputContainer}>
-          <TextInput
-            style={styles.commentInput}
-            placeholder={editingCommentId ? '댓글 수정' : '댓글 입력'}
-            multiline={true}
-            value={commentContent}
-            onChangeText={handleCommentContentChange}
+      <View style={styles.commentInputContainer}>
+        <TextInput
+          style={styles.commentInput}
+          placeholder={editingCommentId ? '댓글 수정' : '댓글 입력'}
+          multiline={true}
+          value={commentContent}
+          onChangeText={handleCommentContentChange}
+        />
+        <TouchableOpacity
+          style={styles.commentSubmitButton}
+          onPress={handleCommentSubmit}>
+          <Image
+            style={[styles.commentSubmitIcon, styles.frameItemLayout]}
+            resizeMode="cover"
+            source={SendIcon}
           />
-          <TouchableOpacity
-            style={styles.commentSubmitButton}
-            onPress={handleCommentSubmit}>
-            <Image
-              style={[styles.commentSubmitIcon, styles.frameItemLayout]}
-              resizeMode="cover"
-              source={planeMessageIcon}
-            />
-          </TouchableOpacity>
-        </View>
+        </TouchableOpacity>
+      </View>
       <BottomSheetModal isVisible={isModalVisible} onClose={toggleModal}>
         <View style={styles.modalContent}>
           <TouchableOpacity
@@ -703,7 +717,7 @@ const CommunityPostDetail = ({route}) => {
               handleEdit();
               toggleModal();
             }}>
-            <Image source={pencilIcon} style={{width: 24, height: 24}} />
+            <Image source={PencilIcon} style={{width: 24, height: 24}} />
             <Text style={styles.modalButtonText}>게시글 수정</Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -712,7 +726,7 @@ const CommunityPostDetail = ({route}) => {
               handleDelete();
               toggleModal();
             }}>
-            <Image source={deleteIcon} style={{width: 24, height: 24}} />
+            <Image source={DeleteIcon} style={{width: 24, height: 24}} />
             <Text style={styles.modalButtonText}>게시글 삭제</Text>
           </TouchableOpacity>
         </View>
@@ -735,22 +749,9 @@ const CommunityPostDetail = ({route}) => {
         iconSource={modalMessage.iconSource}
         showConfirmButton={modalMessage.showConfirmButton}
       />
-      </KeyboardAvoidingView>
+    </KeyboardAvoidingView>
   );
 };
-
-const moreIcon = require('../../assets/icons/moreIcon.png');
-const commentLineIcon = require('../../assets/icons/commentLineIcon.png');
-const commentFillIcon = require('../../assets/icons/commentFillIcon.png');
-const writeCommentIcon = require('../../assets/icons/WriteCommentIcon.png');
-const heartLineIcon = require('../../assets/icons/heartLineIcon.png');
-const heartRedIcon = require('../../assets/icons/heartRedIcon.png');
-const shareIcon = require('../../assets/icons/shareIcon.png');
-const pencilIcon = require('../../assets/icons/pencilIcon.png');
-const deleteIcon = require('../../assets/icons/deleteIcon.png');
-const defaultPostImg = require('../../assets/images/defaultPostImg.jpg');
-const planeMessageIcon = require('../../assets/icons/planeMessageIcon.png');
-const defaultProfileImg = require('../../assets/images/defaultProfileImg.jpeg');
 
 const styles = StyleSheet.create({
   container: {
@@ -898,8 +899,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   moreIcon: {
-    width: 24,
-    height: 24,
+    width: 22,
+    height: 22,
   },
   modalContainer: {
     flex: 1,

@@ -338,7 +338,6 @@ const styles = StyleSheet.create({
 
 })
 
-const searchIcon = require('../../assets/icons/searchIcon.png');
-const currGpsIcon = require('../../assets/icons/currGpsIcon.png');
+const currGpsIcon = require('../../assets/newIcons/currGpsIcon.png');
 
 export default Recruit;

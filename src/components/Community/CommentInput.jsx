@@ -6,6 +6,7 @@ import {
   Image,
   StyleSheet,
 } from 'react-native';
+import {SendIcon} from '../../assets/assets';
 
 const CommentInput = React.memo(
   ({onSubmit, editingCommentId, initialContent}) => {
@@ -48,7 +49,7 @@ const CommentInput = React.memo(
           <Image
             style={[styles.commentSubmitIcon, styles.frameItemLayout]}
             resizeMode="cover"
-            source={planeMessageIcon}
+            source={SendIcon}
           />
         </TouchableOpacity>
       </View>
@@ -85,6 +86,5 @@ const styles = StyleSheet.create({
     width: 32,
   },
 });
-const planeMessageIcon = require('../../assets/icons/planeMessageIcon.png');
 
 export default CommentInput;

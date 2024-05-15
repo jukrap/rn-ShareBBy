@@ -13,8 +13,8 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		758F87F8D9C2C610ACCF09DB /* Pods_HobbyShare_HobbyShareTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 21D2A7CF15156ED349D1B839 /* Pods_HobbyShare_HobbyShareTests.framework */; };
 		7D3410EF2BD7A3860046200D /* SwiftBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D3410EE2BD7A3860046200D /* SwiftBridge.swift */; };
-		7D9C3FC72BF395AD003B3273 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7D9C3FC62BF395AD003B3273 /* GoogleService-Info.plist */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		C060A39D2BF4EC8900CB8B97 /* GoogleService-Info .plist in Resources */ = {isa = PBXBuildFile; fileRef = C060A39C2BF4EC8900CB8B97 /* GoogleService-Info .plist */; };
 		C4C5E8D7106FEF86C046CC6E /* Pods_HobbyShare.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D7BA7C117F5EB2DB271A3282 /* Pods_HobbyShare.framework */; };
 /* End PBXBuildFile section */
 
@@ -32,7 +32,7 @@
 		00E356EE1AD99517003FC87E /* HobbyShareTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HobbyShareTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* HobbyShareTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HobbyShareTests.m; sourceTree = "<group>"; };
-		042924B1C026A41E2B4547FB /* Pods-HobbyShare-HobbyShareTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HobbyShare-HobbyShareTests.release.xcconfig"; path = "Target Support Files/Pods-HobbyShare-HobbyShareTests/Pods-HobbyShare-HobbyShareTests.release.xcconfig"; sourceTree = "<group>"; };
+		05B516202BF3C2E200451725 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* HobbyShare.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HobbyShare.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = HobbyShare/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = HobbyShare/AppDelegate.mm; sourceTree = "<group>"; };
@@ -43,12 +43,13 @@
 		21D2A7CF15156ED349D1B839 /* Pods_HobbyShare_HobbyShareTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HobbyShare_HobbyShareTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		26B897D626A8C7F62DCFD4C8 /* Pods-HobbyShare.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HobbyShare.release.xcconfig"; path = "Target Support Files/Pods-HobbyShare/Pods-HobbyShare.release.xcconfig"; sourceTree = "<group>"; };
 		3CDA927BA08C14FC926427BD /* Pods-HobbyShare-HobbyShareTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HobbyShare-HobbyShareTests.debug.xcconfig"; path = "Target Support Files/Pods-HobbyShare-HobbyShareTests/Pods-HobbyShare-HobbyShareTests.debug.xcconfig"; sourceTree = "<group>"; };
+		59F8C1E37BCCB7A8DEF63BA5 /* Pods-HobbyShare.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HobbyShare.debug.xcconfig"; path = "Target Support Files/Pods-HobbyShare/Pods-HobbyShare.debug.xcconfig"; sourceTree = "<group>"; };
 		7D3410ED2BD7A3850046200D /* HobbyShare-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "HobbyShare-Bridging-Header.h"; sourceTree = "<group>"; };
 		7D3410EE2BD7A3860046200D /* SwiftBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftBridge.swift; sourceTree = "<group>"; };
-		7D9C3FC62BF395AD003B3273 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		7DC706F12BE2949B00103A63 /* HobbyShare.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = HobbyShare.entitlements; path = HobbyShare/HobbyShare.entitlements; sourceTree = "<group>"; };
-		7EEB1D01C21B320EE2371FC6 /* Pods-HobbyShare.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HobbyShare.debug.xcconfig"; path = "Target Support Files/Pods-HobbyShare/Pods-HobbyShare.debug.xcconfig"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = HobbyShare/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		C060A39C2BF4EC8900CB8B97 /* GoogleService-Info .plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info .plist"; sourceTree = "<group>"; };
+		D095803A45F07405ED52D839 /* Pods-HobbyShare-HobbyShareTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HobbyShare-HobbyShareTests.release.xcconfig"; path = "Target Support Files/Pods-HobbyShare-HobbyShareTests/Pods-HobbyShare-HobbyShareTests.release.xcconfig"; sourceTree = "<group>"; };
 		D7BA7C117F5EB2DB271A3282 /* Pods_HobbyShare.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HobbyShare.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -93,10 +94,11 @@
 		13B07FAE1A68108700A75B9A /* HobbyShare */ = {
 			isa = PBXGroup;
 			children = (
-				7D9C3FC62BF395AD003B3273 /* GoogleService-Info.plist */,
+				C060A39C2BF4EC8900CB8B97 /* GoogleService-Info .plist */,
 				7DC706F12BE2949B00103A63 /* HobbyShare.entitlements */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
+				05B516202BF3C2E200451725 /* GoogleService-Info.plist */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
@@ -152,10 +154,10 @@
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				7EEB1D01C21B320EE2371FC6 /* Pods-HobbyShare.debug.xcconfig */,
 				26B897D626A8C7F62DCFD4C8 /* Pods-HobbyShare.release.xcconfig */,
 				3CDA927BA08C14FC926427BD /* Pods-HobbyShare-HobbyShareTests.debug.xcconfig */,
-				042924B1C026A41E2B4547FB /* Pods-HobbyShare-HobbyShareTests.release.xcconfig */,
+				59F8C1E37BCCB7A8DEF63BA5 /* Pods-HobbyShare.debug.xcconfig */,
+				D095803A45F07405ED52D839 /* Pods-HobbyShare-HobbyShareTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -255,8 +257,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
-				7D9C3FC72BF395AD003B3273 /* GoogleService-Info.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				C060A39D2BF4EC8900CB8B97 /* GoogleService-Info .plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -466,7 +468,7 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 042924B1C026A41E2B4547FB /* Pods-HobbyShare-HobbyShareTests.release.xcconfig */;
+			baseConfigurationReference = D095803A45F07405ED52D839 /* Pods-HobbyShare-HobbyShareTests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -491,7 +493,7 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7EEB1D01C21B320EE2371FC6 /* Pods-HobbyShare.debug.xcconfig */;
+			baseConfigurationReference = 59F8C1E37BCCB7A8DEF63BA5 /* Pods-HobbyShare.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -634,10 +636,7 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;
@@ -720,10 +719,7 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;

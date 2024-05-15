@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Image,
@@ -6,20 +6,14 @@ import {
   TouchableOpacity,
   Dimensions,
   StyleSheet,
-  ImageBackground,
 } from 'react-native';
-import ProgressiveImage from './ProgressiveImage';
 import {useFocusEffect} from '@react-navigation/native';
 import {formatDistanceToNow} from 'date-fns';
 import {ko} from 'date-fns/locale';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
-import Modal from 'react-native-modal';
-import {SwiperFlatList} from 'react-native-swiper-flatlist';
 import BottomSheetModal from './BottomSheetModal';
 import ImageDetailModal from './ImageDetailModal';
-
-import FastImage from 'react-native-fast-image';
 import {FasterImageView} from '@candlefinance/faster-image';
 import ImageSlider from './ImageSlider';
 
@@ -31,7 +25,7 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(item.likeCount || 0);
-  const likeIcon = isLiked ? heartLineIcon : heartRedIcon;
+  const likeIcon = isLiked ? HeartIcon : RedHeartIcon;
   const [commentCount, setCommentCount] = useState(item.commentCount || 0);
   const [isLikeProcessing, setIsLikeProcessing] = useState(false);
   const [isMoreContent, setIsMoreContent] = useState(false);
@@ -188,7 +182,7 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
               url: postUserData?.profileImage,
               priority: 'high',
               cachePolicy: 'discWithCacheControl',
-              failureImageUrl: defaultProfileImg,
+              failureImageUrl: DefaultProfileIcon,
               resizeMode: 'cover',
               borderRadius: 50,
             }}
@@ -208,7 +202,7 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
             <Image
               style={styles.moreIcon}
               resizeMode="cover"
-              source={moreIcon}
+              source={MoreIcon}
             />
           </TouchableOpacity>
         </View>
@@ -247,8 +241,8 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
             ]}
             onPress={handleLikePress}>
             <Image
-              source={isLiked ? heartRedIcon : heartLineIcon}
-              style={{width: 24, height: 24}}
+              source={isLiked ? RedHeartIcon : HeartIcon}
+              style={{width: 20, height: 20}}
             />
             <Text
               style={[
@@ -261,7 +255,7 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
           <TouchableOpacity
             style={styles.interactionButton}
             onPress={onComment}>
-            <Image source={commentLineIcon} style={{width: 24, height: 24}} />
+            <Image source={CommentLineIcon} style={{width: 20, height: 20}} />
             <Text style={styles.interactionText}>{commentCount}</Text>
           </TouchableOpacity>
         </View>
@@ -269,7 +263,7 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
           <TouchableOpacity
             style={styles.interactionButton}
             onPress={handleSharePress}>
-            <Image source={shareIcon} style={{width: 24, height: 24}} />
+            <Image source={ShareIcon} style={{width: 20, height: 20}} />
           </TouchableOpacity>
         </View>
       </View>
@@ -281,7 +275,7 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
               onEdit(item.id);
               toggleModal();
             }}>
-            <Image source={pencilIcon} style={{width: 24, height: 24}} />
+            <Image source={PencilIcon} style={{width: 20, height: 20}} />
             <Text style={styles.modalButtonText}>게시글 수정</Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -290,7 +284,7 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
               onDelete(item.id);
               toggleModal();
             }}>
-            <Image source={deleteIcon} style={{width: 24, height: 24}} />
+            <Image source={DeleteIcon} style={{width: 24, height: 24}} />
             <Text style={styles.modalButtonText}>게시글 삭제</Text>
           </TouchableOpacity>
         </View>
@@ -306,18 +300,16 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
     </View>
   );
 };
-
-const moreIcon = require('../../assets/icons/moreIcon.png');
-const commentLineIcon = require('../../assets/icons/commentLineIcon.png');
-const commentFillIcon = require('../../assets/icons/commentFillIcon.png');
-const heartLineIcon = require('../../assets/icons/heartLineIcon.png');
-const heartRedIcon = require('../../assets/icons/heartRedIcon.png');
-const shareIcon = require('../../assets/icons/shareIcon.png');
-const pencilIcon = require('../../assets/icons/pencilIcon.png');
-const deleteIcon = require('../../assets/icons/deleteIcon.png');
-const defaultPostImg = require('../../assets/images/defaultPostImg.jpg');
-const defaultProfileImg = require('../../assets/images/defaultProfileImg.jpeg');
-
+import {
+  MoreIcon,
+  CommentLineIcon,
+  HeartIcon,
+  RedHeartIcon,
+  ShareIcon,
+  PencilIcon,
+  DeleteIcon,
+  DefaultProfileIcon,
+} from '../../assets/assets';
 export default PostCard;
 
 const styles = StyleSheet.create({
@@ -379,8 +371,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   moreIcon: {
-    width: 24,
-    height: 24,
+    width: 20,
+    height: 20,
   },
   postContentText: {
     fontSize: 14,

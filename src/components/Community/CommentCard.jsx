@@ -11,8 +11,13 @@ import {formatDistanceToNow, format} from 'date-fns';
 import {ko} from 'date-fns/locale';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
-import Modal from 'react-native-modal';
 import BottomSheetModal from './BottomSheetModal';
+import {
+  MoreIcon,
+  PencilIcon,
+  DeleteIcon,
+  DefaultProfileIcon,
+} from '../../assets/assets';
 
 const CommentCard = ({item, onDelete, onEdit}) => {
   const [currentUser, setCurrentUser] = useState(null);
@@ -61,7 +66,7 @@ const CommentCard = ({item, onDelete, onEdit}) => {
             source={
               commentUserData && commentUserData.profileImage
                 ? {uri: commentUserData.profileImage}
-                : defaultProfileImg
+                : DefaultProfileIcon
             }
           />
           <View style={styles.userInfoTextContainer}>
@@ -74,7 +79,7 @@ const CommentCard = ({item, onDelete, onEdit}) => {
                   <Image
                     style={styles.moreIcon}
                     resizeMode="cover"
-                    source={moreIcon}
+                    source={MoreIcon}
                   />
                 </TouchableOpacity>
               </View>
@@ -99,7 +104,7 @@ const CommentCard = ({item, onDelete, onEdit}) => {
               onEdit(item.id);
               toggleModal();
             }}>
-            <Image source={pencilIcon} style={{width: 24, height: 24}} />
+            <Image source={PencilIcon} style={{width: 24, height: 24}} />
             <Text style={styles.modalButtonText}>댓글 수정</Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -108,7 +113,7 @@ const CommentCard = ({item, onDelete, onEdit}) => {
               onDelete(item.id);
               toggleModal();
             }}>
-            <Image source={deleteIcon} style={{width: 24, height: 24}} />
+            <Image source={DeleteIcon} style={{width: 24, height: 24}} />
             <Text style={styles.modalButtonText}>댓글 삭제</Text>
           </TouchableOpacity>
         </View>
@@ -118,11 +123,6 @@ const CommentCard = ({item, onDelete, onEdit}) => {
 };
 
 export default CommentCard;
-
-const moreIcon = require('../../assets/icons/moreIcon.png');
-const pencilIcon = require('../../assets/icons/pencilIcon.png');
-const deleteIcon = require('../../assets/icons/deleteIcon.png');
-const defaultProfileImg = require('../../assets/images/defaultProfileImg.jpeg');
 
 const styles = StyleSheet.create({
   topContainer: {
