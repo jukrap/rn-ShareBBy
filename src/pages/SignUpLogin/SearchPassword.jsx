@@ -63,9 +63,8 @@ const SearchPassword = ({navigation}) => {
         keyboardVerticalOffset={1}
         style={{flex: 1}}>
         <TouchableOpacity
-          style={styles.backIcon}
           onPress={() => navigation.goBack()}>
-          <Image source={BackIcon2} />
+          <Image  style={{marginLeft:8}} source={BackIcon2} />
         </TouchableOpacity>
         <View style={{justifyContent: 'space-between', flex: 1}}>
           <View>

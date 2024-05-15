@@ -7,7 +7,6 @@ import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import userStore from './userStore';
-import Toast from '../components/Main/Toast';
 
 // 네이버 로그인 초기화
 const initializeNaverLogin = async () => {
@@ -87,22 +86,35 @@ const getNaverProfiles = async navigation => {
         .ref('dummyprofile.png')
         .getDownloadURL();
 
-      const {user} = await auth().createUserWithEmailAndPassword(
-        profileData.response.email,
+      const email = profileData.response.email;
+
+      // 이미 가입된 사용자인지 확인
+      const userCredential = await auth().signInWithEmailAndPassword(
+        email,
         'temporary_password',
       );
+      let user = userCredential.user;
 
-      // 사용자 정보를 AsyncStorage에 저장
-      const userInfo = {
-        id: user.uid,
-        email: profileData.response.email,
-        nickname: profileData.response.nickname,
-        profileImage: profileImageUrl,
-      };
-      await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
+      if (!user) {
+        // 가입되지 않은 사용자일 경우에만 가입 처리
+        const createUserResult = await auth().createUserWithEmailAndPassword(
+          email,
+          'temporary_password',
+        );
+        user = createUserResult.user;
 
-      // Firestore에 사용자 정보 저장
-      await firestore().collection('users').doc(user.uid).set(userInfo);
+        // 사용자 정보를 AsyncStorage에 저장
+        const userInfo = {
+          id: user.uid,
+          email: email,
+          nickname: profileData.response.nickname,
+          profileImage: profileImageUrl,
+        };
+        await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
+
+        // Firestore에 사용자 정보 저장
+        await firestore().collection('users').doc(user.uid).set(userInfo);
+      }
 
       // 사용자 토큰 및 화면 전환
       await AsyncStorage.setItem('userToken', user.uid);
@@ -136,17 +148,29 @@ export const onGoogleButtonPress = async navigation => {
         .ref('dummyprofile.png')
         .getDownloadURL();
 
-      // 사용자 정보를 AsyncStorage에 저장
-      const userInfo = {
-        id: user.uid,
-        email: email,
-        nickname: displayName,
-        profileImage: profileImageUrl,
-      };
-      await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
+      // 사용자 정보를 AsyncStorage에 저장 (최초 로그인 시에만 저장)
+      const storedUserInfo = await AsyncStorage.getItem('userInfo');
+      if (!storedUserInfo) {
+        const userInfo = {
+          id: user.uid,
+          email: email,
+          nickname: displayName,
+          profileImage: profileImageUrl,
+        };
+        await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
+      }
 
-      // Firestore에 사용자 정보 저장
-      await firestore().collection('users').doc(user.uid).set(userInfo);
+      // Firestore에 사용자 정보 저장 (최초 로그인 시에만 저장)
+      const userDoc = await firestore().collection('users').doc(user.uid).get();
+      if (!userDoc.exists) {
+        const userInfo = {
+          id: user.uid,
+          email: email,
+          nickname: displayName,
+          profileImage: profileImageUrl,
+        };
+        await firestore().collection('users').doc(user.uid).set(userInfo);
+      }
 
       // 사용자 토큰 및 화면 전환
       await AsyncStorage.setItem('userToken', user.uid);
@@ -199,31 +223,50 @@ const getKakaoProfile = async navigation => {
   }
 };
 
-// 카카오 사용자 등록
 const registerKakaoUser = async (profile, navigation) => {
   try {
-    const {user} = await auth().createUserWithEmailAndPassword(
-      `${profile.email}`,
+    const email = profile.email;
+
+    // 이미 가입된 사용자인지 확인
+    const userCredential = await auth().signInWithEmailAndPassword(
+      email,
       'temporary_password',
     );
-    const profileImageUrl = await storage()
-      .ref('dummyprofile.png')
-      .getDownloadURL();
+    const user = userCredential.user;
 
-    // 사용자 정보를 하나의 객체로 묶어서 AsyncStorage에 저장
-    const userInfo = {
-      id: user.uid,
-      email: profile.email,
-      nickname: profile.nickname,
-      profileImage: profileImageUrl,
-    };
-    await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo)); // JSON 문자열로 변환하여 저장
+    if (user) {
+      const profileImageUrl = await storage()
+        .ref('dummyprofile.png')
+        .getDownloadURL();
 
-    await firestore().collection('users').doc(user.uid).set(userInfo); // Firestore에도 저장
+      // 최초 로그인 시에만 AsyncStorage에 사용자 정보 저장
+      const storedUserInfo = await AsyncStorage.getItem('userInfo');
+      if (!storedUserInfo) {
+        const userInfo = {
+          id: user.uid,
+          email: profile.email,
+          nickname: profile.nickname,
+          profileImage: profileImageUrl,
+        };
+        await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
+      }
 
-    // 사용자 토큰 저장 및 화면 전환
-    await AsyncStorage.setItem('userToken', user.uid);
-    navigation.navigate('BottomTab');
+      // 최초 로그인 시에만 Firestore에 사용자 정보 저장
+      const userDoc = await firestore().collection('users').doc(user.uid).get();
+      if (!userDoc.exists) {
+        const userInfo = {
+          id: user.uid,
+          email: profile.email,
+          nickname: profile.nickname,
+          profileImage: profileImageUrl,
+        };
+        await firestore().collection('users').doc(user.uid).set(userInfo);
+      }
+
+      // 사용자 토큰 저장 및 화면 전환
+      await AsyncStorage.setItem('userToken', user.uid);
+      navigation.navigate('BottomTab');
+    }
   } catch (error) {
     Alert.alert('오류', '사용자 등록 및 정보 저장 중 오류가 발생했습니다.');
     console.log(error);
