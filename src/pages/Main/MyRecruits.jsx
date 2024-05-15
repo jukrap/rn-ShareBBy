@@ -56,6 +56,11 @@ const MyRecruits = ({navigation, route}) => {
         }
         return {id: doc.id, ...data};
       });
+      tmp_recruit.sort((a, b) => {
+        const dateA = a.writeTime;
+        const dateB = b.writeTime;
+        return dateB - dateA; // 내림차순 정렬
+      });
       setHobbies(tmp_recruit);
     } catch (error) {
       console.error('Error fetching posts:', error.message);

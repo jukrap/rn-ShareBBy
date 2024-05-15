@@ -108,6 +108,11 @@ const MyLists = ({navigation, route}) => {
       return post;
     });
 
+    tmpPosts.sort((a, b) => {
+      const dateA = a.post_created;
+      const dateB = b.post_created;
+      return dateB - dateA; // 내림차순 정렬
+    });
     setPosts(tmpPosts);
   };
 
