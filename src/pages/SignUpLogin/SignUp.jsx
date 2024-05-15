@@ -13,8 +13,8 @@ import SignUpNickname from '../../components/SignUp/SignUpNickname.jsx';
 import SignUpAddress from '../../components/SignUp/SignUpAddress.jsx';
 import ProgressBar from '../../components/SignUp/ProgressBar.jsx';
 import SignUpPassword from '../../components/SignUp/SignUpPassword.jsx';
-
-const backIcon = require('../../assets/newIcons/back.png');
+import {BackIcon} from '../../assets/assets';
+// const backIcon = require('../../assets/icons/back.png');
 
 const SignUp = ({navigation}) => {
   const {step, handleNextStep, handlePreviousStep, userData} =
@@ -66,7 +66,7 @@ const SignUp = ({navigation}) => {
           if (showPostcode) setShowPostcode(false);
           else handlePreviousStep();
         }}>
-        <Image source={backIcon} />
+        <Image source={BackIcon} />
       </TouchableOpacity>
 
       <ProgressBar percentage={progressPercentage} />

@@ -254,7 +254,7 @@ const Detail = ({route, navigation}) => {
               <View style={{marginLeft: 'auto', justifyContent: 'center'}}>
                 <Image
                   source={
-                    isTextClick.deadLine ? dropDownOnIcon : dropDownOffIcon
+                    isTextClick.deadLine ? DropDownOnIcon : DropDownOffIcon
                   }
                   style={{width: 30, height: 30}}
                 />
@@ -314,7 +314,7 @@ const Detail = ({route, navigation}) => {
               <View style={{marginLeft: 'auto', justifyContent: 'center'}}>
                 <Image
                   source={
-                    isTextClick.peopleCount ? dropDownOnIcon : dropDownOffIcon
+                    isTextClick.peopleCount ? DropDownOnIcon : DropDownOffIcon
                   }
                   style={{width: 30, height: 30}}
                 />
@@ -514,9 +514,9 @@ const Detail = ({route, navigation}) => {
     </SafeAreaView>
   );
 };
-
-const dropDownOnIcon = require('../../assets/newIcons/dropDownOnIcon.png');
-const dropDownOffIcon = require('../../assets/newIcons/dropDownOffIcon.png');
+import {DropDownOffIcon, DropDownOnIcon} from '../../assets/assets';
+// const dropDownOnIcon = require('../../assets/newIcons/dropDownOnIcon.png');
+// const dropDownOffIcon = require('../../assets/newIcons/dropDownOffIcon.png');
 
 const countList = [
   {

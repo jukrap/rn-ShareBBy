@@ -83,13 +83,13 @@ const BottomTab = ({navigation}) => {
           let iconName;
 
           if (route.name === '홈') {
-            iconName = focused ? homeOnIcon : homeOffIcon;
+            iconName = focused ? HomeOnIcon : HomeOffIcon;
           } else if (route.name === '게시판') {
-            iconName = focused ? boardOnIcon : boardOffIcon;
+            iconName = focused ? BoardOnIcon : BoardOffIcon;
           } else if (route.name === '채팅') {
-            iconName = focused ? chatOnIcon : chatOffIcon;
+            iconName = focused ? ChatOnIcon : ChatOffIcon;
           } else if (route.name === '프로필') {
-            iconName = focused ? profileOnIcon : profileOffIcon;
+            iconName = focused ? ProfileOnIcon : ProfileOffIcon;
           }
           // 아이콘 반환
           return <Image source={iconName} style={style.icon} />;
@@ -104,20 +104,29 @@ const BottomTab = ({navigation}) => {
     </Tab.Navigator>
   );
 };
-
-const homeOnIcon = require('../assets/newIcons/homeOnIcon.png');
-const homeOffIcon = require('../assets/newIcons/homeOffIcon.png');
-const boardOnIcon = require('../assets/newIcons/boardOnIcon.png');
-const boardOffIcon = require('../assets/newIcons/boardOffIcon.png');
-const chatOnIcon = require('../assets/newIcons/chatOnIcon.png');
-const chatOffIcon = require('../assets/newIcons/chatOffIcon.png');
-const profileOnIcon = require('../assets/newIcons/profileOnIcon.png');
-const profileOffIcon = require('../assets/newIcons/profileOffIcon.png');
+import {
+  HomeOnIcon,
+  HomeOffIcon,
+  BoardOffIcon,
+  BoardOnIcon,
+  ChatOnIcon,
+  ChatOffIcon,
+  ProfileOffIcon,
+  ProfileOnIcon,
+} from '../assets/assets';
+// const homeOnIcon = require('../assets/newIcons/homeOnIcon.png');
+// const homeOffIcon = require('../assets/newIcons/homeOffIcon.png');
+// const boardOnIcon = require('../assets/newIcons/boardOnIcon.png');
+// const boardOffIcon = require('../assets/newIcons/boardOffIcon.png');
+// const chatOnIcon = require('../assets/newIcons/chatOnIcon.png');
+// const chatOffIcon = require('../assets/newIcons/chatOffIcon.png');
+// const profileOnIcon = require('../assets/newIcons/profileOnIcon.png');
+// const profileOffIcon = require('../assets/newIcons/profileOffIcon.png');
 
 export const style = StyleSheet.create({
   icon: {
-    width: 30,
-    height: 30,
+    width: 26,
+    height: 26,
   },
 });
 

@@ -24,7 +24,7 @@ const TopTab = ({navigation, leftFunc, rightFunc, onPressRight, title}) => {
             {leftFunc ? (
               <Text style={styles.topText}>{leftFunc}</Text>
             ) : (
-              <Image source={backIcon} style={{width: 20, height: 20}} />
+              <Image source={BackIcon} style={{width: 20, height: 20}} />
             )}
           </TouchableOpacity>
           <Text style={{fontWeight: '700', fontSize: 16}}>{title}</Text>
@@ -43,7 +43,8 @@ const TopTab = ({navigation, leftFunc, rightFunc, onPressRight, title}) => {
   );
 };
 
-const backIcon = require('../../assets/newIcons/backIcon.png');
+import {BackIcon} from '../../assets/assets';
+// const backIcon = require('../../assets/newIcons/backIcon.png');
 
 const styles = StyleSheet.create({
   commonRate: {

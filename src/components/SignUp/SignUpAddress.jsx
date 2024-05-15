@@ -17,9 +17,8 @@ import storage from '@react-native-firebase/storage';
 import LoginToast from './LoginToast';
 
 const {width} = Dimensions.get('window');
-
-const addressSearch = require('../../assets/newIcons/addressSearch.png');
-
+import {AddressSearch} from '../../assets/assets';
+// const addressSearch = require('../../assets/newIcons/addressSearch.png');
 
 const SignUpAddress = ({
   navigation,
@@ -93,7 +92,7 @@ const SignUpAddress = ({
               borderColor: '#07AC7D',
               marginHorizontal: 16,
             }}>
-            <Image style={{width: 21, height: 21}} source={addressSearch} />
+            <Image style={{width: 21, height: 21}} source={AddressSearch} />
             <TextInput
               style={styles.addressTextInput}
               placeholder="지번, 도로명, 건물명으로 검색"
