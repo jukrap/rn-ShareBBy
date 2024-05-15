@@ -14,7 +14,6 @@ import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import useStore from '../../lib/userStore';
 import {useFocusEffect} from '@react-navigation/native';
-import {StackActions} from '@react-navigation/native';
 
 const heart = require('../../assets/newIcons/heart-icon.png');
 const pencil = require('../../assets/newIcons/pencil-icon.png');
@@ -27,25 +26,8 @@ const Profile = ({navigation, route}) => {
   const [users, setUsers] = useState(null);
   const [userUid, setUserUid] = useState(null);
   const usersCollection = firestore().collection('users');
-  // const clearUserToken = useStore(state => state.clearUserToken);
   const userToken = useStore(state => state.userToken); // 토큰 상태 추가
 
-  // useEffect(() => {
-  //   const fetchUserUid = async () => {
-  //     try {
-  //       const user = auth().currentUser;
-  //       if (user) {
-  //         //set uuid
-  //         const userUID = user.uid;
-  //         setUserUid(userUID);
-  //       }
-  //     } catch (error) {
-  //       console.error('Error fetching current user: ', error);
-  //     }
-  //     console.log('call user uid', userUid);
-  //   };
-  //   fetchUserUid();
-  // }, [navigation]);
   const fetchUserUid = async () => {
     try {
       const user = auth().currentUser;
@@ -57,12 +39,11 @@ const Profile = ({navigation, route}) => {
     } catch (error) {
       console.error('Error fetching current user: ', error);
     }
-    // console.log('call user uid', userUid);
   };
   const fetchUserData = async () => {
     try {
       const querySnapshot = (await usersCollection.doc(userUid).get()).data();
-      // console.log(querySnapshot);
+
       setUsers(querySnapshot); // 사용자 데이터 상태 설정
     } catch (error) {
       console.log(error.message);
@@ -94,14 +75,12 @@ const Profile = ({navigation, route}) => {
     }
   };
 
-  console.log('User Token:', userToken);
   return (
     <SafeAreaView style={styles.safeAreaViewStyle}>
       {users ? (
         <ScrollView>
           <Text style={styles.title}>마이페이지</Text>
           <View style={styles.profileHeader}>
-            {/* onPress 추가 */}
             <Image
               source={{uri: users.profileImage}}
               style={styles.profileImageStyle}
@@ -208,9 +187,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   profileHeader: {
-    // paddingBottom: 15,
     justifyContent: 'flex-start',
-    // alignItems: 'center',
     paddingBottom: 10,
     flexDirection: 'row',
     marginTop: 20,
@@ -245,14 +222,7 @@ const styles = StyleSheet.create({
 
     marginRight: 22,
   },
-  profileWrapper: {
-    backgroundColor: '#fff',
 
-    // marginTop: -80,
-
-    borderTopLeftRadius: 50,
-    borderTopRightRadius: 50,
-  },
   icon: {
     width: 16,
     height: 16,
@@ -262,16 +232,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#212529',
     flexDirection: 'row',
-    // textAlign: 'center',
-    // justifyContent: 'center',
     margin: 10,
     fontWeight: 'bold',
   },
   infoStyle: {
     fontSize: 16,
-    // flexDirection: 'row',
-    // textAlign: 'center',
-    // justifyContent: 'center',
     marginTop: 10,
     marginLeft: 30,
     marginRight: 30,
@@ -283,7 +248,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     textAlign: 'center',
     alignItems: 'center',
-    // justifyContent: 'center',
   },
   noticeStyle: {
     fontSize: 15,
