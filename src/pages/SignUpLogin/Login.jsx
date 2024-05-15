@@ -21,10 +21,6 @@ import {
   kakaoLogins,
 } from '../../lib/SocialLogin';
 import {Naver, Google, Kakao} from '../../assets/assets';
-// const naverIcon = require('../../assets/newIcons/naver.png');
-// const kakaoIcon = require('../../assets/newIcons/kakao.png');
-// const googleIcon = require('../../assets/newIcons/google.png');
-
 const LoginTitle = require('../../assets/images/LoginTitle.png');
 
 const Login = ({navigation}) => {

@@ -9,8 +9,6 @@ import {
 import firestore from '@react-native-firebase/firestore';
 import {useEffect, useState} from 'react';
 import {BackIcon, HeartIcon} from '../../assets/assets';
-// const leftArrow = require('../../assets/newIcons/backIcon.png');
-// const heart = require('../../assets/newIcons/heart-icon.png');
 const formatDate = date => {
   return new Intl.DateTimeFormat('ko-KR', {
     year: 'numeric',

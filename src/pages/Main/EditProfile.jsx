@@ -13,7 +13,6 @@ import firestore from '@react-native-firebase/firestore';
 import ImagePicker from 'react-native-image-crop-picker';
 import storage from '@react-native-firebase/storage';
 import {BackIcon} from '../../assets/assets';
-// const leftArrow = require('../../assets/newIcons/backIcon.png');
 const EditProfile = ({navigation, route}) => {
   const [nickname, setNickname] = useState(route.params.nickname);
   const [editImage, setEditImage] = useState({

@@ -278,8 +278,6 @@ const Join = ({navigation, route}) => {
 };
 
 import {CurrGpsIcon} from '../../assets/assets';
-// const currGpsIcon = require('../../assets/newIcons/currGpsIcon.png');
-
 const styles = StyleSheet.create({
   searchView: {
     width: width,

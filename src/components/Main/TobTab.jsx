@@ -44,8 +44,6 @@ const TopTab = ({navigation, leftFunc, rightFunc, onPressRight, title}) => {
 };
 
 import {BackIcon} from '../../assets/assets';
-// const backIcon = require('../../assets/newIcons/backIcon.png');
-
 const styles = StyleSheet.create({
   commonRate: {
     justifyContent: 'space-between',

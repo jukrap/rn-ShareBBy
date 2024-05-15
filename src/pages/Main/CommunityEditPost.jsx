@@ -27,10 +27,6 @@ import {
   CameraIcon,
   ImageIcon,
 } from '../../assets/assets';
-// const warningIcon = require('../../assets/newIcons/warningIcon.png');
-// const cautionIcon = require('../../assets/newIcons/cautionIcon.png');
-// const cameraIcon = require('../../assets/newIcons/cameraIcon.png');
-// const pictureIcon = require('../../assets/newIcons/imageIcon.png');
 
 const CommunityEditPost = ({route}) => {
   const navigation = useNavigation();

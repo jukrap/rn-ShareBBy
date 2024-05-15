@@ -3,6 +3,7 @@
 export const AddressSearch = require('../assets/newIcons/addressSearch.png');
 export const Back = require('../assets/newIcons/back.png');
 export const BackIcon = require('../assets/newIcons/backIcon.png');
+export const BackIcon2 = require('../assets/newIcons/backIcon2.png');
 export const BoardOffIcon = require('../assets/newIcons/boardOffIcon.png');
 export const BoardOnIcon = require('../assets/newIcons/boardOnIcon.png');
 export const CameraIcon = require('../assets/newIcons/cameraIcon.png');
@@ -18,6 +19,7 @@ export const DropDownOnIcon = require('../assets/newIcons/dropDownOnIcon.png');
 export const ExitIcon = require('../assets/newIcons/exitIcon.png');
 export const Google = require('../assets/newIcons/google.png');
 export const GreenCloseIcon = require('../assets/newIcons/greenCloseIcon.png');
+export const GreenPencilIcon = require('../assets/newIcons/greenPencilIcon.png');
 export const HamburgerIcon = require('../assets/newIcons/hamburgerIcon.png');
 export const HeartIcon = require('../assets/newIcons/heart-icon.png');
 export const HomeOffIcon = require('../assets/newIcons/homeOffIcon.png');
@@ -34,7 +36,6 @@ export const OnCheckBox = require('../assets/newIcons/onCheckBox.png');
 export const OtherIcon = require('../assets/newIcons/otherIcon.png');
 export const PasswordHideIcon = require('../assets/newIcons/passwordHide.png');
 export const PencilIcon = require('../assets/newIcons/pencil-icon.png');
-
 export const PlusIcon = require('../assets/newIcons/plusIcon.png');
 export const ProfileOffIcon = require('../assets/newIcons/profileOffIcon.png');
 export const ProfileOnIcon = require('../assets/newIcons/profileOnIcon.png');
@@ -45,9 +46,6 @@ export const ShareIcon = require('../assets/newIcons/shareIcon.png');
 export const SuccessIcon = require('../assets/newIcons/successIcon.png');
 export const WarningIcon = require('../assets/newIcons/warningIcon.png');
 export const WritecommentIcon = require('../assets/newIcons/writeCommentIcon.png');
-
-export const GreenPencilIcon = require('../assets/newIcons/greenPencilIcon.png');
-
 
 //Images
 export const DefaultProfileIcon = require('../assets/images/defaultProfileImg.jpeg');

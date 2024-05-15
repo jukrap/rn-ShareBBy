@@ -18,7 +18,6 @@ import LoginToast from './LoginToast';
 
 const {width} = Dimensions.get('window');
 import {AddressSearch} from '../../assets/assets';
-// const addressSearch = require('../../assets/newIcons/addressSearch.png');
 
 const SignUpAddress = ({
   navigation,

@@ -79,7 +79,6 @@ const CommunityHeader = ({
 
 export default CommunityHeader;
 import {BackIcon} from '../../assets/assets';
-// const backIcon = require('../../assets/newIcons/backIcon.png');
 
 const styles = StyleSheet.create({
   topbarView: {

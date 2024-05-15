@@ -46,17 +46,6 @@ import {
   SendIcon,
   DefaultProfileIcon,
 } from '../../assets/assets';
-// const warningIcon = require('../../assets/newIcons/warningIcon.png');
-// const moreIcon = require('../../assets/newIcons/moreIcon.png');
-// const commentLineIcon = require('../../assets/newIcons/commentLineIcon.png');
-// const writeCommentIcon = require('../../assets/newIcons/writeCommentIcon.png');
-// const heartLineIcon = require('../../assets/newIcons/heart-icon.png');
-// const heartRedIcon = require('../../assets/newIcons/redHeartIcon.png');
-// const shareIcon = require('../../assets/newIcons/shareIcon.png');
-// const pencilIcon = require('../../assets/newIcons/pencil-icon.png');
-// const deleteIcon = require('../../assets/newIcons/deleteIcon.png');
-// const planeMessageIcon = require('../../assets/newIcons/sendIcon.png');
-// const defaultProfileImg = require('../../assets/images/defaultProfileImg.jpeg');
 
 const CommunityPostDetail = ({route}) => {
   const navigation = useNavigation();
