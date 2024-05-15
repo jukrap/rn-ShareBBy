@@ -1,11 +1,11 @@
 import React from 'react';
 import {SafeAreaView, View, Text, Image, TouchableOpacity} from 'react-native';
 import {WebView} from 'react-native-webview';
-import {BackIcon} from '../../../assets/assets';
+import {BackIcon2} from '../../../assets/assets';
 
 const TeenagerAgree = ({navigation}) => {
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <SafeAreaView style={{flex: 1, backgroundColor:'#fefffe'}}>
       <View
         style={{
           flexDirection: 'row',
@@ -16,7 +16,7 @@ const TeenagerAgree = ({navigation}) => {
         <TouchableOpacity
           onPress={() => navigation.goBack()}
           style={{flex: 0.5}}>
-          <Image source={BackIcon} />
+          <Image source={BackIcon2} />
         </TouchableOpacity>
         <View>
           <Text style={{color: '#fff'}}>청소년 보호정책</Text>

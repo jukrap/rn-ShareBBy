@@ -66,8 +66,11 @@ const Profile = ({navigation, route}) => {
       // Firebase에서 로그아웃
       await auth().signOut();
       await AsyncStorage.removeItem('userInfo');
-      navigation.navigate('Login');
       setLogoutShowModal(false);
+      navigation.reset({
+        index: 0,
+        routes: [{name: 'Login'}],
+      });
     } catch (error) {
       console.error('로그아웃 실패:', error);
     }
