@@ -20,7 +20,7 @@ const pencil = require('../../assets/newIcons/pencil-icon.png');
 const marker = require('../../assets/newIcons/marker-icon.png');
 
 const {width, height} = Dimensions.get('window');
-const rightArrow = require('../../assets/icons/right-arrow.png');
+const rightArrow = require('../../assets/newIcons/rightIcon.png');
 
 const Profile = ({navigation, route}) => {
   const [users, setUsers] = useState(null);
@@ -198,17 +198,19 @@ const styles = StyleSheet.create({
   },
   name: {
     flexDirection: 'row',
+    alignItems: 'center',
+    paddingBottom: 10,
   },
   nameStyle: {
     fontSize: 20,
     fontWeight: 'bold',
     color: '#212529',
-    paddingBottom: 10,
+    // paddingBottom: 10,
   },
   arrow: {
-    width: 20,
-    height: 20,
-    alignItems: 'center',
+    width: 15,
+    height: 15,
+    // alignItems: 'center',
   },
   emailStyle: {
     fontSize: 15,
@@ -219,7 +221,6 @@ const styles = StyleSheet.create({
     borderRadius: 70,
     width: 70,
     height: 70,
-
     marginRight: 22,
   },
 
@@ -253,7 +254,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: 'bold',
     color: '#3f3f3f',
-    alignItems: 'center',
+    // alignItems: 'center',
     marginLeft: 5,
   },
   noticeWrapper: {
