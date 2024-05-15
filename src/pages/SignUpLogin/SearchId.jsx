@@ -13,7 +13,7 @@ import firestore from '@react-native-firebase/firestore'; // firestore import ì¶
 import LoginToast from '../../components/SignUp/LoginToast';
 import LoginModal from '../../components/SignUp/LoginModal';
 
-const backIcon = require('../../assets/newIcons/back.png');
+const backIcon = require('../../assets/icons/back.png');
 
 const SignUpEmail = ({navigation}) => {
   const [email, setEmail] = useState('');
