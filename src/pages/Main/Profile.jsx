@@ -14,6 +14,7 @@ import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import useStore from '../../lib/userStore';
 import {useFocusEffect} from '@react-navigation/native';
+import LoginModal from '../../components/SignUp/LoginModal';
 
 const heart = require('../../assets/newIcons/heart-icon.png');
 const pencil = require('../../assets/newIcons/pencil-icon.png');
@@ -25,6 +26,7 @@ const rightArrow = require('../../assets/icons/right-arrow.png');
 const Profile = ({navigation, route}) => {
   const [users, setUsers] = useState(null);
   const [userUid, setUserUid] = useState(null);
+  const [showLogoutModal, setLogoutShowModal] = useState(null);
   const usersCollection = firestore().collection('users');
   const userToken = useStore(state => state.userToken); // 토큰 상태 추가
 
@@ -66,15 +68,22 @@ const Profile = ({navigation, route}) => {
     try {
       // Firebase에서 로그아웃
       await auth().signOut();
-
       await AsyncStorage.removeItem('userInfo');
-
-      navigation.replace('Login');
+      navigation.navigate('Login');
+      setLogoutShowModal(false)
     } catch (error) {
       console.error('로그아웃 실패:', error);
     }
   };
 
+  const handleLogoutModalClose = () => {
+    // 모달 닫기
+    setLogoutShowModal(false);
+  };
+  const handleLogoutShowModal = () => {
+    setLogoutShowModal(true);
+    };
+  
   return (
     <SafeAreaView style={styles.safeAreaViewStyle}>
       {users ? (
@@ -156,7 +165,7 @@ const Profile = ({navigation, route}) => {
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={handleLogout}
+              onPress={handleLogoutShowModal}
               style={styles.noticeWrapper}>
               <Text style={styles.noticeStyle}>로그아웃</Text>
             </TouchableOpacity>
@@ -169,6 +178,16 @@ const Profile = ({navigation, route}) => {
           <Text>not users</Text>
         </ScrollView>
       )}
+      <LoginModal
+        animationType="slide"
+        visible={showLogoutModal}
+        closeModal={handleLogoutModalClose}
+        message="로그아웃"
+        message2="로그아웃 하시겠어요?"
+        LeftButton="취소"
+        RightButton="로그아웃"
+        onConfirm={handleLogout}
+      />
     </SafeAreaView>
   );
 };

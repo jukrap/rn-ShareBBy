@@ -3,19 +3,17 @@ import {
   Text,
   View,
   TextInput,
-  Alert,
   Image,
   TouchableOpacity,
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
-  Modal
 } from 'react-native';
 import {signIn} from '../../lib/auth';
 import firestore from '@react-native-firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import userStore from '../../lib/userStore';
-import Toast from '../../components/Main/Toast';
+import LoginToast from '../../components/SignUp/LoginToast';
 
 import {
   onGoogleButtonPress,
@@ -78,7 +76,7 @@ const Login = ({navigation}) => {
   };
 
   return (
-    <KeyboardAvoidingView style={{flex: 1, backgroundColor: '#fff'}}>
+    <KeyboardAvoidingView style={{flex: 1, backgroundColor: '#fefffe'}}>
       <View style={styles.firstContainer}>
         <View>
           <Image source={LoginTitle} />
@@ -165,7 +163,7 @@ const Login = ({navigation}) => {
           </View>
         </View>
       </View>
-      <Toast text="아이디 또는 비밀번호를 확인해주세요." visible={showToast} handleCancel={() => setShowToast(false)} />
+      <LoginToast text="아이디 또는 비밀번호를 확인해주세요." visible={showToast} handleCancel={() => setShowToast(false)} />
 
     </KeyboardAvoidingView>
   );
