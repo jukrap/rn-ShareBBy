@@ -18,7 +18,7 @@ function calculateTimeDifference(targetDate) {
   const timeDifference = endDate.getTime() - now.getTime();
 
   if (timeDifference <= 0) {
-    console.log('목표 시간이 이미 지났습니다.');
+    // console.log('목표 시간이 이미 지났습니다.');
     return;
   }
 
@@ -56,6 +56,11 @@ const MyRecruits = ({navigation, route}) => {
         }
         return {id: doc.id, ...data};
       });
+      tmp_recruit.sort((a, b) => {
+        const dateA = a.writeTime;
+        const dateB = b.writeTime;
+        return dateB - dateA; // 내림차순 정렬
+      });
       setHobbies(tmp_recruit);
     } catch (error) {
       console.error('Error fetching posts:', error.message);
@@ -78,11 +83,7 @@ const MyRecruits = ({navigation, route}) => {
             return (
               <View key={idx} style={styles.post}>
                 <Text style={styles.title}>{it.title}</Text>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                  }}>
+                <View style={styles.recruiteContainer}>
                   <View style={styles.contentWrapper}>
                     <Text style={styles.content}>{it.content}</Text>
                     <Text style={styles.address}>
@@ -143,32 +144,32 @@ const styles = StyleSheet.create({
     color: '#212529',
     marginBottom: 10,
   },
-  contentWrapper: {},
-  personCount: {
-    fontSize: 15,
-    color: '#212529',
-    paddingTop: 10,
-    paddingBottom: 10,
+  recruiteContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
+  contentWrapper: {
+    flex: 0.95,
+  },
+
   tag: {
     fontSize: 15,
     fontWeight: 'bold',
     color: '#212529',
-    paddingTop: 10,
-    paddingBottom: 10,
+    paddingTop: 5,
   },
   deadline: {
     fontSize: 15,
     fontWeight: 'bold',
     color: '#898989',
-    paddingTop: 10,
+    paddingTop: 5,
     paddingBottom: 10,
   },
   content: {
-    fontSize: 15,
+    fontSize: 16,
     color: '#212529',
     paddingTop: 10,
-    paddingBottom: 10,
+    paddingBottom: 7,
   },
   address: {
     fontSize: 15,
@@ -181,14 +182,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   recruiteStatus: {
-    fontSize: 15,
+    fontSize: 16,
     color: '#07AC7D',
     paddingTop: 10,
-    paddingBottom: 10,
+    paddingBottom: 7,
   },
   recruiteComplete: {
-    fontSize: 15,
+    fontSize: 16,
     color: '#4E8FE4',
+    paddingTop: 10,
+    paddingBottom: 7,
+  },
+  personCount: {
+    fontSize: 15,
+    color: '#212529',
     paddingTop: 10,
     paddingBottom: 10,
   },

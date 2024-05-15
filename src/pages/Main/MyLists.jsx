@@ -45,18 +45,18 @@ const PostItem = React.memo(({item}) => {
           </View>
 
           <Text style={styles.content}>{item.post_content}</Text>
-          <View style={styles.imageWrapper}>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {item.post_files &&
-                item.post_files.map((file, index) => (
-                  <Image
-                    key={index}
-                    style={styles.contentImage}
-                    source={{uri: file}}
-                  />
-                ))}
-            </ScrollView>
-          </View>
+
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {item.post_files &&
+              item.post_files.map((file, index) => (
+                <Image
+                  key={index}
+                  style={styles.contentImage}
+                  source={{uri: file}}
+                />
+              ))}
+          </ScrollView>
+
           <View style={styles.like}>
             <Image source={heart} style={styles.heart} />
             <Text style={styles.likeCount}>{item.likeCount}</Text>
@@ -108,6 +108,11 @@ const MyLists = ({navigation, route}) => {
       return post;
     });
 
+    tmpPosts.sort((a, b) => {
+      const dateA = a.post_created;
+      const dateB = b.post_created;
+      return dateB - dateA; // 내림차순 정렬
+    });
     setPosts(tmpPosts);
   };
 
@@ -138,10 +143,6 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     marginRight: 20,
   },
-  profileWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
   post: {
     borderColor: 'grey',
     borderWidth: 1,
@@ -150,7 +151,10 @@ const styles = StyleSheet.create({
     marginTop: 12,
     marginBottom: 12,
   },
-
+  profileWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -160,10 +164,6 @@ const styles = StyleSheet.create({
   },
   arrow: {width: 22, height: 22},
   headtext: {fontSize: 20, fontWeight: 'bold', marginLeft: 10},
-  profileWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
   image: {
     width: 40,
     height: 40,
