@@ -31,13 +31,14 @@ const MyPosts = ({navigation, route}) => {
       const snapshot = await postsCollection.where('userId', '==', uuid).get();
       const tmp_posts = snapshot.docs.map(doc => {
         const data = doc.data();
+
         if (data.post_created && data.post_created.toDate) {
           data.post_created = data.post_created.toDate(); // Date 객체로 변환
         }
         return {id: doc.id, ...data};
       });
+      console.log('포스트', tmp_posts);
       setPosts(tmp_posts);
-      // console.log('posts', posts);
     } catch (error) {
       console.error('Error fetching posts:', error.message);
     }
