@@ -9,7 +9,6 @@ import {
 import firestore from '@react-native-firebase/firestore';
 import {useEffect, useState} from 'react';
 import {BackIcon} from '../../assets/assets';
-// const leftArrow = require('../../assets/newIcons/backIcon.png');
 
 function calculateTimeDifference(targetDate) {
   const now = new Date(); // 현재 시간

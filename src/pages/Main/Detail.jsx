@@ -515,8 +515,6 @@ const Detail = ({route, navigation}) => {
   );
 };
 import {DropDownOffIcon, DropDownOnIcon} from '../../assets/assets';
-// const dropDownOnIcon = require('../../assets/newIcons/dropDownOnIcon.png');
-// const dropDownOffIcon = require('../../assets/newIcons/dropDownOffIcon.png');
 
 const countList = [
   {

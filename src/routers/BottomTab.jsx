@@ -120,14 +120,6 @@ import {
   ProfileOffIcon,
   ProfileOnIcon,
 } from '../assets/assets';
-// const homeOnIcon = require('../assets/newIcons/homeOnIcon.png');
-// const homeOffIcon = require('../assets/newIcons/homeOffIcon.png');
-// const boardOnIcon = require('../assets/newIcons/boardOnIcon.png');
-// const boardOffIcon = require('../assets/newIcons/boardOffIcon.png');
-// const chatOnIcon = require('../assets/newIcons/chatOnIcon.png');
-// const chatOffIcon = require('../assets/newIcons/chatOffIcon.png');
-// const profileOnIcon = require('../assets/newIcons/profileOnIcon.png');
-// const profileOffIcon = require('../assets/newIcons/profileOffIcon.png');
 
 export const style = StyleSheet.create({
   icon: {

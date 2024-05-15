@@ -13,9 +13,7 @@ import {
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore'; // firestore import 추가
 import LoginToast from '../../components/SignUp/LoginToast';
-
-
-const backIcon = require('../../assets/icons/back.png');
+import {BackIcon2} from '../../assets/assets';
 
 const SearchPassword = ({navigation}) => {
   const [email, setEmail] = useState('');
@@ -67,7 +65,7 @@ const SearchPassword = ({navigation}) => {
         <TouchableOpacity
           style={styles.backIcon}
           onPress={() => navigation.goBack()}>
-          <Image source={BackIcon} />
+          <Image source={BackIcon2} />
         </TouchableOpacity>
         <View style={{justifyContent: 'space-between', flex: 1}}>
           <View>

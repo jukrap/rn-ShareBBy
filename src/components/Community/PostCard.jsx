@@ -310,15 +310,6 @@ import {
   DeleteIcon,
   DefaultProfileIcon,
 } from '../../assets/assets';
-// const moreIcon = require('../../assets/newIcons/moreIcon.png');
-// const commentLineIcon = require('../../assets/newIcons/commentLineIcon.png');
-// const heartLineIcon = require('../../assets/newIcons/heart-icon.png');
-// const heartRedIcon = require('../../assets/newIcons/redHeartIcon.png');
-// const shareIcon = require('../../assets/newIcons/shareIcon.png');
-// const pencilIcon = require('../../assets/newIcons/pencil-icon.png');
-// const deleteIcon = require('../../assets/newIcons/deleteIcon.png');
-// const defaultProfileImg = require('../../assets/images/defaultProfileImg.jpeg');
-
 export default PostCard;
 
 const styles = StyleSheet.create({

@@ -13,7 +13,6 @@ import {
 import LoginToast from './LoginToast';
 
 import {PasswordHideIcon} from '../../assets/assets';
-// const passwordHideIcon = require('../../assets/newIcons/passwordHide.png');
 
 const {width, height} = Dimensions.get('window');
 

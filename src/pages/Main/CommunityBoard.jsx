@@ -20,8 +20,6 @@ import CommunityHeader from '../../components/Community/CommunityHeader';
 import CommunityActionToast from '../../components/Community/CommunityActionToast';
 import CommunityActionModal from '../../components/Community/CommunityActionModal';
 import {WarningIcon, PencilIcon} from '../../assets/assets';
-// const warningIcon = require('../../assets/newIcons/warningIcon.png');
-// const pencilIcon = require('../../assets/newIcons/pencil-icon.png');
 const {width, height} = Dimensions.get('window');
 
 const CommunityBoard = ({navigation, route}) => {

@@ -15,10 +15,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import useStore from '../../lib/userStore';
 import {useFocusEffect} from '@react-navigation/native';
 import LoginModal from '../../components/SignUp/LoginModal';
-
-const heart = require('../../assets/newIcons/heart-icon.png');
-const pencil = require('../../assets/newIcons/pencil-icon.png');
-const marker = require('../../assets/newIcons/marker-icon.png');
+import {HeartIcon, PencilIcon, MarkerIcon} from '../../assets/assets';
 
 const {width, height} = Dimensions.get('window');
 const rightArrow = require('../../assets/newIcons/rightIcon.png');
@@ -121,7 +118,7 @@ const Profile = ({navigation, route}) => {
                 })
               }
               style={styles.myList}>
-              <Image source={pencil} style={styles.icon} />
+              <Image source={PencilIcon} style={styles.icon} />
               <Text style={styles.listStyle}>내가 쓴 글</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -131,7 +128,7 @@ const Profile = ({navigation, route}) => {
                 })
               }
               style={styles.myList}>
-              <Image source={heart} style={styles.icon} />
+              <Image source={HeartIcon} style={styles.icon} />
               <Text style={styles.listStyle}>찜한 글</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -141,7 +138,7 @@ const Profile = ({navigation, route}) => {
                 })
               }
               style={styles.myList}>
-              <Image source={marker} style={styles.icon} />
+              <Image source={MarkerIcon} style={styles.icon} />
               <Text
                 // onPress={() => navigation.navigate('Home')}
                 style={styles.listStyle}>
