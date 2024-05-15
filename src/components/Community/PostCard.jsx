@@ -16,6 +16,7 @@ import BottomSheetModal from './BottomSheetModal';
 import ImageDetailModal from './ImageDetailModal';
 import {FasterImageView} from '@candlefinance/faster-image';
 import ImageSlider from './ImageSlider';
+import LoginToast from '../SignUp/LoginToast';
 
 const {width, height} = Dimensions.get('window');
 
@@ -48,6 +49,28 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
     fetchPostUserData();
     return () => unsubscribe();
   }, []);
+
+  const toggleReportModal = async () => {
+    try {
+      // 해당 유저 정보 가져오기
+      const userDoc = await firestore().collection('users').doc(item.userId).get();
+      if (userDoc.exists) {
+        const userData = userDoc.data();
+        let reportCount = userData.report || 0;
+        reportCount++; 
+        
+        await firestore().collection('users').doc(item.userId).update({ report: reportCount });
+        // 모달이 닫힐 때 토스트를 보여주기
+        setIsModalVisible(!isModalVisible);
+        setShowToast(true);
+
+      } else {
+        console.log("해당 유저 정보가 존재하지 않습니다.");
+      }
+    } catch (error) {
+      console.error("유저 정보를 업데이트하는 중에 오류가 발생했습니다:", error);
+    }
+  };
 
   const toggleModal = () => {
     setIsModalVisible(!isModalVisible);
@@ -284,8 +307,15 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
               onDelete(item.id);
               toggleModal();
             }}>
-            <Image source={DeleteIcon} style={{width: 24, height: 24}} />
+            <Image source={DeleteIcon} style={{width: 20, height: 20}} />
             <Text style={styles.modalButtonText}>게시글 삭제</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={styles.modalButton}
+            onPress={toggleReportModal}>
+            <Image source={CautionIcon} style={{width: 20, height: 20}} />
+            <Text style={styles.modalButtonText}>신고하기</Text>
           </TouchableOpacity>
         </View>
       </BottomSheetModal>
@@ -297,6 +327,11 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
           onClose={() => setIsImageModalVisible(false)}
         />
       )}
+      <LoginToast
+          text="신고되었습니다."
+          visible={showToast}
+          handleCancel={() => setShowToast(false)}
+        />
     </View>
   );
 };
@@ -308,6 +343,7 @@ import {
   ShareIcon,
   PencilIcon,
   DeleteIcon,
+  CautionIcon ,
   DefaultProfileIcon,
 } from '../../assets/assets';
 export default PostCard;
