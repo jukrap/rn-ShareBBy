@@ -9,10 +9,10 @@ import {
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 
-const OnCheckBox = require('../../assets/newIcons/onCheckBox.png');
-const OffCheckBox = require('../../assets/newIcons/offCheckBox.png');
-const onCheckIcon = require('../../assets/newIcons/onCheck.png');
-const offCheckIcon = require('../../assets/newIcons/offCheck.png');
+const OnCheckBox = require('../../assets/icons/onCheckBox.png');
+const OffCheckBox = require('../../assets/icons/offCheckBox.png');
+const onCheckIcon = require('../../assets/icons/onCheck.png');
+const offCheckIcon = require('../../assets/icons/offCheck.png');
 
 const CheckBox = ({onChange}) => {
   const navigation = useNavigation();
