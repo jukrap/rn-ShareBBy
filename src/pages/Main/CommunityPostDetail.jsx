@@ -395,12 +395,13 @@ const CommunityPostDetail = ({route}) => {
           progressBar: true,
         });
         setToastVisible(true);
-        navigation.goBack();
+        navigation.navigate('CommunityBoard', { deletedPostId: postId });
       })
       .catch(e => {
         console.log('게시물을 삭제하는 중에 오류가 발생', e);
       });
   };
+  
 
   const handleEdit = () => {
     const selectedPost = posts;

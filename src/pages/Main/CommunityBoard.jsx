@@ -92,6 +92,18 @@ const CommunityBoard = ({navigation, route}) => {
 
   useFocusEffect(
     React.useCallback(() => {
+      const newPost = route.params?.newPost;
+      if (newPost) {
+        setPosts((prevPosts) => [newPost, ...prevPosts]);
+        navigation.setParams({ newPost: null });
+      }
+      
+      const deletedPostId = route.params?.deletedPostId;
+      if (deletedPostId) {
+        setPosts((prevPosts) => prevPosts.filter((post) => post.id !== deletedPostId));
+        navigation.setParams({ deletedPostId: null });
+      }
+  
       if (route.params?.sendToastMessage) {
         setToastMessage({
           message: route.params.sendToastMessage,
@@ -103,8 +115,7 @@ const CommunityBoard = ({navigation, route}) => {
         navigation.setParams({sendToastMessage: null});
       }
     }, [route.params]),
-  );
-  
+  );  
 
   const fetchCurrentUserAddress = async () => {
     if (currentUser) {
