@@ -103,6 +103,16 @@ const CommunityBoard = ({navigation, route}) => {
         setPosts((prevPosts) => prevPosts.filter((post) => post.id !== deletedPostId));
         navigation.setParams({ deletedPostId: null });
       }
+      
+      const updatedPost = route.params?.updatedPost;
+      if (updatedPost) {
+        setPosts(prevPosts =>
+          prevPosts.map(post =>
+            post.id === updatedPost.id ? { ...post, ...updatedPost } : post
+          )
+        );
+        navigation.setParams({ updatedPost: null });
+      }
   
       if (route.params?.sendToastMessage) {
         setToastMessage({
