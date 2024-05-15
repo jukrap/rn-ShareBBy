@@ -16,20 +16,12 @@ import DatePicker from 'react-native-date-picker';
 import Modal from 'react-native-modal';
 import firestore from '@react-native-firebase/firestore';
 
-import {recruitHobby, getHobbies} from '../../lib/hobby';
+import {recruitHobby} from '../../lib/hobby';
 import Tobbar from '../../components/Main/TobTab';
 import { StackActions } from '@react-navigation/native';
 import Toast from "../../components/Main/Toast";
 
 const {width, height} = Dimensions.get('window');
-
-const ErrorMessage = {
-    detailAddress : '상세주소를 입력해주세요!',
-    showTag : '태그를 입력해주세요!',
-    peopleCount : '인원수를 선택해주세요!',
-    showTitle : '타이틀을 입력해주세요!',
-    showContent : '내용을 입력해주세요!',
-}
 
 const Detail = ({route, navigation}) => {
   const userData = route.params;

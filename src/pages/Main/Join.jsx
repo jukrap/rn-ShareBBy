@@ -5,8 +5,6 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  ScrollView,
-  TextInput,
   Dimensions,
   Image,
   FlatList,
@@ -14,11 +12,9 @@ import {
 import {
   NaverMapView,
   NaverMapMarkerOverlay,
-  TrackingMode,
 } from '@mj-studio/react-native-naver-map';
 import Geolocation from 'react-native-geolocation-service';
 import dayjs from 'dayjs';
-import firestore from '@react-native-firebase/firestore';
 
 import {getNearHobbies} from '../../lib/hobby';
 import userFetchAddress from '../../hooks/userFetchAddress';
@@ -27,6 +23,7 @@ const {width, height} = Dimensions.get('window');
 
 const LATITUDE_DELTA = 0.05;
 const LONGITUDE_DELTA = LATITUDE_DELTA * (width / height);
+
 const layerGroups = {
   BUILDING: true,
   BICYCLE: false,
@@ -55,7 +52,6 @@ const Join = ({ navigation, route }) => {
 
     const initSetData = async () => {
         const permission = await Geolocation.requestAuthorization("always")
-        console.log("permission", permission)
         if (permission === "granted") {
             Geolocation.getCurrentPosition(
                 async (pos) => {
@@ -69,7 +65,6 @@ const Join = ({ navigation, route }) => {
                     const currentAddress = await userFetchAddress(latitude, longitude);
                     const splitAddress = currentAddress.split(" ", 3).join(" ");
                     const nearHobbiesData = await getNearHobbies(splitAddress);
-                    // setHobbiesData(nearHobbiesData)
                 },
                 error => {
                     console.log(error);
@@ -106,7 +101,6 @@ const Join = ({ navigation, route }) => {
         const finalHobbiesData = await getNearHobbies(centerGu);
 
         const deadlineData = finalHobbiesData.filter(v => dayjs(v.data._data.deadline).diff(now, 'days') > 0)
-        // console.log(centerGu);
         setHobbiesData(deadlineData)
 
     }
@@ -193,7 +187,6 @@ const Join = ({ navigation, route }) => {
                     }
                 </View>
             </TouchableOpacity>
-            
         )
     }
 
@@ -243,7 +236,6 @@ const Join = ({ navigation, route }) => {
 }
 
 const currGpsIcon = require('../../assets/icons/currGpsIcon.png');
-const searchIcon = require('../../assets/icons/searchIcon.png');
 
 const styles = StyleSheet.create({
   searchView: {

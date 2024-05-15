@@ -14,7 +14,6 @@ import Toast from "../../components/Main/Toast";
 const { width, height } = Dimensions.get('window');
 
 const Show = ({ navigation, route }) => {
-    console.log(route);
     const showValue = useRef(new Animated.Value(0)).current;
     const { address, detail_address, content, deadline, latitude, longitude, nickname, peopleCount, tag, title, writeTime, user_id } = route.params.data._data;
     const id = route.params.id
@@ -28,7 +27,6 @@ const Show = ({ navigation, route }) => {
         longitudeDelta: 0,
     });
     const [isToast, setIsToast] = useState('');
-    const toastValue = useRef(new Animated.Value(0)).current;
     const showAnimated = (value) => Animated.timing(showValue, { toValue: value, useNativeDriver: true, duration: 300 });
 
     useEffect(() => {
@@ -39,20 +37,15 @@ const Show = ({ navigation, route }) => {
 
     const getUserToken = async () => {
         try {
-            // 'userToken' 키를 사용하여 데이터 가져오기
             const userToken = await AsyncStorage.getItem('userToken');
             const userId = await getUser(userToken);
             if (userToken !== null) {
-                // 데이터가 있을 경우 처리
-                // console.log('User Token:', userToken);
-                // console.log('UserInfo:', userInfo);
                 setUserToken(userToken)
                 setUserInfo(userId)
             } else {
                 console.log('User Token이 없습니다.');
             }
             } catch (error) {
-            // 오류 처리
             console.error('AsyncStorage에서 데이터를 가져오는 중 오류 발생:', error);
         }
     };
@@ -75,7 +68,6 @@ const Show = ({ navigation, route }) => {
                             memberDetails.push(userData);
                         }
                     }
-                    // console.log('memberDetails ========>', memberDetails);
                     setJoinUsers(memberDetails)
         } catch (e) {
         }
@@ -100,7 +92,6 @@ const Show = ({ navigation, route }) => {
                             params : userInfo,
                         });
                     }, 2000)
-          
                 }
             } catch (error) {
                 console.error('chatRooms 정보를 가져오는데 실패했습니다:', error);
