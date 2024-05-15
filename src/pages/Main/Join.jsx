@@ -76,7 +76,6 @@ const Join = ({ navigation, route }) => {
             );
         }
     }
-};
 
 const deadLineHobbiesData = data => {
     const deadlineData = data.filter(
@@ -119,60 +118,6 @@ const renderMarker = useCallback(marker => {
             onPress={() => handleMarkerPress(marker)}
         />
     );
-}, []);
-
-const renderItem = ({ item }) => {
-    const diffDays = dayjs(item.data._data.deadline).diff(now, 'days');
-    const diffHours = dayjs(item.data._data.deadline).diff(now, 'hours');
-    const diffMins = dayjs(item.data._data.deadline).diff(now, 'minutes');
-
-    const moveMarkerLocation = () => {
-        const Region = {
-            latitude: item.data._data.latitude,
-            latitudeDelta: 0,
-            longitude: item.data._data.longitude,
-            longitudeDelta: 0,
-        };
-        const CameraMoveBaseParams = {
-            duration: 700,
-            easing: 'EaseOut',
-            pivot: {
-                x: 0.5,
-                y: 0.5,
-            },
-        };
-        mapView?.current?.animateRegionTo(Region, CameraMoveBaseParams);
-    };
-
-    const percentFun = (curr, total) => {
-        return Math.round((curr / total) * 100)
-    }
-
-    const moveCurrLocation = () => {
-        mapView?.current?.setLocationTrackingMode("Follow")
-    };
-
-    const onCameraChanged = async (event) => {
-        const { latitude, longitude } = event
-        const centerAddress = await userFetchAddress(latitude, longitude)
-        const centerGu = centerAddress.split(" ", 3).join(" ");
-        const finalHobbiesData = await getNearHobbies(centerGu);
-
-        const deadlineData = finalHobbiesData.filter(v => dayjs(v.data._data.deadline).diff(now, 'days') > 0)
-        setHobbiesData(deadlineData)
-
-    }
-
-
-    const renderMarker = useCallback((marker) => {
-        return (
-            <NaverMapMarkerOverlay
-                key={marker.id}
-                latitude={marker.data._data.latitude}
-                longitude={marker.data._data.longitude}
-                onPress={() => handleMarkerPress(marker)}
-            />
-        )
     }, []);
 
     const renderItem = ({ item }) => {
@@ -283,7 +228,7 @@ const renderItem = ({ item }) => {
                 onCameraChanged={onCameraChanged}
                 isExtentBoundedInKorea
                 maxZoom={15}
-                minZoom={15}
+                minZoom={10}
             >
                 {
                     hobbiesData.map(v => renderMarker(v))
@@ -295,7 +240,7 @@ const renderItem = ({ item }) => {
 
 const currGpsIcon = require('../../assets/newIcons/currGpsIcon.png');
 
-// import { CurrGpsIcon } from '../../assets/assets';
+
 const styles = StyleSheet.create({
     searchView: {
         width: width,

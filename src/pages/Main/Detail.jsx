@@ -61,15 +61,10 @@ const Detail = ({route, navigation}) => {
   const [errorMessage, setErrorMessage] = useState('');
 
   const handleInputContent = (name, value) => {
-      value.length == 0 ? (
-        setErrorMessage(isErrorMsg.name)
-      ) : (
-        setErrorMessage(''),
         setDetailConetent({
           ...detailContent,
           [name]: value,
         })
-      )
   };
 
   const countTextLength = text => {
@@ -138,7 +133,6 @@ const Detail = ({route, navigation}) => {
   const onPressRight = () => {
     setIsToastVisible(false)
 
-    const requiredFields = ['detailAddress', 'showTag', 'deadLine', 'peopleCount', 'showTitle', 'showContent'];
     
     setTimeout(() => {
       if(detailContent.detailAddress.length === 0 || detailContent.showTag.length === 0 || detailContent.deadLine.length === 0 || detailContent.peopleCount.length === 0 || detailContent.showTitle.length === 0 || detailContent.showContent.length === 0) {
