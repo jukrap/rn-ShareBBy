@@ -12,8 +12,10 @@ import {
 import firestore from '@react-native-firebase/firestore'; // firestore import 추가
 import LoginToast from '../../components/SignUp/LoginToast';
 import LoginModal from '../../components/SignUp/LoginModal';
-import {BackIcon} from '../../assets/assets';
-// const backIcon = require('../../assets/icons/back.png');
+
+
+const backIcon = require('../../assets/icons/back.png');
+
 
 const SignUpEmail = ({navigation}) => {
   const [email, setEmail] = useState('');

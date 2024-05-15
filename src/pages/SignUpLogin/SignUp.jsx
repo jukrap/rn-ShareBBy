@@ -13,8 +13,11 @@ import SignUpNickname from '../../components/SignUp/SignUpNickname.jsx';
 import SignUpAddress from '../../components/SignUp/SignUpAddress.jsx';
 import ProgressBar from '../../components/SignUp/ProgressBar.jsx';
 import SignUpPassword from '../../components/SignUp/SignUpPassword.jsx';
-import {BackIcon} from '../../assets/assets';
-// const backIcon = require('../../assets/icons/back.png');
+
+
+const backIcon = require('../../assets/icons/back.png');
+
+
 
 const SignUp = ({navigation}) => {
   const {step, handleNextStep, handlePreviousStep, userData} =

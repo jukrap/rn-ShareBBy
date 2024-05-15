@@ -34,7 +34,7 @@ import {
 } from '../../assets/assets';
 
 const ChatRoom = ({route, navigation}) => {
-  const {chatRoomId, chatRoomName, hobbiesId} = route.params;
+  const {chatRoomId, chatRoomName, hobbiesId, members} = route.params;
 
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
@@ -444,6 +444,13 @@ const ChatRoom = ({route, navigation}) => {
     setSlideModalVisible(false);
   };
 
+  const goToChatRoomNotice = () => {
+    navigation.navigate('ChatRoomNotice', {
+      chatRoomId: chatRoomId,
+    });
+    setSlideModalVisible(false);
+  };
+
   const toggleHamburgerModal = () => {
     setSlideModalVisible(!slideModalVisible);
   };
@@ -471,7 +478,12 @@ const ChatRoom = ({route, navigation}) => {
         <TouchableOpacity onPress={handleGoBack}>
           <Image source={BackIcon} style={{width: 24, height: 24}} />
         </TouchableOpacity>
-        <Text style={styles.roomName}>{chatRoomName}</Text>
+        <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
+          <Text style={styles.roomName}>{chatRoomName}</Text>
+          <Text style={{fontSize: 18, color: '#A7A7A7', fontWeight: '600'}}>
+            {members.length}
+          </Text>
+        </View>
         <TouchableOpacity onPress={toggleHamburgerModal}>
           <Image style={{width: 24, height: 24}} source={HamburgerIcon} />
         </TouchableOpacity>
@@ -562,7 +574,7 @@ const ChatRoom = ({route, navigation}) => {
               paddingHorizontal: 12,
               gap: 8,
             }}>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={goToChatRoomNotice}>
               <Text style={{fontSize: 16, marginBottom: 8, fontWeight: '700'}}>
                 공지 사항
               </Text>

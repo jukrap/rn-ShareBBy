@@ -13,8 +13,9 @@ import {
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore'; // firestore import 추가
 import LoginToast from '../../components/SignUp/LoginToast';
-import {BackIcon} from '../../assets/assets';
-// const backIcon = require('../../assets/icons/back.png');
+
+
+const backIcon = require('../../assets/icons/back.png');
 
 const SearchPassword = ({navigation}) => {
   const [email, setEmail] = useState('');

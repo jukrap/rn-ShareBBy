@@ -20,6 +20,9 @@ import MyPosts from '../pages/Main/MyPosts';
 import MyLists from '../pages/Main/MyLists';
 import MyRecruits from '../pages/Main/MyRecruits';
 import ShowAllImages from '../pages/Main/ShowAllImages';
+import ChatRoomNotice from '../pages/Main/ChatRoomNotice';
+import WriteNotice from '../pages/Main/WriteNotice';
+import NoticeDetail from '../pages/Main/NoticeDetail';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -43,6 +46,9 @@ const AboutChat = () => {
       <Stack.Screen name="Chat" component={Chat} />
       <Stack.Screen name="ChatRoom" component={ChatRoom} />
       <Stack.Screen name="ShowAllImages" component={ShowAllImages} />
+      <Stack.Screen name="ChatRoomNotice" component={ChatRoomNotice} />
+      <Stack.Screen name="WriteNotice" component={WriteNotice} />
+      <Stack.Screen name="NoticeDetail" component={NoticeDetail} />
     </Stack.Navigator>
   );
 };
