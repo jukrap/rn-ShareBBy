@@ -136,23 +136,58 @@ const CommunityAddPost = () => {
       console.log('이미지 URLs: ', imageUrls);
       console.log('게시글 내용: ', postContent);
 
+      // 현재 사용자의 주소 정보 가져오기
+      const userDoc = await firestore()
+        .collection('users')
+        .doc(currentUser.uid)
+        .get();
+
+      const userData = userDoc.data();
+      let userRegion = '';
+
+      if (userData.address) {
+        const addressParts = userData.address.split(' ');
+        if (addressParts.length >= 2) {
+          userRegion = addressParts.slice(0, 2).join(' ');
+        } else {
+          console.log('사용자 주소 정보의 형식이 올바르지 않습니다.');
+          userRegion = '주소 정보 없음';
+        }
+      } else {
+        console.log('사용자 주소 정보가 없습니다.');
+        userRegion = '주소 정보 없음';
+      }
+
       // Firestore에 게시글 추가
-      await firestore()
-        .collection('posts')
-        .add({
+      const postRef = await firestore().collection('posts').add({
+        userId: currentUser.uid,
+        post_content: postContent,
+        post_files: imageUrls,
+        post_created: firestore.Timestamp.fromDate(new Date()),
+        post_actflag: true,
+        likeCount: 0,
+        commentCount: 0,
+        userRegion: userRegion,
+      });
+
+      navigation.navigate('CommunityBoard', {
+        newPost: {
+          id: postRef.id,
           userId: currentUser.uid,
           post_content: postContent,
           post_files: imageUrls,
           post_created: firestore.Timestamp.fromDate(new Date()),
           post_actflag: true,
-        });
+          likeCount: 0,
+          commentCount: 0,
+          userRegion: userRegion,
+        },
+        sendToastMessage: '성공적으로 게시글이 업로드됐습니다!',
+      });
 
       console.log('게시글 업로드 완료!');
       setPostContent(null);
       setSelectedImages([]);
-      navigation.navigate('CommunityBoard', {
-        sendToastMessage: '성공적으로 게시글이 업로드됐습니다!',
-      });
     } catch (error) {
       console.log(
         'Firestore에 게시물을 추가하는 중에 문제가 발생했습니다.',

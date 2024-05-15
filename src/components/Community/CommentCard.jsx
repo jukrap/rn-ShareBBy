@@ -197,12 +197,13 @@ const styles = StyleSheet.create({
   modalButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingVertical: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#FEFFFE',
   },
   modalButtonText: {
-    marginLeft: 8,
+    marginLeft: 16,
+    marginBottom: 2,
     fontSize: 16,
     fontFamily: 'Pretendard',
     color: '#898989',

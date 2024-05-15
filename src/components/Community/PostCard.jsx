@@ -196,9 +196,8 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
   return (
     <View style={styles.card}>
       <View style={styles.userInfoContainer}>
-        <TouchableOpacity
-          style={styles.userInfoWrapper}
-          onPress={() => onProfile(item.userId)}>
+        <View
+          style={styles.userInfoWrapper}>
           <FasterImageView
             style={[styles.userProfileImage, {overflow: 'hidden'}]}
             source={{
@@ -219,7 +218,7 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
               })}
             </Text>
           </View>
-        </TouchableOpacity>
+        </View>
         <View style={styles.moreIconContainer}>
           <TouchableOpacity onPress={toggleModal}>
             <Image
@@ -498,12 +497,13 @@ const styles = StyleSheet.create({
   modalButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingVertical: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#FEFFFE',
   },
   modalButtonText: {
-    marginLeft: 8,
+    marginLeft: 16,
+    marginBottom: 2,
     fontSize: 16,
     fontFamily: 'Pretendard',
     color: '#898989',

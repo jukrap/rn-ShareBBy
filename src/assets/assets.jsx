@@ -41,6 +41,7 @@ export const ProfileOffIcon = require('../assets/newIcons/profileOffIcon.png');
 export const ProfileOnIcon = require('../assets/newIcons/profileOnIcon.png');
 export const RedHeartIcon = require('../assets/newIcons/redHeartIcon.png');
 export const RightIcon = require('../assets/newIcons/rightIcon.png');
+export const SortIcon = require('../assets/newIcons/sortIcon.png');
 export const SendIcon = require('../assets/newIcons/sendIcon.png');
 export const ShareIcon = require('../assets/newIcons/shareIcon.png');
 export const SuccessIcon = require('../assets/newIcons/successIcon.png');

@@ -119,21 +119,50 @@ const CommunityPostDetail = ({route}) => {
     React.useCallback(() => {
       // 현재 사용자가 해당 게시글에 좋아요를 눌렀는지 확인
       const checkLikeStatus = async () => {
-        if (currentUser) {
-          const likeDoc = await firestore()
-            .collection('likes')
-            .where('postId', '==', postId)
-            .where('userId', '==', currentUser.uid)
-            .get();
+        try {
+          if (currentUser) {
+            const likeDoc = await firestore()
+              .collection('likes')
+              .where('postId', '==', postId)
+              .where('userId', '==', currentUser.uid)
+              .get();
 
-          if (!likeDoc.empty) {
-            setIsLiked(true);
+            if (!likeDoc.empty) {
+              setIsLiked(true);
+            }
           }
+        } catch (error) {
+          console.log('좋아요를 가져오는 중에 오류가 발생했습니다:', error);
         }
       };
 
       checkLikeStatus();
     }, [currentUser, postId]),
+  );
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const updatedPost = route.params?.updatedPost;
+      if (updatedPost && updatedPost.id === postId) {
+        setPosts({...posts, ...updatedPost});
+        navigation.setParams({updatedPost: null});
+      }
+    }, [route.params, postId, posts]),
+  );
+
+  useFocusEffect(
+    React.useCallback(() => {
+      if (route.params?.sendToastMessage) {
+        setToastMessage({
+          message: route.params.sendToastMessage,
+          leftIcon: 'successIcon',
+          closeButton: true,
+          progressBar: true,
+        });
+        setToastVisible(true);
+        navigation.setParams({sendToastMessage: null});
+      }
+    }, [route.params]),
   );
 
   const fetchPost = async postId => {
@@ -149,6 +178,8 @@ const CommunityPostDetail = ({route}) => {
         fetchPostUserData(postData.userId);
         setLikeCount(postData.likeCount || 0);
         setCommentCount(postData.commentCount || 0);
+      } else {
+        console.log('게시글이 존재하지 않습니다.');
       }
     } catch (error) {
       console.log('게시글을 가져오는 중에 오류가 발생했습니다:', error);
@@ -411,7 +442,7 @@ const CommunityPostDetail = ({route}) => {
           progressBar: true,
         });
         setToastVisible(true);
-        navigation.goBack();
+        navigation.navigate('CommunityBoard', {deletedPostId: postId});
       })
       .catch(e => {
         console.log('게시물을 삭제하는 중에 오류가 발생', e);
@@ -441,7 +472,10 @@ const CommunityPostDetail = ({route}) => {
   };
 
   const editPost = () => {
-    navigation.navigate('CommunityEditPost', {postId});
+    navigation.navigate('CommunityEditPost', {
+      postId,
+      prevScreen: 'CommunityPostDetail',
+    });
   };
 
   const handleCommentDelete = commentId => {
@@ -916,12 +950,13 @@ const styles = StyleSheet.create({
   modalButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingVertical: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#FEFFFE',
   },
   modalButtonText: {
-    marginLeft: 8,
+    marginLeft: 16,
+    marginBottom: 2,
     fontSize: 16,
     fontFamily: 'Pretendard',
     color: '#898989',
