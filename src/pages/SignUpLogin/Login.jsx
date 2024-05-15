@@ -3,26 +3,27 @@ import {
   Text,
   View,
   TextInput,
-  Alert,
   Image,
   TouchableOpacity,
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
+
 } from 'react-native';
 import {signIn} from '../../lib/auth';
 import firestore from '@react-native-firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import userStore from '../../lib/userStore';
+import LoginToast from '../../components/SignUp/LoginToast';
 
 import {
   onGoogleButtonPress,
   handleNaverLogin,
   kakaoLogins,
 } from '../../lib/SocialLogin';
-const naverIcon = require('../../assets/icons/naver.png');
-const kakaoIcon = require('../../assets/icons/kakao.png');
-const googleIcon = require('../../assets/icons/google.png');
+const naverIcon = require('../../assets/newIcons/naver.png');
+const kakaoIcon = require('../../assets/newIcons/kakao.png');
+const googleIcon = require('../../assets/newIcons/google.png');
 
 const LoginTitle = require('../../assets/images/LoginTitle.png');
 
@@ -30,6 +31,7 @@ const Login = ({navigation}) => {
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
   const [isEmailValid, setIsEmailValid] = useState(false);
+  const [showToast, setShowToast] = useState(false);
 
   const setUserData = userStore(state => state.setUserData); // Zustand 스토어 custom hook 사용
   const setUserToken = userStore(state => state.setUserToken);
@@ -52,8 +54,10 @@ const Login = ({navigation}) => {
       setUserToken(user.uid); // Zustand 스토어에 사용자 토큰 설정
       // navigation을 여기서 호출
       navigation.navigate('BottomTab');
-    } catch (e) {
-      Alert.alert('아이디 또는 비밀번호를 확인해주세요.');
+    } catch (error) {
+      // 로그인 실패 시에는 토스트 메시지를 표시합니다.
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
     }
   };
 
@@ -70,7 +74,7 @@ const Login = ({navigation}) => {
   };
 
   return (
-    <KeyboardAvoidingView style={{flex: 1, backgroundColor: '#fff'}}>
+    <KeyboardAvoidingView style={{flex: 1, backgroundColor: '#fefffe'}}>
       <View style={styles.firstContainer}>
         <View>
           <Image source={LoginTitle} />
@@ -157,6 +161,10 @@ const Login = ({navigation}) => {
           </View>
         </View>
       </View>
+
+      <LoginToast text="아이디 또는 비밀번호를 확인해주세요." visible={showToast} handleCancel={() => setShowToast(false)} />
+
+
     </KeyboardAvoidingView>
   );
 };

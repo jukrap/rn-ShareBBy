@@ -1,4 +1,3 @@
-// SignUpEmail.jsx
 import React, {useState} from 'react';
 import {
   View,
@@ -7,18 +6,21 @@ import {
   SafeAreaView,
   TouchableOpacity,
   TextInput,
-  Alert,
   Image,
-  Modal,
   KeyboardAvoidingView,
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore'; // firestore import 추가
+import LoginToast from '../../components/SignUp/LoginToast';
+import LoginModal from '../../components/SignUp/LoginModal';
 
-const backIcon = require('../../assets/icons/back.png');
+const backIcon = require('../../assets/newIcons/back.png');
 
 const SignUpEmail = ({navigation}) => {
   const [email, setEmail] = useState('');
-  const [showModal, setShowModal] = useState(false); // 모달 표시 여부 상태 추가
+  const [showSignUpModal, setSignUpShowModal] = useState(false); // 모달 표시 여부 상태 추가
+  const [showLoginModal, setLoginShowModal] = useState(false); // 모달 표시 여부 상태 추가
+  const [toastMessage, setToastMessage] = useState('');
+  const [showToast, setShowToast] = useState(false);
 
   const validateEmail = email => {
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -27,7 +29,9 @@ const SignUpEmail = ({navigation}) => {
 
   const handleNext = async () => {
     if (!validateEmail(email)) {
-      Alert.alert('유효하지 않은 이메일', '올바른 이메일 형식이 아닙니다.');
+      setToastMessage('유효하지 않은 이메일입니다.');
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
       return;
     }
     try {
@@ -37,38 +41,48 @@ const SignUpEmail = ({navigation}) => {
         .where('email', '==', email)
         .get();
       if (!userQuery.empty) {
-        // 중복된 이메일이 있으면 알림 표시
-        Alert.alert('가입된 이메일', '같은 주소로 가입된 계정이 있어요!');
+        // 중복된 이메일인 경우
+        setLoginShowModal(true);
       } else {
         // 중복된 이메일이 없으면 모달 표시
-        setShowModal(true);
+        setSignUpShowModal(true);
       }
     } catch (error) {
-      console.error('이메일 중복 확인 오류:', error);
-      Alert.alert(
-        '이메일 중복 확인 실패',
-        '이메일 중복 확인 중 오류가 발생했습니다.',
-      );
+      // 에러가 발생한 경우
+      setToastMessage('오류가 발생했습니다. 나중에 다시 시도해주세요.');
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
     }
+  };
+
+  const handleModalClose1 = () => {
+    // 모달 닫기
+    setLoginShowModal(false);
+  };
+
+  const handleLogin = () => {
+    // 회원가입 화면으로 이동
+    navigation.navigate('Login');
+    setLoginShowModal(false);
   };
 
   const handleModalClose = () => {
     // 모달 닫기
-    setShowModal(false);
+    setSignUpShowModal(false);
   };
 
   const handleSignUp = () => {
     // 회원가입 화면으로 이동
     navigation.navigate('SignUp');
-    setShowModal(false);
+    setSignUpShowModal(false);
   };
 
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <SafeAreaView style={{flex: 1, backgroundColor: '#fefffe'}}>
       <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={1}
-      style={{flex:1}}>
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={1}
+        style={{flex: 1}}>
         <TouchableOpacity
           style={styles.backIcon}
           onPress={() => navigation.goBack()}>
@@ -101,26 +115,33 @@ const SignUpEmail = ({navigation}) => {
           </View>
         </View>
       </KeyboardAvoidingView>
-      <Modal visible={showModal} transparent animationType="slide">
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalText}>아이디 찾기 결과</Text>
-              <Text>입력하신 이메일로 가입된 계정을 찾을 수 없어요</Text>
-              <View style={styles.modalButtonContainer}>
-                <TouchableOpacity
-                  style={styles.modalButton1}
-                  onPress={handleModalClose}>
-                  <Text style={styles.modalButtonText}>취소</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.modalButton}
-                  onPress={handleSignUp}>
-                  <Text style={styles.modalButtonText}>회원가입</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </Modal>
+
+      <LoginModal
+        animationType="slide"
+        visible={showSignUpModal}
+        closeModal={handleModalClose}
+        message="아이디 찾기 결과"
+        message2="입력하신 이메일로 가입된 계정을 찾을 수 없어요"
+        LeftButton="취소"
+        RightButton="회원가입"
+        onConfirm={handleSignUp}
+      />
+      <LoginModal
+        animationType="slide"
+        visible={showLoginModal}
+        closeModal={handleModalClose1}
+        message="아이디 찾기 결과"
+        message2="가입되어 있는 이메일입니다."
+        LeftButton="취소"
+        RightButton="로그인"
+        onConfirm={handleLogin}
+      />
+      <LoginToast
+
+        text={toastMessage}
+        visible={showToast}
+        handleCancel={() => setShowToast(false)}
+      />
     </SafeAreaView>
   );
 };

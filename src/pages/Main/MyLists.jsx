@@ -26,22 +26,26 @@ const formatDate = date => {
 
 const PostItem = React.memo(({item}) => {
   return (
-    <View style={styles.container}>
-      <View style={styles.post}>
-        <View style={styles.profileWrapper}>
-          <Image style={styles.image} source={{uri: item.user.profileImage}} />
-          <View style={styles.userName}>
-            <Text style={styles.name}>{item.user.nickname}</Text>
-            <Text style={styles.date}>
-              {item.post_created
-                ? formatDate(item.post_created)
-                : '날짜 정보 없음'}
-            </Text>
+    <View style={styles.containerView}>
+      <View style={styles.container}>
+        <View style={styles.post}>
+          <View style={styles.profileWrapper}>
+            <Image
+              style={styles.image}
+              source={{uri: item.user.profileImage}}
+            />
+            <View style={styles.userName}>
+              <Text style={styles.name}>{item.user.nickname}</Text>
+              <Text style={styles.date}>
+                {item.post_created
+                  ? formatDate(item.post_created)
+                  : '날짜 정보 없음'}
+              </Text>
+            </View>
           </View>
-        </View>
 
-        <Text style={styles.content}>{item.post_content}</Text>
-        <View style={styles.imageWrapper}>
+          <Text style={styles.content}>{item.post_content}</Text>
+
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             {item.post_files &&
               item.post_files.map((file, index) => (
@@ -52,10 +56,11 @@ const PostItem = React.memo(({item}) => {
                 />
               ))}
           </ScrollView>
-        </View>
-        <View style={styles.like}>
-          <Image source={heart} style={styles.heart} />
-          <Text style={styles.likeCount}>{item.likeCount}</Text>
+
+          <View style={styles.like}>
+            <Image source={heart} style={styles.heart} />
+            <Text style={styles.likeCount}>{item.likeCount}</Text>
+          </View>
         </View>
       </View>
     </View>
@@ -103,6 +108,11 @@ const MyLists = ({navigation, route}) => {
       return post;
     });
 
+    tmpPosts.sort((a, b) => {
+      const dateA = a.post_created;
+      const dateB = b.post_created;
+      return dateB - dateA; // 내림차순 정렬
+    });
     setPosts(tmpPosts);
   };
 
@@ -128,13 +138,10 @@ const MyLists = ({navigation, route}) => {
 };
 
 const styles = StyleSheet.create({
+  containerView: {flex: 1},
   container: {
     marginLeft: 20,
     marginRight: 20,
-  },
-  profileWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
   },
   post: {
     borderColor: 'grey',
@@ -144,7 +151,10 @@ const styles = StyleSheet.create({
     marginTop: 12,
     marginBottom: 12,
   },
-
+  profileWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -154,10 +164,6 @@ const styles = StyleSheet.create({
   },
   arrow: {width: 22, height: 22},
   headtext: {fontSize: 20, fontWeight: 'bold', marginLeft: 10},
-  profileWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
   image: {
     width: 40,
     height: 40,

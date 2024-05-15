@@ -1,17 +1,12 @@
 import React, {useEffect, useState} from 'react';
 import {
   View,
-  ScrollView,
   Text,
-  Image,
-  TextInput,
   Dimensions,
   StyleSheet,
   FlatList,
   SafeAreaView,
-  TouchableOpacity,
   ActivityIndicator,
-  Alert,
 } from 'react-native';
 
 import firestore from '@react-native-firebase/firestore';
@@ -21,12 +16,12 @@ import {useFocusEffect} from '@react-navigation/native';
 import PostCard from '../../components/Community/PostCard';
 import auth from '@react-native-firebase/auth';
 
-
-import {useNavigation} from '@react-navigation/native';
 import CommunityHeader from '../../components/Community/CommunityHeader';
 import CommunityActionToast from '../../components/Community/CommunityActionToast';
 import CommunityActionModal from '../../components/Community/CommunityActionModal';
 
+const warningIcon = require('../../assets/newIcons/warningIcon.png');
+const pencilIcon = require('../../assets/newIcons/pencil-icon.png');
 const {width, height} = Dimensions.get('window');
 
 const CommunityBoard = ({navigation, route}) => {
@@ -85,7 +80,7 @@ const CommunityBoard = ({navigation, route}) => {
         setToastVisible(true);
         navigation.setParams({sendToastMessage: null});
       }
-    }, [route.params])
+    }, [route.params]),
   );
   const fetchInitialPosts = async () => {
     setLoading(true);
@@ -198,7 +193,7 @@ const CommunityBoard = ({navigation, route}) => {
         setModalMessage({
           title: '게시글 삭제',
           modalText: '해당 게시글을 삭제하겠습니까?',
-          iconSource: require('../../assets/icons/warningIcon.png'),
+          iconSource: warningIcon,
           showConfirmButton: false,
           onConfirm: () => {
             deletePost(postId);
@@ -213,7 +208,7 @@ const CommunityBoard = ({navigation, route}) => {
         setModalMessage({
           title: '권한 없음',
           modalText: '게시글 작성자만 수정/삭제할 수 있습니다.',
-          iconSource: require('../../assets/icons/warningIcon.png'),
+          iconSource: warningIcon,
           showConfirmButton: true,
           onConfirm: () => {
             setModalVisible(false);
@@ -258,8 +253,7 @@ const CommunityBoard = ({navigation, route}) => {
         console.log('게시물 존재 여부를 확인하는 중에 오류가 발생', e);
       });
   };
-  
-  
+
   const handleEdit = postId => {
     if (posts) {
       const selectedPost = posts.find(item => item.id === postId);
@@ -274,7 +268,7 @@ const CommunityBoard = ({navigation, route}) => {
         setModalMessage({
           title: '권한 없음',
           modalText: '게시글 작성자만 수정/삭제할 수 있습니다.',
-          iconSource: require('../../assets/icons/warningIcon.png'),
+          iconSource: warningIcon,
           showConfirmButton: true,
           onConfirm: () => {
             setModalVisible(false);
@@ -395,9 +389,6 @@ const CommunityBoard = ({navigation, route}) => {
 };
 
 export default CommunityBoard;
-
-const searchIcon = require('../../assets/icons/searchIcon.png');
-const pencilIcon = require('../../assets/icons/pencilIcon.png');
 
 const styles = StyleSheet.create({
   Container: {

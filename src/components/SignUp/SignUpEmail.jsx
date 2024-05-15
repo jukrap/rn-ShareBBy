@@ -5,14 +5,16 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
-  Alert,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
+import LoginToast from './LoginToast';
 
 const SignUpEmail = ({onNextStep}) => {
   const [email, setEmail] = useState('');
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
 
   const validateEmail = email => {
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -21,7 +23,9 @@ const SignUpEmail = ({onNextStep}) => {
 
   const handleNext = async () => {
     if (!validateEmail(email)) {
-      Alert.alert('유효하지 않은 이메일', '올바른 이메일 형식이 아닙니다.');
+      // 유효하지 않은 이메일인 경우
+      setToastMessage('유효하지 않은 이메일입니다.');
+      setShowToast(true);
       return;
     }
 
@@ -32,18 +36,18 @@ const SignUpEmail = ({onNextStep}) => {
         .where('email', '==', email)
         .get();
       if (!userQuery.empty) {
-        // 중복된 이메일이 있으면 알림 표시
-        Alert.alert('중복된 이메일', '이미 사용 중인 이메일입니다.');
+        // 중복된 이메일인 경우
+        setToastMessage('중복된 이메일입니다. 다른 이메일을 사용해주세요.');
+        setShowToast(true);
+        return;
       } else {
         // 중복된 이메일이 없으면 다음 단계로 진행
         onNextStep({email});
       }
     } catch (error) {
-      console.error('이메일 중복 확인 오류:', error);
-      Alert.alert(
-        '이메일 중복 확인 실패',
-        '이메일 중복 확인 중 오류가 발생했습니다.',
-      );
+      // 에러가 발생한 경우
+      setToastMessage('오류가 발생했습니다. 나중에 다시 시도해주세요.');
+      setShowToast(true);
     }
   };
 
@@ -78,6 +82,11 @@ const SignUpEmail = ({onNextStep}) => {
           </TouchableOpacity>
         </View>
       </View>
+      <LoginToast
+        text={toastMessage}
+        visible={showToast}
+        handleCancel={() => setShowToast(false)}
+      />
     </KeyboardAvoidingView>
   );
 };
@@ -118,7 +127,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: '#07AC7D',
     alignItems: 'center',
-    justifyContent:'center',
+    justifyContent: 'center',
     marginHorizontal: 16,
     marginTop: 16,
     paddingVertical: 16,

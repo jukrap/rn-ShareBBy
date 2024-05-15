@@ -55,7 +55,7 @@ const ShowAllImages = ({navigation, route}) => {
         }}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Image
-            source={require('../../assets/icons/backIcon.png')}
+            source={require('../../assets/newIcons/backIcon.png')}
             style={{width: 24, height: 24}}
           />
         </TouchableOpacity>

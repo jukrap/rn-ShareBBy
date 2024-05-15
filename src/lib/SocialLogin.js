@@ -7,6 +7,7 @@ import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import userStore from './userStore';
+import Toast from '../components/Main/Toast';
 
 // 네이버 로그인 초기화
 const initializeNaverLogin = async () => {
