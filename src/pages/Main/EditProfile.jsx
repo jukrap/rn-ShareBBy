@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   TextInput,
   KeyboardAvoidingView,
+  ActivityIndicator,
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import ImagePicker from 'react-native-image-crop-picker';
@@ -18,6 +19,7 @@ const EditProfile = ({navigation, route}) => {
     IsEdit: false,
     ImageUrl: '',
   });
+  const [loading, setLoading] = useState(false);
   const usersCollection = firestore().collection('users');
 
   const getPhotos = async () => {
@@ -35,13 +37,14 @@ const EditProfile = ({navigation, route}) => {
     });
   };
   const UploadImage = async uri => {
-    const reference = storage().ref(
-      `gs://sharebbyteam.appspot.com/${route.params.uuid}.png`,
-    );
-    await reference.putFile(
-      Platform.OS === 'ios' ? uri.replace('file://', '') : uri,
-    );
     try {
+      setLoading(true);
+      const reference = storage().ref(
+        `gs://sharebbyteam.appspot.com/${route.params.uuid}.png`,
+      );
+      await reference.putFile(
+        Platform.OS === 'ios' ? uri.replace('file://', '') : uri,
+      );
       const userDocRef = await usersCollection.doc(route.params.uuid);
 
       await userDocRef.update({
@@ -49,15 +52,20 @@ const EditProfile = ({navigation, route}) => {
       });
     } catch (error) {
       console.log(error.message);
+    } finally {
+      setLoading(false); // 작업이 끝나면 로딩 상태 해제
     }
   };
   const UpdateNickname = async () => {
     try {
+      setLoading(true);
       const userDocRef = await usersCollection.doc(route.params.uuid);
 
       await userDocRef.update({nickname: nickname});
     } catch (error) {
       console.log(error.message);
+    } finally {
+      setLoading(false); // 작업이 끝나면 로딩 상태 해제
     }
   };
 
@@ -72,6 +80,11 @@ const EditProfile = ({navigation, route}) => {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={1}
       style={styles.container}>
+      {loading && ( // 로딩 상태면 인디케이터 표시
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#898989" />
+        </View>
+      )}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Image style={styles.arrow} source={leftArrow} />
@@ -105,11 +118,13 @@ const EditProfile = ({navigation, route}) => {
 
       <TouchableOpacity
         onPress={async () => {
+          setLoading(true);
           await UpdateNickname();
           if (editImage.IsEdit) {
             await UploadImage(editImage.ImageUrl);
           }
           await goHome();
+          setLoading(false);
         }}
         style={styles.submitBox}>
         <Text style={styles.sumbitText}>완료</Text>
@@ -122,6 +137,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fefffe',
+  },
+  loadingContainer: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // 반투명 배경
+    zIndex: 1000,
   },
   header: {
     flexDirection: 'row',
@@ -150,11 +176,6 @@ const styles = StyleSheet.create({
     marginRight: 25,
     marginBottom: 25,
     marginTop: 10,
-  },
-  myProfile: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 10,
   },
   itemText: {
     fontSize: 18,
