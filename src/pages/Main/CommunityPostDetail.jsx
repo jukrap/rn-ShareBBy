@@ -12,6 +12,7 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
   ActivityIndicator,
+  Platform,
 } from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
 
@@ -45,6 +46,7 @@ import {
   DeleteIcon,
   SendIcon,
   DefaultProfileIcon,
+  RightIcon,
 } from '../../assets/assets';
 
 const CommunityPostDetail = ({route}) => {
@@ -725,24 +727,46 @@ const CommunityPostDetail = ({route}) => {
         ListFooterComponent={renderFooter}
         style={styles.container}
       />
-      <View style={styles.commentInputContainer}>
-        <TextInput
-          style={styles.commentInput}
-          placeholder={editingCommentId ? '댓글 수정' : '댓글 입력'}
-          multiline={true}
-          value={commentContent}
-          onChangeText={handleCommentContentChange}
-        />
-        <TouchableOpacity
-          style={styles.commentSubmitButton}
-          onPress={handleCommentSubmit}>
-          <Image
-            style={[styles.commentSubmitIcon, styles.frameItemLayout]}
-            resizeMode="cover"
-            source={SendIcon}
+      {Platform.OS === 'ios' ? (
+        <View style={styles.commentInputContainer}>
+          <TextInput
+            style={styles.commentInput}
+            placeholder={editingCommentId ? '댓글 수정' : '댓글 입력'}
+            multiline={true}
+            value={commentContent}
+            onChangeText={handleCommentContentChange}
           />
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity
+            style={styles.commentSubmitButton}
+            onPress={handleCommentSubmit}>
+            <Image
+              style={[styles.commentSubmitIcon, styles.frameItemLayout]}
+              resizeMode="cover"
+              source={RightIcon}
+            />
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <View style={styles.commentInputContainer}>
+          <TextInput
+            style={styles.commentInput}
+            placeholder={editingCommentId ? '댓글 수정' : '댓글 입력'}
+            multiline={true}
+            value={commentContent}
+            onChangeText={handleCommentContentChange}
+          />
+          <TouchableOpacity
+            style={styles.commentSubmitButton}
+            onPress={handleCommentSubmit}>
+            <Image
+              style={[styles.commentSubmitIcon, styles.frameItemLayout]}
+              resizeMode="cover"
+              source={RightIcon}
+            />
+          </TouchableOpacity>
+        </View>
+      )}
+
       <BottomSheetModal isVisible={isModalVisible} onClose={toggleModal}>
         <View style={styles.modalContent}>
           <TouchableOpacity
@@ -911,23 +935,26 @@ const styles = StyleSheet.create({
     backgroundColor: '#FEFFFE',
     gap: 12,
     paddingVertical: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#ccc',
   },
   commentInput: {
     flex: 1,
+    borderWidth: 1,
+    borderColor: '#ccc',
     minHeight: 32,
     maxHeight: 60,
-    backgroundColor: '#dbdbdb',
     borderRadius: 16,
     paddingHorizontal: 20,
     fontSize: 12,
     fontWeight: '500',
     fontFamily: 'Pretendard',
-    paddingVertical: 4,
+    paddingVertical: 8,
   },
   commentSubmitButton: {},
   commentSubmitIcon: {
-    height: 32,
-    width: 32,
+    height: 16,
+    width: 16,
   },
   moreIconContainer: {
     justifyContent: 'center',

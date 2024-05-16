@@ -68,7 +68,14 @@ const NoticeDetail = ({navigation, route}) => {
         </View>
         <TouchableOpacity
           onPress={() => setChatOutModalVisible(!chatOutModalVisible)}>
-          <Text style={{color: '#07AC7D', fontWeight: '700'}}>삭제하기</Text>
+          <Text
+            style={{
+              color: '#07AC7D',
+              fontWeight: '700',
+              fontFamily: 'Pretendard',
+            }}>
+            삭제하기
+          </Text>
         </TouchableOpacity>
       </View>
       <View
@@ -91,13 +98,17 @@ const NoticeDetail = ({navigation, route}) => {
             paddingHorizontal: 12,
             paddingVertical: 12,
           }}>
-          <Text style={{fontSize: 12}}>{notices.sender}</Text>
-          <Text style={{fontSize: 12, color: '#aaa'}}>{formattedTime}</Text>
+          <Text style={{fontSize: 12, fontFamily: 'Pretendard'}}>
+            {notices.sender}
+          </Text>
+          <Text style={{fontSize: 12, color: '#aaa', fontFamily: 'Pretendard'}}>
+            {formattedTime}
+          </Text>
         </View>
       </View>
 
       <View style={{paddingHorizontal: 12}}>
-        <Text>{notices.text}</Text>
+        <Text style={{fontFamily: 'Pretendard'}}>{notices.text}</Text>
       </View>
       <Modal
         isVisible={chatOutModalVisible}
@@ -154,6 +165,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     paddingVertical: 16,
+    fontFamily: 'Pretendard',
   },
   chatOutConfirm: {
     marginHorizontal: 30,
@@ -164,6 +176,7 @@ const styles = StyleSheet.create({
   pressText: {
     marginBottom: 6,
     fontSize: 16,
+    fontFamily: 'Pretendard',
   },
   pressOptionView: {
     justifyContent: 'space-between',
@@ -179,6 +192,7 @@ const styles = StyleSheet.create({
   pressOptionText: {
     fontSize: 16,
     color: '#FFF',
+    fontFamily: 'Pretendard',
   },
 });
 

@@ -56,7 +56,10 @@ const ShowAllImages = ({navigation, route}) => {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Image source={BackIcon} style={{width: 24, height: 24}} />
         </TouchableOpacity>
-        <Text style={{fontSize: 20, fontWeight: '600'}}>앨범</Text>
+        <Text
+          style={{fontSize: 20, fontWeight: '600', fontFamily: 'Pretendard'}}>
+          앨범
+        </Text>
         <View />
       </View>
 

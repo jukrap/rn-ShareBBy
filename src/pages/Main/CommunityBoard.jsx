@@ -67,47 +67,48 @@ const CommunityBoard = ({navigation, route}) => {
 
     setViewMode(initialViewMode);
     setCurrentUserAddress(initialUserAddress);
-  
+
     fetchInitialPosts(initialViewMode, initialUserAddress);
-  
+
     return unsubscribe;
   }, []);
-  
+
   useEffect(() => {
     if (currentUser) {
       fetchCurrentUserAddress();
     }
   }, [currentUser]);
-  
+
   useEffect(() => {
     fetchInitialPosts(viewMode, currentUserAddress);
   }, [viewMode, currentUserAddress]);
-  
 
   useFocusEffect(
     React.useCallback(() => {
       const newPost = route.params?.newPost;
       if (newPost) {
-        setPosts((prevPosts) => [newPost, ...prevPosts]);
-        navigation.setParams({ newPost: null });
+        setPosts(prevPosts => [newPost, ...prevPosts]);
+        navigation.setParams({newPost: null});
       }
-      
+
       const deletedPostId = route.params?.deletedPostId;
       if (deletedPostId) {
-        setPosts((prevPosts) => prevPosts.filter((post) => post.id !== deletedPostId));
-        navigation.setParams({ deletedPostId: null });
+        setPosts(prevPosts =>
+          prevPosts.filter(post => post.id !== deletedPostId),
+        );
+        navigation.setParams({deletedPostId: null});
       }
-      
+
       const updatedPost = route.params?.updatedPost;
       if (updatedPost) {
         setPosts(prevPosts =>
           prevPosts.map(post =>
-            post.id === updatedPost.id ? { ...post, ...updatedPost } : post
-          )
+            post.id === updatedPost.id ? {...post, ...updatedPost} : post,
+          ),
         );
-        navigation.setParams({ updatedPost: null });
+        navigation.setParams({updatedPost: null});
       }
-  
+
       if (route.params?.sendToastMessage) {
         setToastMessage({
           message: route.params.sendToastMessage,
@@ -119,7 +120,7 @@ const CommunityBoard = ({navigation, route}) => {
         navigation.setParams({sendToastMessage: null});
       }
     }, [route.params]),
-  );  
+  );
 
   const fetchCurrentUserAddress = async () => {
     if (currentUser) {
@@ -148,26 +149,26 @@ const CommunityBoard = ({navigation, route}) => {
 
   const fetchInitialPosts = async (viewMode, currentUserAddress) => {
     setLoading(true);
-  
+
     try {
       let query = firestore()
         .collection('posts')
         .where('post_actflag', '==', true);
-  
+
       if (viewMode === '내 주변 보기' && currentUserAddress) {
         const userRegion = currentUserAddress.split(' ').slice(0, 2).join(' ');
         query = query.where('userRegion', '==', userRegion);
       }
-  
+
       query = query.orderBy('post_created', 'desc').limit(10);
-  
+
       const querySnapshot = await query.get();
-  
+
       const initialPosts = querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
       }));
-  
+
       setPosts(initialPosts);
       setOldestVisible(querySnapshot.docs[querySnapshot.docs.length - 1]);
       setNewestVisible(querySnapshot.docs[0]);
@@ -177,7 +178,6 @@ const CommunityBoard = ({navigation, route}) => {
       setLoading(false);
     }
   };
-  
 
   const fetchOlderPosts = async () => {
     if (oldestVisible) {
@@ -467,20 +467,23 @@ const CommunityBoard = ({navigation, route}) => {
     return (
       <View style={styles.headerContainer}>
         {refreshingNewer ? (
-        <View style={{ flex: 1, justifyContent: 'center' }}>
-          <ActivityIndicator size="large" color="#07AC7D" style={{ marginVertical: 16 }} />
-        </View>
+          <View style={{flex: 1, justifyContent: 'center'}}>
+            <ActivityIndicator
+              size="large"
+              color="#07AC7D"
+              style={{marginVertical: 16}}
+            />
+          </View>
         ) : (
           <>
             {currentUserAddress ? (
               <TouchableOpacity
                 style={styles.viewModeButton}
                 onPress={() =>
-                  setViewMode((prevMode) =>
-                    prevMode === '전체 보기' ? '내 주변 보기' : '전체 보기'
+                  setViewMode(prevMode =>
+                    prevMode === '전체 보기' ? '내 주변 보기' : '전체 보기',
                   )
-                }
-              >
+                }>
                 <Text style={styles.viewModeButtonText}>{viewMode}</Text>
               </TouchableOpacity>
             ) : (
@@ -492,8 +495,7 @@ const CommunityBoard = ({navigation, route}) => {
             )}
             <TouchableOpacity
               style={styles.sortButton}
-              onPress={() => setIsSortOptionsVisible(true)}
-            >
+              onPress={() => setIsSortOptionsVisible(true)}>
               <Text style={styles.sortButtonText}>{selectedSortOption}</Text>
               <Image source={SortIcon} style={styles.sortIcon} />
             </TouchableOpacity>
@@ -502,7 +504,7 @@ const CommunityBoard = ({navigation, route}) => {
       </View>
     );
   };
-  
+
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: '#FEFFFE'}}>
       <View style={{flex: 1}}>
@@ -705,21 +707,19 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   sortButtonText: {
-    fontSize: 16,
     fontFamily: 'Pretendard',
     marginRight: 8,
     marginBottom: 4,
     color: '#07AC7D',
   },
   sortIcon: {
-    width: 24,
-    height: 24,
+    width: 18,
+    height: 18,
   },
   viewModeButton: {
     paddingVertical: 8,
   },
   viewModeButtonText: {
-    fontSize: 16,
     fontFamily: 'Pretendard',
     marginRight: 8,
     marginBottom: 4,
