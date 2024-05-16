@@ -18,15 +18,16 @@ import firestore from '@react-native-firebase/firestore';
 
 import {recruitHobby} from '../../lib/hobby';
 import Tobbar from '../../components/Main/TobTab';
-import { StackActions } from '@react-navigation/native';
-import Toast from "../../components/Main/Toast";
+import {StackActions} from '@react-navigation/native';
+import Toast from '../../components/Main/Toast';
 
 const {width, height} = Dimensions.get('window');
 
 const Detail = ({route, navigation}) => {
   const userData = route.params;
 
-  const {pickAddress, pickLatitude, pickLongitude, id, nickname, profileImage} = userData;
+  const {pickAddress, pickLatitude, pickLongitude, id, nickname, profileImage} =
+    userData;
   const writeTime = new Date(); // 내가 쓴 모집글 시간을 저장
   const [date, setDate] = useState(new Date());
   const [isDateModal, setIsDateModal] = useState(false);
@@ -61,10 +62,10 @@ const Detail = ({route, navigation}) => {
   const [errorMessage, setErrorMessage] = useState('');
 
   const handleInputContent = (name, value) => {
-        setDetailConetent({
-          ...detailContent,
-          [name]: value,
-        })
+    setDetailConetent({
+      ...detailContent,
+      [name]: value,
+    });
   };
 
   const countTextLength = text => {
@@ -82,7 +83,7 @@ const Detail = ({route, navigation}) => {
     setIsTextClick(prev => ({
       ...prev,
       [name]: false,
-    })); 
+    }));
   };
 
   const postHobby = async () => {
@@ -129,19 +130,24 @@ const Detail = ({route, navigation}) => {
       console.error('Error: ', error);
     }
   };
-  
-  const onPressRight = () => {
-    setIsToastVisible(false)
 
-    
+  const onPressRight = () => {
+    setIsToastVisible(false);
+
     setTimeout(() => {
-      if(detailContent.detailAddress.length === 0 || detailContent.showTag.length === 0 || detailContent.deadLine.length === 0 || detailContent.peopleCount.length === 0 || detailContent.showTitle.length === 0 || detailContent.showContent.length === 0) {
-        setIsToastVisible(true)
+      if (
+        detailContent.detailAddress.length === 0 ||
+        detailContent.showTag.length === 0 ||
+        detailContent.deadLine.length === 0 ||
+        detailContent.peopleCount.length === 0 ||
+        detailContent.showTitle.length === 0 ||
+        detailContent.showContent.length === 0
+      ) {
+        setIsToastVisible(true);
       } else {
-        setIsModalVisible(!isModalVisible)
-      } 
-    }, 200)
-    
+        setIsModalVisible(!isModalVisible);
+      }
+    }, 200);
   };
 
   const renderItem = ({item}) => {
@@ -162,7 +168,6 @@ const Detail = ({route, navigation}) => {
       </View>
     );
   };
-
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: '#FEFFFE'}}>
@@ -527,12 +532,13 @@ const Detail = ({route, navigation}) => {
           </View>
         </View>
       </Modal>
-      <Toast  text="모든 필드를 입력해주세요!"
+      <Toast
+        text="모든 필드를 입력해주세요!"
         visible={isToastVisible}
         handleCancel={() => {
-            setIsToast(false);
+          setIsToast(false);
         }}
-/>
+      />
     </SafeAreaView>
   );
 };
@@ -586,6 +592,7 @@ const styles = StyleSheet.create({
   textInput: {
     height: 40,
     paddingHorizontal: 8,
+    marginTop: 4,
     borderRadius: 6,
     borderWidth: 1,
     borderColor: '#07AC7D',

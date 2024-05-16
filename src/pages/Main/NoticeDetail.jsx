@@ -60,23 +60,37 @@ const NoticeDetail = ({navigation, route}) => {
   return (
     <SafeAreaView style={{flex: 1}}>
       <View style={styles.topBar}>
-        <TouchableOpacity onPress={handleGoBack}>
+        <TouchableOpacity style={{flex: 1}} onPress={handleGoBack}>
           <Image source={BackIcon} style={{width: 24, height: 24}} />
         </TouchableOpacity>
-        <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 8,
+            flex: 1,
+          }}>
           <Text style={styles.roomName}>상세보기</Text>
         </View>
-        <TouchableOpacity
-          onPress={() => setChatOutModalVisible(!chatOutModalVisible)}>
-          <Text
-            style={{
-              color: '#07AC7D',
-              fontWeight: '700',
-              fontFamily: 'Pretendard',
-            }}>
-            삭제하기
-          </Text>
-        </TouchableOpacity>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'flex-end',
+            alignItems: 'flex-end',
+          }}>
+          <TouchableOpacity
+            onPress={() => setChatOutModalVisible(!chatOutModalVisible)}>
+            <Text
+              style={{
+                color: '#07AC7D',
+                fontWeight: '700',
+                fontFamily: 'Pretendard',
+              }}>
+              삭제하기
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
       <View
         style={{
