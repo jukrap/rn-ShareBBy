@@ -133,6 +133,7 @@ const Chat = () => {
             flex: 1,
             justifyContent: 'center',
             alignItems: 'flex-start',
+            
           }}>
           <Image
             style={{width: 48, height: 48, borderRadius: 8}}
