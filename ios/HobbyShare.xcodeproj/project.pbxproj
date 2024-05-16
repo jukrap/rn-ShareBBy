@@ -14,8 +14,8 @@
 		444E99F024FFF5DD544BE745 /* Pods_HobbyShare.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16F8FC1E572BE228AEE44778 /* Pods_HobbyShare.framework */; };
 		5313472F56A471F0AB151F22 /* Pods_HobbyShare_HobbyShareTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B88D3B88AA1DF1A58BF7030B /* Pods_HobbyShare_HobbyShareTests.framework */; };
 		7D3410EF2BD7A3860046200D /* SwiftBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D3410EE2BD7A3860046200D /* SwiftBridge.swift */; };
+		7EF2BAAB2BF61D1E0028E068 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7EF2BAAA2BF61D1E0028E068 /* GoogleService-Info.plist */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		C065A8CB2BF4FF050032902F /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C065A8CA2BF4FF050032902F /* GoogleService-Info.plist */; };
 		C5833209EB16420FBFAEBA7A /* Pretendard.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 60CF285D14534BEB8EAF6AF6 /* Pretendard.ttf */; };
 /* End PBXBuildFile section */
 
@@ -44,15 +44,15 @@
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = HobbyShare/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		16F8FC1E572BE228AEE44778 /* Pods_HobbyShare.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HobbyShare.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		534DE1028E28940BC4C7E26F /* Pods-HobbyShare.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HobbyShare.release.xcconfig"; path = "Target Support Files/Pods-HobbyShare/Pods-HobbyShare.release.xcconfig"; sourceTree = "<group>"; };
+		60CF285D14534BEB8EAF6AF6 /* Pretendard.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Pretendard.ttf; path = ../src/assets/fonts/Pretendard.ttf; sourceTree = "<group>"; };
 		7D3410ED2BD7A3850046200D /* HobbyShare-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "HobbyShare-Bridging-Header.h"; sourceTree = "<group>"; };
 		7D3410EE2BD7A3860046200D /* SwiftBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftBridge.swift; sourceTree = "<group>"; };
 		7DC706F12BE2949B00103A63 /* HobbyShare.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = HobbyShare.entitlements; path = HobbyShare/HobbyShare.entitlements; sourceTree = "<group>"; };
+		7EF2BAAA2BF61D1E0028E068 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = HobbyShare/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		B88D3B88AA1DF1A58BF7030B /* Pods_HobbyShare_HobbyShareTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HobbyShare_HobbyShareTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		C065A8CA2BF4FF050032902F /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		E05BA0AE8321FAFE939DCF7B /* Pods-HobbyShare-HobbyShareTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HobbyShare-HobbyShareTests.release.xcconfig"; path = "Target Support Files/Pods-HobbyShare-HobbyShareTests/Pods-HobbyShare-HobbyShareTests.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
-		60CF285D14534BEB8EAF6AF6 /* Pretendard.ttf */ = {isa = PBXFileReference; name = "Pretendard.ttf"; path = "../src/assets/fonts/Pretendard.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -95,7 +95,7 @@
 		13B07FAE1A68108700A75B9A /* HobbyShare */ = {
 			isa = PBXGroup;
 			children = (
-				C065A8CA2BF4FF050032902F /* GoogleService-Info.plist */,
+				7EF2BAAA2BF61D1E0028E068 /* GoogleService-Info.plist */,
 				7DC706F12BE2949B00103A63 /* HobbyShare.entitlements */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
@@ -118,6 +118,14 @@
 				B88D3B88AA1DF1A58BF7030B /* Pods_HobbyShare_HobbyShareTests.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		7EB8C14B91AA48BBACCFD1BF /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				60CF285D14534BEB8EAF6AF6 /* Pretendard.ttf */,
+			);
+			name = Resources;
 			sourceTree = "<group>";
 		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
@@ -162,15 +170,6 @@
 			);
 			path = Pods;
 			sourceTree = "<group>";
-		};
-		7EB8C14B91AA48BBACCFD1BF /* Resources */ = {
-			isa = "PBXGroup";
-			children = (
-				60CF285D14534BEB8EAF6AF6 /* Pretendard.ttf */,
-			);
-			name = Resources;
-			sourceTree = "<group>";
-			path = "";
 		};
 /* End PBXGroup section */
 
@@ -267,8 +266,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
+				7EF2BAAB2BF61D1E0028E068 /* GoogleService-Info.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
-				C065A8CB2BF4FF050032902F /* GoogleService-Info.plist in Resources */,
 				C5833209EB16420FBFAEBA7A /* Pretendard.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -647,7 +646,10 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = "$(inherited)  ";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					" ",
+				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;
@@ -730,7 +732,10 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = "$(inherited)  ";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					" ",
+				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;

@@ -62,6 +62,12 @@ const AboutProfile = () => {
       <Stack.Screen name="MyPosts" component={MyPosts} />
       <Stack.Screen name="MyLikes" component={MyLists} />
       <Stack.Screen name="MyRecruits" component={MyRecruits} />
+      <Stack.Screen name="CommunityEditPost" component={CommunityEditPost} />
+      <Stack.Screen name="CommunityBoard" component={CommunityBoard} />
+      <Stack.Screen
+        name="CommunityPostDetail"
+        component={CommunityPostDetail}
+      />
     </Stack.Navigator>
   );
 };
