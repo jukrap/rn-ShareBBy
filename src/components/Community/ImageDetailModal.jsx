@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import Modal from 'react-native-modal';
 import ImageDetailSlider from './ImageDetailSlider';
-
+import {GreenCloseIcon} from '../../assets/assets';
 const {width, height} = Dimensions.get('window');
 
 const ImageDetailModal = ({images, currentIndex, isVisible, onClose}) => {
@@ -21,15 +21,13 @@ const ImageDetailModal = ({images, currentIndex, isVisible, onClose}) => {
       style={styles.modal}>
       <View style={styles.container}>
         <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-          <Image source={greenCloseIcon} style={styles.closeIcon} />
+          <Image source={GreenCloseIcon} style={styles.closeIcon} />
         </TouchableOpacity>
         <ImageDetailSlider images={images} initialIndex={currentIndex} />
       </View>
     </Modal>
   );
 };
-
-const greenCloseIcon = require('../../assets/newIcons/greenCloseIcon.png');
 
 const styles = StyleSheet.create({
   modal: {

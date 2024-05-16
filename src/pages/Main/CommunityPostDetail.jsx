@@ -33,17 +33,19 @@ import CommunityActionModal from '../../components/Community/CommunityActionModa
 
 const {width, height} = Dimensions.get('window');
 
-const warningIcon = require('../../assets/newIcons/warningIcon.png');
-const moreIcon = require('../../assets/newIcons/moreIcon.png');
-const commentLineIcon = require('../../assets/newIcons/commentLineIcon.png');
-const writeCommentIcon = require('../../assets/newIcons/writeCommentIcon.png');
-const heartLineIcon = require('../../assets/newIcons/heart-icon.png');
-const heartRedIcon = require('../../assets/newIcons/redHeartIcon.png');
-const shareIcon = require('../../assets/newIcons/shareIcon.png');
-const pencilIcon = require('../../assets/newIcons/pencil-icon.png');
-const deleteIcon = require('../../assets/newIcons/deleteIcon.png');
-const planeMessageIcon = require('../../assets/newIcons/sendIcon.png');
-const defaultProfileImg = require('../../assets/images/defaultProfileImg.jpeg');
+import {
+  WarningIcon,
+  MoreIcon,
+  CommentLineIcon,
+  WritecommentIcon,
+  HeartIcon,
+  RedHeartIcon,
+  ShareIcon,
+  PencilIcon,
+  DeleteIcon,
+  SendIcon,
+  DefaultProfileIcon,
+} from '../../assets/assets';
 
 const CommunityPostDetail = ({route}) => {
   const navigation = useNavigation();
@@ -117,21 +119,50 @@ const CommunityPostDetail = ({route}) => {
     React.useCallback(() => {
       // 현재 사용자가 해당 게시글에 좋아요를 눌렀는지 확인
       const checkLikeStatus = async () => {
-        if (currentUser) {
-          const likeDoc = await firestore()
-            .collection('likes')
-            .where('postId', '==', postId)
-            .where('userId', '==', currentUser.uid)
-            .get();
+        try {
+          if (currentUser) {
+            const likeDoc = await firestore()
+              .collection('likes')
+              .where('postId', '==', postId)
+              .where('userId', '==', currentUser.uid)
+              .get();
 
-          if (!likeDoc.empty) {
-            setIsLiked(true);
+            if (!likeDoc.empty) {
+              setIsLiked(true);
+            }
           }
+        } catch (error) {
+          console.log('좋아요를 가져오는 중에 오류가 발생했습니다:', error);
         }
       };
 
       checkLikeStatus();
     }, [currentUser, postId]),
+  );
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const updatedPost = route.params?.updatedPost;
+      if (updatedPost && updatedPost.id === postId) {
+        setPosts({...posts, ...updatedPost});
+        navigation.setParams({updatedPost: null});
+      }
+    }, [route.params, postId, posts]),
+  );
+
+  useFocusEffect(
+    React.useCallback(() => {
+      if (route.params?.sendToastMessage) {
+        setToastMessage({
+          message: route.params.sendToastMessage,
+          leftIcon: 'successIcon',
+          closeButton: true,
+          progressBar: true,
+        });
+        setToastVisible(true);
+        navigation.setParams({sendToastMessage: null});
+      }
+    }, [route.params]),
   );
 
   const fetchPost = async postId => {
@@ -147,6 +178,8 @@ const CommunityPostDetail = ({route}) => {
         fetchPostUserData(postData.userId);
         setLikeCount(postData.likeCount || 0);
         setCommentCount(postData.commentCount || 0);
+      } else {
+        console.log('게시글이 존재하지 않습니다.');
       }
     } catch (error) {
       console.log('게시글을 가져오는 중에 오류가 발생했습니다:', error);
@@ -369,7 +402,7 @@ const CommunityPostDetail = ({route}) => {
       setModalMessage({
         title: '게시글 삭제',
         modalText: '해당 게시글을 삭제하겠습니까?',
-        iconSource: warningIcon,
+        iconSource: WarningIcon,
         showConfirmButton: false,
         onConfirm: () => {
           deletePost();
@@ -384,7 +417,7 @@ const CommunityPostDetail = ({route}) => {
       setModalMessage({
         title: '권한 없음',
         modalText: '게시글 작성자만 삭제할 수 있습니다.',
-        iconSource: warningIcon,
+        iconSource: WarningIcon,
         showConfirmButton: true,
         onConfirm: () => {
           setModalVisible(false);
@@ -409,7 +442,7 @@ const CommunityPostDetail = ({route}) => {
           progressBar: true,
         });
         setToastVisible(true);
-        navigation.goBack();
+        navigation.navigate('CommunityBoard', {deletedPostId: postId});
       })
       .catch(e => {
         console.log('게시물을 삭제하는 중에 오류가 발생', e);
@@ -428,7 +461,7 @@ const CommunityPostDetail = ({route}) => {
       setModalMessage({
         title: '권한 없음',
         modalText: '게시글 작성자만 수정할 수 있습니다.',
-        iconSource: warningIcon,
+        iconSource: WarningIcon,
         showConfirmButton: true,
         onConfirm: () => {
           setModalVisible(false);
@@ -439,7 +472,10 @@ const CommunityPostDetail = ({route}) => {
   };
 
   const editPost = () => {
-    navigation.navigate('CommunityEditPost', {postId});
+    navigation.navigate('CommunityEditPost', {
+      postId,
+      prevScreen: 'CommunityPostDetail',
+    });
   };
 
   const handleCommentDelete = commentId => {
@@ -453,7 +489,7 @@ const CommunityPostDetail = ({route}) => {
         setModalMessage({
           title: '댓글 삭제',
           modalText: '해당 댓글을 삭제하겠습니까?',
-          iconSource: warningIcon,
+          iconSource: WarningIcon,
           showConfirmButton: false,
           onConfirm: () => {
             deleteComment(commentId);
@@ -468,7 +504,7 @@ const CommunityPostDetail = ({route}) => {
         setModalMessage({
           title: '권한 없음',
           modalText: '댓글 작성자만 삭제할 수 있습니다.',
-          iconSource: warningIcon,
+          iconSource: WarningIcon,
           showConfirmButton: true,
           onConfirm: () => {
             setModalVisible(false);
@@ -521,7 +557,7 @@ const CommunityPostDetail = ({route}) => {
         setModalMessage({
           title: '권한 없음',
           modalText: '댓글 작성자만 수정할 수 있습니다.',
-          iconSource: warningIcon,
+          iconSource: WarningIcon,
           showConfirmButton: true,
           onConfirm: () => {
             setModalVisible(false);
@@ -578,7 +614,7 @@ const CommunityPostDetail = ({route}) => {
                 url: postUserData?.profileImage,
                 priority: 'high',
                 cachePolicy: 'memory',
-                failureImageUrl: defaultProfileImg,
+                failureImageUrl: DefaultProfileIcon,
                 resizeMode: 'cover',
                 borderRadius: 50,
               }}
@@ -598,7 +634,7 @@ const CommunityPostDetail = ({route}) => {
               <Image
                 style={styles.moreIcon}
                 resizeMode="cover"
-                source={moreIcon}
+                source={MoreIcon}
               />
             </TouchableOpacity>
           </View>
@@ -622,8 +658,8 @@ const CommunityPostDetail = ({route}) => {
               ]}
               onPress={handleLikePress}>
               <Image
-                source={isLiked ? heartRedIcon : heartLineIcon}
-                style={{width: 24, height: 24}}
+                source={isLiked ? RedHeartIcon : HeartIcon}
+                style={{width: 22, height: 22}}
               />
               <Text
                 style={[
@@ -634,13 +670,13 @@ const CommunityPostDetail = ({route}) => {
               </Text>
             </TouchableOpacity>
             <View style={styles.interactionButton} onPress={() => {}}>
-              <Image source={commentLineIcon} style={{width: 24, height: 24}} />
+              <Image source={CommentLineIcon} style={{width: 22, height: 22}} />
               <Text style={styles.interactionText}>{commentCount}</Text>
             </View>
           </View>
           <View style={styles.rightInteractionContainer}>
             <TouchableOpacity style={styles.interactionRightButton}>
-              <Image source={shareIcon} style={{width: 24, height: 24}} />
+              <Image source={ShareIcon} style={{width: 22, height: 22}} />
             </TouchableOpacity>
           </View>
         </View>
@@ -659,7 +695,7 @@ const CommunityPostDetail = ({route}) => {
 
   const renderEmptyComment = () => (
     <View style={styles.emptyCommentContainer}>
-      <Image source={writeCommentIcon} style={styles.emptyCommentIcon} />
+      <Image source={WritecommentIcon} style={styles.emptyCommentIcon} />
       <Text style={styles.emptyCommentText}>
         댓글이 없습니다. {'\n'} 첫 댓글의 주인공이 돼보세요!
       </Text>
@@ -703,7 +739,7 @@ const CommunityPostDetail = ({route}) => {
           <Image
             style={[styles.commentSubmitIcon, styles.frameItemLayout]}
             resizeMode="cover"
-            source={planeMessageIcon}
+            source={SendIcon}
           />
         </TouchableOpacity>
       </View>
@@ -715,7 +751,7 @@ const CommunityPostDetail = ({route}) => {
               handleEdit();
               toggleModal();
             }}>
-            <Image source={pencilIcon} style={{width: 24, height: 24}} />
+            <Image source={PencilIcon} style={{width: 24, height: 24}} />
             <Text style={styles.modalButtonText}>게시글 수정</Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -724,7 +760,7 @@ const CommunityPostDetail = ({route}) => {
               handleDelete();
               toggleModal();
             }}>
-            <Image source={deleteIcon} style={{width: 24, height: 24}} />
+            <Image source={DeleteIcon} style={{width: 24, height: 24}} />
             <Text style={styles.modalButtonText}>게시글 삭제</Text>
           </TouchableOpacity>
         </View>
@@ -897,8 +933,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   moreIcon: {
-    width: 24,
-    height: 24,
+    width: 22,
+    height: 22,
   },
   modalContainer: {
     flex: 1,
@@ -914,12 +950,13 @@ const styles = StyleSheet.create({
   modalButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingVertical: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#FEFFFE',
   },
   modalButtonText: {
-    marginLeft: 8,
+    marginLeft: 16,
+    marginBottom: 2,
     fontSize: 16,
     fontFamily: 'Pretendard',
     color: '#898989',

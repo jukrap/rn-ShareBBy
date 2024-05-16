@@ -12,7 +12,7 @@ import {
 import firestore from '@react-native-firebase/firestore';
 import ImagePicker from 'react-native-image-crop-picker';
 import storage from '@react-native-firebase/storage';
-const leftArrow = require('../../assets/newIcons/backIcon.png');
+import {BackIcon} from '../../assets/assets';
 const EditProfile = ({navigation, route}) => {
   const [nickname, setNickname] = useState(route.params.nickname);
   const [editImage, setEditImage] = useState({
@@ -87,7 +87,7 @@ const EditProfile = ({navigation, route}) => {
       )}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Image style={styles.arrow} source={leftArrow} />
+          <Image style={styles.arrow} source={BackIcon} />
         </TouchableOpacity>
         <Text style={styles.headtext}>프로필 수정</Text>
       </View>

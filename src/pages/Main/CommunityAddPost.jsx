@@ -21,11 +21,12 @@ import CommunityHeader from '../../components/Community/CommunityHeader';
 import BottomSheetModal from '../../components/Community/BottomSheetModal';
 import CommunityActionToast from '../../components/Community/CommunityActionToast';
 import CommunityActionModal from '../../components/Community/CommunityActionModal';
-
-const warningIcon = require('../../assets/newIcons/warningIcon.png');
-const cautionIcon = require('../../assets/newIcons/cautionIcon.png');
-const cameraIcon = require('../../assets/newIcons/cameraIcon.png');
-const pictureIcon = require('../../assets/newIcons/imageIcon.png');
+import {
+  WarningIcon,
+  CautionIcon,
+  CameraIcon,
+  ImageIcon,
+} from '../../assets/assets';
 
 const CommunityAddPost = () => {
   const navigation = useNavigation();
@@ -78,7 +79,7 @@ const CommunityAddPost = () => {
       } else {
         setToastMessage({
           message: '게시글 내용을 입력해주세요.',
-          leftIcon: 'cautionIcon',
+          leftIcon: 'CautionIcon',
           closeButton: true,
           progressBar: true,
         });
@@ -98,7 +99,7 @@ const CommunityAddPost = () => {
     } else {
       setToastMessage({
         message: '게시글 내용을 입력해주세요.',
-        leftIcon: 'cautionIcon',
+        leftIcon: 'CautionIcon',
         closeButton: true,
         progressBar: true,
       });
@@ -111,7 +112,7 @@ const CommunityAddPost = () => {
     if (!postContent || postContent.trim() === '') {
       setToastMessage({
         message: '게시글 내용을 입력해주세요.',
-        leftIcon: 'cautionIcon',
+        leftIcon: 'CautionIcon',
         closeButton: true,
         progressBar: true,
       });
@@ -135,23 +136,58 @@ const CommunityAddPost = () => {
       console.log('이미지 URLs: ', imageUrls);
       console.log('게시글 내용: ', postContent);
 
+      // 현재 사용자의 주소 정보 가져오기
+      const userDoc = await firestore()
+        .collection('users')
+        .doc(currentUser.uid)
+        .get();
+
+      const userData = userDoc.data();
+      let userRegion = '';
+
+      if (userData.address) {
+        const addressParts = userData.address.split(' ');
+        if (addressParts.length >= 2) {
+          userRegion = addressParts.slice(0, 2).join(' ');
+        } else {
+          console.log('사용자 주소 정보의 형식이 올바르지 않습니다.');
+          userRegion = '주소 정보 없음';
+        }
+      } else {
+        console.log('사용자 주소 정보가 없습니다.');
+        userRegion = '주소 정보 없음';
+      }
+
       // Firestore에 게시글 추가
-      await firestore()
-        .collection('posts')
-        .add({
+      const postRef = await firestore().collection('posts').add({
+        userId: currentUser.uid,
+        post_content: postContent,
+        post_files: imageUrls,
+        post_created: firestore.Timestamp.fromDate(new Date()),
+        post_actflag: true,
+        likeCount: 0,
+        commentCount: 0,
+        userRegion: userRegion,
+      });
+
+      navigation.navigate('CommunityBoard', {
+        newPost: {
+          id: postRef.id,
           userId: currentUser.uid,
           post_content: postContent,
           post_files: imageUrls,
           post_created: firestore.Timestamp.fromDate(new Date()),
           post_actflag: true,
-        });
+          likeCount: 0,
+          commentCount: 0,
+          userRegion: userRegion,
+        },
+        sendToastMessage: '성공적으로 게시글이 업로드됐습니다!',
+      });
 
       console.log('게시글 업로드 완료!');
       setPostContent(null);
       setSelectedImages([]);
-      navigation.navigate('CommunityBoard', {
-        sendToastMessage: '성공적으로 게시글이 업로드됐습니다!',
-      });
     } catch (error) {
       console.log(
         'Firestore에 게시물을 추가하는 중에 문제가 발생했습니다.',
@@ -215,7 +251,7 @@ const CommunityAddPost = () => {
       setModalMessage({
         title: '이미지 업로드 실패',
         modalText: '이미지 업로드 중 오류가 발생했습니다.',
-        iconSource: warningIcon,
+        iconSource: WarningIcon,
         showConfirmButton: true,
         onConfirm: () => {
           setModalVisible(false);
@@ -237,7 +273,7 @@ const CommunityAddPost = () => {
       setModalMessage({
         title: '이미지 업로드 제한',
         modalText: '최대 7장까지 이미지를 업로드할 수 있습니다.',
-        iconSource: cautionIcon,
+        iconSource: CautionIcon,
         showConfirmButton: true,
         onConfirm: () => {
           setModalVisible(false);
@@ -269,7 +305,7 @@ const CommunityAddPost = () => {
       setModalMessage({
         title: '이미지 업로드 제한',
         modalText: '최대 7장까지 이미지를 업로드할 수 있습니다.',
-        iconSource: cautionIcon,
+        iconSource: CautionIcon,
         showConfirmButton: true,
         onConfirm: () => {
           setModalVisible(false);
@@ -339,7 +375,7 @@ const CommunityAddPost = () => {
               <TouchableOpacity
                 style={styles.imageUploadButton}
                 onPress={openImagePicker}>
-                <Image source={cameraIcon} style={{width: 24, height: 24}} />
+                <Image source={CameraIcon} style={{width: 24, height: 24}} />
                 <Text style={styles.imageUploadButtonText}>
                   {selectedImages.length}
                 </Text>
@@ -386,13 +422,13 @@ const CommunityAddPost = () => {
             <TouchableOpacity
               style={styles.modalButton}
               onPress={takePhotoFromCamera}>
-              <Image source={cameraIcon} style={{width: 24, height: 24}} />
+              <Image source={CameraIcon} style={{width: 24, height: 24}} />
               <Text style={styles.modalButtonText}>카메라로 촬영</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.modalButton}
               onPress={choosePhotoFromLibrary}>
-              <Image source={pictureIcon} style={{width: 24, height: 24}} />
+              <Image source={ImageIcon} style={{width: 24, height: 24}} />
               <Text style={styles.modalButtonText}>갤러리에서 선택</Text>
             </TouchableOpacity>
           </View>
@@ -422,7 +458,7 @@ const CommunityAddPost = () => {
         onConfirm={() => setModalVisible(false)}
         title="이미지 업로드 실패"
         modalText={modalMessage}
-        iconSource={warningIcon}
+        iconSource={WarningIcon}
         showConfirmButton={true}
       />
     </SafeAreaView>

@@ -13,8 +13,7 @@ import {
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore'; // firestore import 추가
 import LoginToast from '../../components/SignUp/LoginToast';
-
-const backIcon = require('../../assets/newIcons/back.png');
+import {BackIcon2} from '../../assets/assets';
 
 const SearchPassword = ({navigation}) => {
   const [email, setEmail] = useState('');
@@ -46,7 +45,6 @@ const SearchPassword = ({navigation}) => {
       setShowToast(true);
       setTimeout(() => setShowToast(false), 3000);
     } catch (error) {
-
       setToastMessage('비밀번호 재설정 이메일 전송 중 오류가 발생했습니다.');
       setShowToast(true);
       setTimeout(() => setShowToast(false), 3000);
@@ -59,15 +57,14 @@ const SearchPassword = ({navigation}) => {
   };
 
   return (
-    <SafeAreaView style={{flex: 1 , backgroundColor:'#fefffe'}}>
+    <SafeAreaView style={{flex: 1, backgroundColor: '#fefffe'}}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={1}
         style={{flex: 1}}>
         <TouchableOpacity
-          style={styles.backIcon}
           onPress={() => navigation.goBack()}>
-          <Image source={backIcon} />
+          <Image  style={{marginLeft:8}} source={BackIcon2} />
         </TouchableOpacity>
         <View style={{justifyContent: 'space-between', flex: 1}}>
           <View>

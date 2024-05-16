@@ -21,11 +21,12 @@ import CommunityHeader from '../../components/Community/CommunityHeader';
 import BottomSheetModal from '../../components/Community/BottomSheetModal';
 import CommunityActionToast from '../../components/Community/CommunityActionToast';
 import CommunityActionModal from '../../components/Community/CommunityActionModal';
-
-const warningIcon = require('../../assets/newIcons/warningIcon.png');
-const cautionIcon = require('../../assets/newIcons/cautionIcon.png');
-const cameraIcon = require('../../assets/newIcons/cameraIcon.png');
-const pictureIcon = require('../../assets/newIcons/imageIcon.png');
+import {
+  WarningIcon,
+  CautionIcon,
+  CameraIcon,
+  ImageIcon,
+} from '../../assets/assets';
 
 const CommunityEditPost = ({route}) => {
   const navigation = useNavigation();
@@ -72,13 +73,16 @@ const CommunityEditPost = ({route}) => {
     // 수정할 게시글의 ID를 route params에서 가져옴
     const {postId} = route.params;
     setPostId(postId);
+    console.log('Fetching post with ID:', postId); // 로그 찍자...
 
     // Firestore에서 해당 게시글의 데이터를 가져와서 state에 저장
     const fetchPost = async () => {
       try {
         const postDoc = await firestore().collection('posts').doc(postId).get();
+        console.log('Post document:', postDoc);
         if (postDoc.exists) {
           const postData = postDoc.data();
+          console.log('Post data:', postData);
           setPostContent(postData.post_content);
           setSelectedImages({
             existingImages: postData.post_files,
@@ -111,22 +115,30 @@ const CommunityEditPost = ({route}) => {
             post_files: [...selectedImages.existingImages, ...newImageUrls],
           });
 
-        console.log('게시글 수정 완료!');
-        setToastMessage({
-          message: '성공적으로 게시글이 수정되었습니다!',
-          leftIcon: 'successIcon',
-          closeButton: true,
-          progressBar: true,
-        });
-        setToastVisible(true);
-        navigation.goBack();
-      } catch (error) {
+          console.log('게시글 수정 완료!');
+          setToastMessage({
+            message: '성공적으로 게시글이 수정되었습니다!',
+            leftIcon: 'successIcon',
+            closeButton: true,
+            progressBar: true,
+          });
+          setToastVisible(true);
+    
+          navigation.navigate(route.params?.prevScreen || 'CommunityBoard', {
+            updatedPost: {
+              id: postId,
+              post_content: postContent,
+              post_files: [...selectedImages.existingImages, ...newImageUrls],
+            },
+            sendToastMessage: '성공적으로 게시글이 수정됐습니다!',
+          });
+        } catch (error) {
         console.log('게시글을 수정하는 중 오류 발생:', error);
       }
     } else {
       setToastMessage({
         message: '게시글 내용을 입력해주세요.',
-        leftIcon: 'cautionIcon',
+        leftIcon: 'CautionIcon',
         closeButton: true,
         progressBar: true,
       });
@@ -174,7 +186,7 @@ const CommunityEditPost = ({route}) => {
       setModalMessage({
         title: '이미지 업로드 실패',
         modalText: '이미지 업로드 중 오류가 발생했습니다.',
-        iconSource: warningIcon,
+        iconSource: WarningIcon,
         showConfirmButton: true,
         onConfirm: () => {
           setModalVisible(false);
@@ -215,7 +227,7 @@ const CommunityEditPost = ({route}) => {
       setModalMessage({
         title: '이미지 업로드 제한',
         modalText: '최대 7장까지 이미지를 업로드할 수 있습니다.',
-        iconSource: cautionIcon,
+        iconSource: CautionIcon,
         showConfirmButton: true,
         onConfirm: () => {
           setModalVisible(false);
@@ -252,7 +264,7 @@ const CommunityEditPost = ({route}) => {
       setModalMessage({
         title: '이미지 업로드 제한',
         modalText: '최대 7장까지 이미지를 업로드할 수 있습니다.',
-        iconSource: cautionIcon,
+        iconSource: CautionIcon,
         showConfirmButton: true,
         onConfirm: () => {
           setModalVisible(false);
@@ -318,7 +330,7 @@ const CommunityEditPost = ({route}) => {
               <TouchableOpacity
                 style={styles.imageUploadButton}
                 onPress={openImagePicker}>
-                <Image source={cameraIcon} style={{width: 24, height: 24}} />
+                <Image source={CameraIcon} style={{width: 24, height: 24}} />
                 <Text style={styles.imageUploadButtonText}>
                   {selectedImages.existingImages.length +
                     selectedImages.newImages.length}
@@ -370,13 +382,13 @@ const CommunityEditPost = ({route}) => {
             <TouchableOpacity
               style={styles.modalButton}
               onPress={takePhotoFromCamera}>
-              <Image source={cameraIcon} style={{width: 24, height: 24}} />
+              <Image source={CameraIcon} style={{width: 24, height: 24}} />
               <Text style={styles.modalButtonText}>카메라로 촬영</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.modalButton}
               onPress={choosePhotoFromLibrary}>
-              <Image source={pictureIcon} style={{width: 24, height: 24}} />
+              <Image source={ImageIcon} style={{width: 24, height: 24}} />
               <Text style={styles.modalButtonText}>갤러리에서 선택</Text>
             </TouchableOpacity>
           </View>

@@ -15,10 +15,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import useStore from '../../lib/userStore';
 import {useFocusEffect} from '@react-navigation/native';
 import LoginModal from '../../components/SignUp/LoginModal';
-
-const heart = require('../../assets/newIcons/heart-icon.png');
-const pencil = require('../../assets/newIcons/pencil-icon.png');
-const marker = require('../../assets/newIcons/marker-icon.png');
+import {HeartIcon, PencilIcon, MarkerIcon} from '../../assets/assets';
 
 const {width, height} = Dimensions.get('window');
 const rightArrow = require('../../assets/newIcons/rightIcon.png');
@@ -69,8 +66,11 @@ const Profile = ({navigation, route}) => {
       // Firebase에서 로그아웃
       await auth().signOut();
       await AsyncStorage.removeItem('userInfo');
-      navigation.navigate('Login');
-      setLogoutShowModal(false)
+      setLogoutShowModal(false);
+      navigation.reset({
+        index: 0,
+        routes: [{name: 'Login'}],
+      });
     } catch (error) {
       console.error('로그아웃 실패:', error);
     }
@@ -82,8 +82,8 @@ const Profile = ({navigation, route}) => {
   };
   const handleLogoutShowModal = () => {
     setLogoutShowModal(true);
-    };
-  
+  };
+
   return (
     <SafeAreaView style={styles.safeAreaViewStyle}>
       {users ? (
@@ -121,7 +121,7 @@ const Profile = ({navigation, route}) => {
                 })
               }
               style={styles.myList}>
-              <Image source={pencil} style={styles.icon} />
+              <Image source={PencilIcon} style={styles.icon} />
               <Text style={styles.listStyle}>내가 쓴 글</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -131,7 +131,7 @@ const Profile = ({navigation, route}) => {
                 })
               }
               style={styles.myList}>
-              <Image source={heart} style={styles.icon} />
+              <Image source={HeartIcon} style={styles.icon} />
               <Text style={styles.listStyle}>찜한 글</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -141,7 +141,7 @@ const Profile = ({navigation, route}) => {
                 })
               }
               style={styles.myList}>
-              <Image source={marker} style={styles.icon} />
+              <Image source={MarkerIcon} style={styles.icon} />
               <Text
                 // onPress={() => navigation.navigate('Home')}
                 style={styles.listStyle}>
@@ -229,7 +229,8 @@ const styles = StyleSheet.create({
   arrow: {
     width: 15,
     height: 15,
-    // alignItems: 'center',
+    marginLeft: 10,
+    alignItems: 'center',
   },
   emailStyle: {
     fontSize: 15,
@@ -282,7 +283,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginTop: 10,
-    marginBottom: 10,
+    marginBottom: 12,
   },
   additionalInfo: {
     marginLeft: 30,

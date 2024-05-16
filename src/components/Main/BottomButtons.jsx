@@ -1,5 +1,5 @@
-import React, { useCallback, useMemo, useRef } from 'react';
-import { StyleSheet, View, TouchableOpacity, Text, Animated, Easing, Pressable, Linking } from 'react-native';
+import React, { useCallback, useRef } from 'react';
+import { StyleSheet, View, TouchableOpacity, Text, Animated, Easing, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 
@@ -55,7 +55,6 @@ const BottomButtons = ({ peopleCount, joinUsers, showValue, onLikePress, rightBu
                 ],
             }}
         >
-            {/* <View style={styles.bottomItem}> */}
                 <View style={{ gap : 8}}>
                     <Text style={{ fontSize: 14, fontWeight: 600, color: '#898989' }}>참여가능인원</Text>
                     <Text style={{ fontSize : 12, color: '#898989' }}><Text style={{ color: '#07AC7D' }}>{joinUsers.length}명</Text> / {peopleCount}명</Text>
@@ -66,8 +65,6 @@ const BottomButtons = ({ peopleCount, joinUsers, showValue, onLikePress, rightBu
                 >
                     <Text style={{ fontSize: 16, fontWeight: '600', color: '#fff' }}>참여하기</Text>
                 </TouchableOpacity>
-            {/* </View> */}
-
         </Animated.View>
     );
 };

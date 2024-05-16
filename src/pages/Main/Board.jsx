@@ -1,17 +1,16 @@
-import React, { useRef, useState } from "react";
-import { SafeAreaView, View, Text, TouchableOpacity, StyleSheet, ScrollView, Dimensions, Image, FlatList } from "react-native";
+import React, {useRef, useState} from 'react';
+import {SafeAreaView, View, Text, Dimensions} from 'react-native';
 
-const { width, height } = Dimensions.get('window');
+const {width, height} = Dimensions.get('window');
 
-const Board = ({ navigation, route }) => {
-    
-    return (
-        <SafeAreaView style={{ flex: 1 }}>
-            <View>
-                <Text></Text>
-            </View>
-        </SafeAreaView>
-)
-}
+const Board = ({navigation, route}) => {
+  return (
+    <SafeAreaView style={{flex: 1}}>
+      <View>
+        <Text></Text>
+      </View>
+    </SafeAreaView>
+  );
+};
 
 export default Board;

@@ -13,7 +13,7 @@ import firestore from '@react-native-firebase/firestore'; // firestore import ì¶
 import LoginToast from '../../components/SignUp/LoginToast';
 import LoginModal from '../../components/SignUp/LoginModal';
 
-const backIcon = require('../../assets/newIcons/back.png');
+import {BackIcon2} from '../../assets/assets';
 
 const SignUpEmail = ({navigation}) => {
   const [email, setEmail] = useState('');
@@ -84,9 +84,8 @@ const SignUpEmail = ({navigation}) => {
         keyboardVerticalOffset={1}
         style={{flex: 1}}>
         <TouchableOpacity
-          style={styles.backIcon}
           onPress={() => navigation.goBack()}>
-          <Image source={backIcon} />
+          <Image style={{marginLeft:8}} source={BackIcon2} />
         </TouchableOpacity>
         <View style={{justifyContent: 'space-between', flex: 1}}>
           <View>
@@ -137,7 +136,6 @@ const SignUpEmail = ({navigation}) => {
         onConfirm={handleLogin}
       />
       <LoginToast
-
         text={toastMessage}
         visible={showToast}
         handleCancel={() => setShowToast(false)}
