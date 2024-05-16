@@ -248,6 +248,54 @@ const ChatRoom = ({route, navigation}) => {
     }
   };
 
+  const getPhotosByCamera = async () => {
+    try {
+      const image = await ImagePicker.openCamera({
+        width: 400,
+        height: 400,
+        multiple: false,
+        cropping: true,
+        mediaType: 'photo',
+        cropperChooseText: '이미지 변경',
+        cropperCancelText: '취소',
+        cropperRotateButtonsHidden: true,
+      });
+      const imageUrl = await uploadImage(image.sourceURL, chatRoomId);
+
+      const currentUser = auth().currentUser;
+
+      let currentUserNickname = 'Unknown';
+      if (currentUser) {
+        const userSnapshot = await firestore()
+          .collection('users')
+          .doc(currentUser.uid)
+          .get();
+        if (userSnapshot.exists) {
+          currentUserNickname = userSnapshot.data().nickname;
+          senderProfileImg = userSnapshot.data().profileImage;
+        }
+      }
+
+      const newMessage = {
+        sender: currentUserNickname,
+        senderId: currentUser.uid,
+        timestamp: firestore.FieldValue.serverTimestamp(),
+        senderProfileImg: senderProfileImg,
+        image: imageUrl,
+      };
+
+      await firestore()
+        .collection('chatRooms')
+        .doc(chatRoomId)
+        .collection('messages')
+        .add(newMessage);
+
+      togglePlusModal();
+    } catch (error) {
+      console.error('Error selecting or uploading image:', error);
+    }
+  };
+
   const updateChatRoomName = async newName => {
     try {
       await firestore()
@@ -686,6 +734,7 @@ const ChatRoom = ({route, navigation}) => {
         isVisible={plusModalVisible}
         toggleModal={togglePlusModal}
         getPhotos={getPhotos}
+        getPhotosByCamera={getPhotosByCamera}
       />
       <ImageDetail
         isVisible={isVisible}

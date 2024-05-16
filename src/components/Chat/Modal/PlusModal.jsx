@@ -4,7 +4,7 @@ import Modal from 'react-native-modal';
 
 import {CameraIcon, ImageIcon} from '../../../assets/assets';
 
-const PlusModal = ({isVisible, toggleModal, getPhotos}) => {
+const PlusModal = ({isVisible, toggleModal, getPhotos, getPhotosByCamera}) => {
   return (
     <Modal
       isVisible={isVisible}
@@ -42,7 +42,8 @@ const PlusModal = ({isVisible, toggleModal, getPhotos}) => {
             <Text>사진</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={{alignItems: 'center', justifyContent: 'center', gap: 8}}>
+            style={{alignItems: 'center', justifyContent: 'center', gap: 8}}
+            onPress={getPhotosByCamera}>
             <Image style={{width: 28, height: 28}} source={CameraIcon} />
             <Text>카메라</Text>
           </TouchableOpacity>
