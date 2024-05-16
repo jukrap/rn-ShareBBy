@@ -68,7 +68,7 @@ const NoticeDetail = ({navigation, route}) => {
         </View>
         <TouchableOpacity
           onPress={() => setChatOutModalVisible(!chatOutModalVisible)}>
-          <Text style={{color: '#aaa', fontWeight: '700'}}>삭제하기</Text>
+          <Text style={{color: '#07AC7D', fontWeight: '700'}}>삭제하기</Text>
         </TouchableOpacity>
       </View>
       <View

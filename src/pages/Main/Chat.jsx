@@ -135,7 +135,7 @@ const Chat = () => {
             alignItems: 'flex-start',
           }}>
           <Image
-            style={{width: 48, height: 48, borderRadius: 8}}
+            style={{width: 52, height: 52, borderRadius: 8}}
             source={{uri: item.chatRoomImage}}
           />
         </View>
@@ -189,7 +189,7 @@ const Chat = () => {
   };
 
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <SafeAreaView style={{flex: 1, backgroundColor: '#fff'}}>
       <View
         style={{
           paddingTop: 8,

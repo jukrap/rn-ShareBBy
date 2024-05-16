@@ -8,12 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* HobbyShareTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* HobbyShareTests.m */; };
-		05B516212BF3C2E200451725 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 05B516202BF3C2E200451725 /* GoogleService-Info.plist */; };
+		05B76FFB2BF4F91300FC61C4 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 05B76FFA2BF4F91300FC61C4 /* GoogleService-Info.plist */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		7D3410EF2BD7A3860046200D /* SwiftBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D3410EE2BD7A3860046200D /* SwiftBridge.swift */; };
-		7EA254512BF3C88C00C7A041 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7EA254502BF3C88C00C7A041 /* GoogleService-Info.plist */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		F99E9AC535BDC3D6B83B17D5 /* Pods_HobbyShare.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C5B678C53647B662CD6175D /* Pods_HobbyShare.framework */; };
 		FEFEEA9E449FC4DF3119C230 /* Pods_HobbyShare_HobbyShareTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FCAB9B0AAD3E004F31A02BDA /* Pods_HobbyShare_HobbyShareTests.framework */; };
@@ -33,7 +32,7 @@
 		00E356EE1AD99517003FC87E /* HobbyShareTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HobbyShareTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* HobbyShareTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HobbyShareTests.m; sourceTree = "<group>"; };
-		05B516202BF3C2E200451725 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
+		05B76FFA2BF4F91300FC61C4 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* HobbyShare.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HobbyShare.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = HobbyShare/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = HobbyShare/AppDelegate.mm; sourceTree = "<group>"; };
@@ -46,7 +45,6 @@
 		7D3410ED2BD7A3850046200D /* HobbyShare-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "HobbyShare-Bridging-Header.h"; sourceTree = "<group>"; };
 		7D3410EE2BD7A3860046200D /* SwiftBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftBridge.swift; sourceTree = "<group>"; };
 		7DC706F12BE2949B00103A63 /* HobbyShare.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = HobbyShare.entitlements; path = HobbyShare/HobbyShare.entitlements; sourceTree = "<group>"; };
-		7EA254502BF3C88C00C7A041 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = HobbyShare/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		8C5B678C53647B662CD6175D /* Pods_HobbyShare.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HobbyShare.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C60A3B953FBFBFD18514D2E2 /* Pods-HobbyShare-HobbyShareTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HobbyShare-HobbyShareTests.release.xcconfig"; path = "Target Support Files/Pods-HobbyShare-HobbyShareTests/Pods-HobbyShare-HobbyShareTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -95,13 +93,10 @@
 		13B07FAE1A68108700A75B9A /* HobbyShare */ = {
 			isa = PBXGroup;
 			children = (
-
-				7EA254502BF3C88C00C7A041 /* GoogleService-Info.plist */,
-
 				7DC706F12BE2949B00103A63 /* HobbyShare.entitlements */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
-				05B516202BF3C2E200451725 /* GoogleService-Info.plist */,
+				05B76FFA2BF4F91300FC61C4 /* GoogleService-Info.plist */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
@@ -261,9 +256,7 @@
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
-
-				7EA254512BF3C88C00C7A041 /* GoogleService-Info.plist in Resources */,
-
+				05B76FFB2BF4F91300FC61C4 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -641,10 +634,7 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;
@@ -727,10 +717,7 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;

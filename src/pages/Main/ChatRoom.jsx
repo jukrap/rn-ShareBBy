@@ -306,6 +306,8 @@ const ChatRoom = ({route, navigation}) => {
   };
 
   const renderItem = ({item, index}) => {
+    console.log('chatMembers:', chatMembers);
+    const member = chatMembers.find(member => member.id === item.senderId);
     const isSystemMessage = item.sender === '시스템';
     const isCurrentUser = item.senderId === auth().currentUser?.uid;
     const isFirstMessage = index === messages.length - 1;
@@ -354,85 +356,89 @@ const ChatRoom = ({route, navigation}) => {
         (item.senderId !== prevItem?.senderId && !isCurrentUser)) &&
       item.senderId !== auth().currentUser?.id;
 
-    return (
-      <View>
-        <View style={styles.showDateSeparatorContainer}>
-          {showDateSeparator && (
-            <View>
-              <Text style={styles.showDateSeparatorTime}>
-                {dayjs(item.timestamp?.toDate()).format('YYYY년 MM월 DD일')}
+    if (member) {
+      return (
+        <View>
+          <View style={styles.showDateSeparatorContainer}>
+            {showDateSeparator && (
+              <View>
+                <Text style={styles.showDateSeparatorTime}>
+                  {dayjs(item.timestamp?.toDate()).format('YYYY년 MM월 DD일')}
+                </Text>
+              </View>
+            )}
+          </View>
+          {showProfileInfo && (
+            <View style={styles.showProfileInfoContainer}>
+              <Image
+                style={styles.showProfileInfoImage}
+                source={{uri: member.profileImage}}
+              />
+              <Text style={styles.showProfileInfoNickname}>
+                {member.nickname}
               </Text>
             </View>
           )}
-        </View>
-        {showProfileInfo && (
-          <View style={styles.showProfileInfoContainer}>
-            <Image
-              style={styles.showProfileInfoImage}
-              source={{uri: item.senderProfileImg}}
-            />
-            <Text style={styles.showProfileInfoNickname}>{item.sender}</Text>
-          </View>
-        )}
-        {isCurrentUser ? (
-          <View style={styles.sentByUserWrapper}>
-            {showTime && (
-              <View style={{marginBottom: 8}}>
-                <Text style={{color: '#aaa', fontSize: 10}}>
-                  {item.timestamp &&
-                    item.timestamp.toDate &&
-                    dayjs(item.timestamp.toDate()).format('A hh:mm')}
-                </Text>
-              </View>
-            )}
+          {isCurrentUser ? (
+            <View style={styles.sentByUserWrapper}>
+              {showTime && (
+                <View style={{marginBottom: 8}}>
+                  <Text style={{color: '#aaa', fontSize: 10}}>
+                    {item.timestamp &&
+                      item.timestamp.toDate &&
+                      dayjs(item.timestamp.toDate()).format('A hh:mm')}
+                  </Text>
+                </View>
+              )}
 
-            {item.image ? (
-              <TouchableOpacity onPress={() => toggleModal(item.image)}>
-                <Image
-                  source={{uri: item.image}}
-                  style={{width: 150, height: 150, borderRadius: 8}}
-                />
-              </TouchableOpacity>
-            ) : (
-              <View style={styles.sentByUserMessage}>
-                <Text>{item.text}</Text>
-              </View>
-            )}
-          </View>
-        ) : isSystemMessage ? (
-          <View style={{justifyContent: 'center', alignItems: 'center'}}>
-            <Text style={{paddingVertical: 22, color: '#aaa', fontSize: 12}}>
-              {item.text}
-            </Text>
-            {showTime && <View style={{marginBottom: 8}}></View>}
-          </View>
-        ) : (
-          <View style={styles.sentByOtherWrapper}>
-            {item.image ? (
-              <TouchableOpacity onPress={() => toggleModal(item.image)}>
-                <Image
-                  source={{uri: item.image}}
-                  style={{width: 150, height: 150, borderRadius: 8}}
-                />
-              </TouchableOpacity>
-            ) : (
-              <View style={styles.sentByOtherMessage}>
-                <Text>{item.text}</Text>
-              </View>
-            )}
-            {showTime && (
-              <View style={{marginBottom: 8}}>
-                <Text style={{color: '#aaa', fontSize: 10}}>
-                  {item.timestamp &&
-                    item.timestamp.toDate &&
-                    dayjs(item.timestamp.toDate()).format('A hh:mm')}
-                </Text>
-              </View>
-            )}
-          </View>
-        )}
-      </View>
-    );
+              {item.image ? (
+                <TouchableOpacity onPress={() => toggleModal(item.image)}>
+                  <Image
+                    source={{uri: item.image}}
+                    style={{width: 150, height: 150, borderRadius: 8}}
+                  />
+                </TouchableOpacity>
+              ) : (
+                <View style={styles.sentByUserMessage}>
+                  <Text>{item.text}</Text>
+                </View>
+              )}
+            </View>
+          ) : isSystemMessage ? (
+            <View style={{justifyContent: 'center', alignItems: 'center'}}>
+              <Text style={{paddingVertical: 22, color: '#aaa', fontSize: 12}}>
+                {item.text}
+              </Text>
+              {showTime && <View style={{marginBottom: 8}}></View>}
+            </View>
+          ) : (
+            <View style={styles.sentByOtherWrapper}>
+              {item.image ? (
+                <TouchableOpacity onPress={() => toggleModal(item.image)}>
+                  <Image
+                    source={{uri: item.image}}
+                    style={{width: 150, height: 150, borderRadius: 8}}
+                  />
+                </TouchableOpacity>
+              ) : (
+                <View style={styles.sentByOtherMessage}>
+                  <Text>{item.text}</Text>
+                </View>
+              )}
+              {showTime && (
+                <View style={{marginBottom: 8}}>
+                  <Text style={{color: '#aaa', fontSize: 10}}>
+                    {item.timestamp &&
+                      item.timestamp.toDate &&
+                      dayjs(item.timestamp.toDate()).format('A hh:mm')}
+                  </Text>
+                </View>
+              )}
+            </View>
+          )}
+        </View>
+      );
+    }
   };
 
   const handleGoBack = () => {
