@@ -28,7 +28,6 @@ const OptimizedImageItem = React.memo(({item}) => {
   const source = useMemo(() => (item.bgImg ? item.bgImg : null), [item.bgImg]);
   return source ? (
     <Image
-      resizeMethod="auto"
       source={source}
       style={{width: width, height: height / 4}}
     />
@@ -158,30 +157,33 @@ const Main = ({navigation}) => {
 
   // 이벤트 배너를 자동으로 스크롤하는 useEffect, 이너벌 대신 애니메이션에서 duration
   useEffect(() => {
-    const scrollInterval = setInterval(() => {
-      if (eventBanner.length > 1 && bannerRef.current) {
-        let nextIndex;
-        if (currentIndex === eventBanner.length - 1) {
-          nextIndex = 1;
-          bannerRef.current.scrollToIndex({
-            index: nextIndex,
-            animated: false,
-          });
-        } else {
-          nextIndex = currentIndex + 1;
-          bannerRef.current.scrollToIndex({
-            index: nextIndex,
-            animated: true,
-          });
+    if (eventBanner.length > 0) {
+      const scrollInterval = setInterval(() => {
+        if (bannerRef.current) {
+          let nextIndex;
+          if (currentIndex === eventBanner.length - 1) {
+            nextIndex = 1;
+            bannerRef.current.scrollToIndex({
+              index: nextIndex,
+              animated: false,
+            });
+          } else {
+            nextIndex = currentIndex + 1;
+            bannerRef.current.scrollToIndex({
+              index: nextIndex,
+              animated: true,
+            });
+          }
+          setCurrentIndex(nextIndex);
         }
-        setCurrentIndex(nextIndex);
-      }
-    }, 3000);
+      }, 3000);
 
-    return () => {
-      clearInterval(scrollInterval);
-    };
+      return () => {
+        clearInterval(scrollInterval);
+      };
+    }
   }, [currentIndex, eventBanner.length]);
+
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: '#fff'}}>
