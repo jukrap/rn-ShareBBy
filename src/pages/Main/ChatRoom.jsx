@@ -354,7 +354,6 @@ const ChatRoom = ({route, navigation}) => {
   };
 
   const renderItem = ({item, index}) => {
-    console.log('chatMembers:', chatMembers);
     const member = chatMembers.find(member => member.id === item.senderId);
     const isSystemMessage = item.sender === '시스템';
     const isCurrentUser = item.senderId === auth().currentUser?.uid;
@@ -448,7 +447,7 @@ const ChatRoom = ({route, navigation}) => {
                 </TouchableOpacity>
               ) : (
                 <View style={styles.sentByUserMessage}>
-                  <Text>{item.text}</Text>
+                  <Text style={{fontFamily: 'Pretendard'}}>{item.text}</Text>
                 </View>
               )}
             </View>
@@ -470,7 +469,7 @@ const ChatRoom = ({route, navigation}) => {
                 </TouchableOpacity>
               ) : (
                 <View style={styles.sentByOtherMessage}>
-                  <Text>{item.text}</Text>
+                  <Text style={{fontFamily: 'Pretendard'}}>{item.text}</Text>
                 </View>
               )}
               {showTime && (
@@ -605,7 +604,14 @@ const ChatRoom = ({route, navigation}) => {
                 marginHorizontal: 8,
                 paddingTop: 8,
               }}>
-              <Text style={{fontSize: 16, fontWeight: '700'}}>사진</Text>
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: '700',
+                  fontFamily: 'Pretendard',
+                }}>
+                사진
+              </Text>
               <Image source={RightIcon} style={{width: 16, height: 16}} />
             </TouchableOpacity>
 
@@ -629,7 +635,13 @@ const ChatRoom = ({route, navigation}) => {
               gap: 8,
             }}>
             <TouchableOpacity onPress={goToChatRoomNotice}>
-              <Text style={{fontSize: 16, marginBottom: 8, fontWeight: '700'}}>
+              <Text
+                style={{
+                  fontSize: 16,
+                  marginBottom: 8,
+                  fontWeight: '700',
+                  fontFamily: 'Pretendard',
+                }}>
                 공지 사항
               </Text>
             </TouchableOpacity>
@@ -644,11 +656,17 @@ const ChatRoom = ({route, navigation}) => {
               paddingHorizontal: 12,
               gap: 8,
             }}>
-            <Text style={{fontSize: 16, marginBottom: 8, fontWeight: '700'}}>
+            <Text
+              style={{
+                fontSize: 16,
+                marginBottom: 8,
+                fontWeight: '700',
+                fontFamily: 'Pretendard',
+              }}>
               채팅방 설정
             </Text>
             <TouchableOpacity onPress={toggleChatRoomNameChangeModal}>
-              <Text>채팅방 이름 변경</Text>
+              <Text style={{fontFamily: 'Pretendard'}}>채팅방 이름 변경</Text>
             </TouchableOpacity>
             <ChatRoomNameChangeModal
               isVisible={roomNameChangeModal}
@@ -656,7 +674,7 @@ const ChatRoom = ({route, navigation}) => {
               updateChatRoomName={updateChatRoomName}
             />
             <TouchableOpacity onPress={getProfileImage}>
-              <Text>채팅방 사진 변경</Text>
+              <Text style={{fontFamily: 'Pretendard'}}>채팅방 사진 변경</Text>
             </TouchableOpacity>
           </View>
           <View
@@ -764,6 +782,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     paddingVertical: 16,
+    fontFamily: 'Pretendard',
   },
   showDateSeparatorContainer: {
     justifyContent: 'center',
@@ -773,6 +792,7 @@ const styles = StyleSheet.create({
     paddingVertical: 22,
     color: '#aaa',
     fontSize: 12,
+    fontFamily: 'Pretendard',
   },
   showProfileInfoContainer: {
     flexDirection: 'row',
@@ -788,6 +808,7 @@ const styles = StyleSheet.create({
   },
   showProfileInfoNickname: {
     fontWeight: '700',
+    fontFamily: 'Pretendard',
   },
   inputContainer: {
     flexDirection: 'row',
@@ -855,6 +876,7 @@ const styles = StyleSheet.create({
   pressText: {
     marginBottom: 6,
     fontSize: 16,
+    fontFamily: 'Pretendard',
   },
   pressOptionView: {
     justifyContent: 'space-between',
@@ -870,6 +892,7 @@ const styles = StyleSheet.create({
   pressOptionText: {
     fontSize: 16,
     color: '#FFF',
+    fontFamily: 'Pretendard',
   },
 });
 

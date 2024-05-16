@@ -16,6 +16,7 @@
 		7D3410EF2BD7A3860046200D /* SwiftBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D3410EE2BD7A3860046200D /* SwiftBridge.swift */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		C065A8CB2BF4FF050032902F /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C065A8CA2BF4FF050032902F /* GoogleService-Info.plist */; };
+		C5833209EB16420FBFAEBA7A /* Pretendard.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 60CF285D14534BEB8EAF6AF6 /* Pretendard.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +52,7 @@
 		C065A8CA2BF4FF050032902F /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		E05BA0AE8321FAFE939DCF7B /* Pods-HobbyShare-HobbyShareTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HobbyShare-HobbyShareTests.release.xcconfig"; path = "Target Support Files/Pods-HobbyShare-HobbyShareTests/Pods-HobbyShare-HobbyShareTests.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		60CF285D14534BEB8EAF6AF6 /* Pretendard.ttf */ = {isa = PBXFileReference; name = "Pretendard.ttf"; path = "../src/assets/fonts/Pretendard.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -93,7 +95,6 @@
 		13B07FAE1A68108700A75B9A /* HobbyShare */ = {
 			isa = PBXGroup;
 			children = (
-
 				C065A8CA2BF4FF050032902F /* GoogleService-Info.plist */,
 				7DC706F12BE2949B00103A63 /* HobbyShare.entitlements */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
@@ -135,6 +136,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
+				7EB8C14B91AA48BBACCFD1BF /* Resources */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -160,6 +162,15 @@
 			);
 			path = Pods;
 			sourceTree = "<group>";
+		};
+		7EB8C14B91AA48BBACCFD1BF /* Resources */ = {
+			isa = "PBXGroup";
+			children = (
+				60CF285D14534BEB8EAF6AF6 /* Pretendard.ttf */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+			path = "";
 		};
 /* End PBXGroup section */
 
@@ -257,9 +268,8 @@
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
-
 				C065A8CB2BF4FF050032902F /* GoogleService-Info.plist in Resources */,
-
+				C5833209EB16420FBFAEBA7A /* Pretendard.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -500,7 +510,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = HobbyShare/HobbyShare.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 5R5KBK7K55;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = HobbyShare/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -532,7 +542,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 5R5KBK7K55;
 				INFOPLIST_FILE = HobbyShare/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
