@@ -778,12 +778,13 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ccc',
   },
   roomName: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'center',
     paddingVertical: 16,
     fontFamily: 'Pretendard',
   },
+
   showDateSeparatorContainer: {
     justifyContent: 'center',
     alignItems: 'center',
