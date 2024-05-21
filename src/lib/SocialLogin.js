@@ -88,35 +88,43 @@ const getNaverProfiles = async navigation => {
 
       const email = profileData.response.email;
 
-      // 이미 가입된 사용자인지 확인
-      const userCredential = await auth().signInWithEmailAndPassword(
-        email,
-        'temporary_password',
-      );
-      let user = userCredential.user;
+      // Firestore에서 이메일로 사용자 조회
+      const userQuerySnapshot = await firestore()
+        .collection('users')
+        .where('email', '==', email)
+        .get();
 
-      if (!user) {
-        // 가입되지 않은 사용자일 경우에만 가입 처리
-        const createUserResult = await auth().createUserWithEmailAndPassword(
+      let user;
+      if (!userQuerySnapshot.empty) {
+        // 사용자가 존재하면 해당 사용자 정보를 가져옴
+        const userData = userQuerySnapshot.docs[0].data();
+        user = await auth().signInWithEmailAndPassword(
           email,
           'temporary_password',
         );
-        user = createUserResult.user;
+      } else {
+        // 사용자가 존재하지 않으면 새로운 사용자 생성
+        const newUserCredential = await auth().createUserWithEmailAndPassword(
+          email,
+          'temporary_password',
+        );
+        user = newUserCredential.user;
 
-        // 사용자 정보를 AsyncStorage에 저장
         const userInfo = {
           id: user.uid,
-          email: email,
+          email: profileData.response.email,
           nickname: profileData.response.nickname,
           profileImage: profileImageUrl,
         };
-        await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
 
         // Firestore에 사용자 정보 저장
         await firestore().collection('users').doc(user.uid).set(userInfo);
+
+        // AsyncStorage에 사용자 정보 저장
+        await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
       }
 
-      // 사용자 토큰 및 화면 전환
+      // 사용자 토큰 저장 및 화면 전환
       await AsyncStorage.setItem('userToken', user.uid);
       navigation.navigate('BottomTab');
     } else {
@@ -227,46 +235,49 @@ const registerKakaoUser = async (profile, navigation) => {
   try {
     const email = profile.email;
 
-    // 이미 가입된 사용자인지 확인
-    const userCredential = await auth().signInWithEmailAndPassword(
-      email,
-      'temporary_password',
-    );
-    const user = userCredential.user;
+    // Firestore에서 이메일로 사용자 조회
+    const userQuerySnapshot = await firestore()
+      .collection('users')
+      .where('email', '==', email)
+      .get();
 
-    if (user) {
+    let user;
+    if (!userQuerySnapshot.empty) {
+      // 사용자가 존재하면 해당 사용자 정보를 가져옴
+      const userData = userQuerySnapshot.docs[0].data();
+      user = await auth().signInWithEmailAndPassword(
+        email,
+        'temporary_password',
+      );
+    } else {
+      // 사용자가 존재하지 않으면 새로운 사용자 생성
+      const newUserCredential = await auth().createUserWithEmailAndPassword(
+        email,
+        'temporary_password',
+      );
+      user = newUserCredential.user;
+
       const profileImageUrl = await storage()
         .ref('dummyprofile.png')
         .getDownloadURL();
 
-      // 최초 로그인 시에만 AsyncStorage에 사용자 정보 저장
-      const storedUserInfo = await AsyncStorage.getItem('userInfo');
-      if (!storedUserInfo) {
-        const userInfo = {
-          id: user.uid,
-          email: profile.email,
-          nickname: profile.nickname,
-          profileImage: profileImageUrl,
-        };
-        await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
-      }
+      const userInfo = {
+        id: user.uid,
+        email: profile.email,
+        nickname: profile.nickname,
+        profileImage: profileImageUrl,
+      };
 
-      // 최초 로그인 시에만 Firestore에 사용자 정보 저장
-      const userDoc = await firestore().collection('users').doc(user.uid).get();
-      if (!userDoc.exists) {
-        const userInfo = {
-          id: user.uid,
-          email: profile.email,
-          nickname: profile.nickname,
-          profileImage: profileImageUrl,
-        };
-        await firestore().collection('users').doc(user.uid).set(userInfo);
-      }
+      // Firestore에 사용자 정보 저장
+      await firestore().collection('users').doc(user.uid).set(userInfo);
 
-      // 사용자 토큰 저장 및 화면 전환
-      await AsyncStorage.setItem('userToken', user.uid);
-      navigation.navigate('BottomTab');
+      // AsyncStorage에 사용자 정보 저장
+      await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
     }
+
+    // 사용자 토큰 저장 및 화면 전환
+    await AsyncStorage.setItem('userToken', user.uid);
+    navigation.navigate('BottomTab');
   } catch (error) {
     Alert.alert('오류', '사용자 등록 및 정보 저장 중 오류가 발생했습니다.');
     console.log(error);
