@@ -58,7 +58,7 @@ const NoticeDetail = ({navigation, route}) => {
   };
 
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <SafeAreaView style={{flex: 1, backgroundColor: '#fefffe'}}>
       <View style={styles.topBar}>
         <TouchableOpacity style={{flex: 1}} onPress={handleGoBack}>
           <Image source={BackIcon} style={{width: 24, height: 24}} />
@@ -166,6 +166,7 @@ const NoticeDetail = ({navigation, route}) => {
 
 const styles = StyleSheet.create({
   topBar: {
+    backgroundColor: 'fefffe',
     flexDirection: 'row',
     paddingHorizontal: 8,
     alignItems: 'center',
