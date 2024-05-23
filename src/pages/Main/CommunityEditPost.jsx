@@ -123,8 +123,9 @@ const CommunityEditPost = ({route}) => {
             progressBar: true,
           });
           setToastVisible(true);
-    
-          navigation.navigate(route.params?.prevScreen || 'CommunityBoard', {
+      
+          navigation.navigate('CommunityPostDetail', {
+            postId: postId,
             updatedPost: {
               id: postId,
               post_content: postContent,

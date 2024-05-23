@@ -146,10 +146,10 @@ const CommunityPostDetail = ({route}) => {
     React.useCallback(() => {
       const updatedPost = route.params?.updatedPost;
       if (updatedPost && updatedPost.id === postId) {
-        setPosts({...posts, ...updatedPost});
+        setPosts(prevPosts => ({...prevPosts, ...updatedPost}));
         navigation.setParams({updatedPost: null});
       }
-    }, [route.params, postId, posts]),
+    }, [route.params, postId]),
   );
 
   useFocusEffect(
@@ -810,6 +810,8 @@ const CommunityPostDetail = ({route}) => {
     </KeyboardAvoidingView>
   );
 };
+export default CommunityPostDetail;
+
 
 const styles = StyleSheet.create({
   container: {
@@ -1017,5 +1019,3 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
-
-export default CommunityPostDetail;
