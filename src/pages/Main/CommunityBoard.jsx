@@ -240,22 +240,26 @@ const CommunityBoard = ({route}) => {
   };
 
   const fetchNewerPosts = async () => {
+    console.log("PTR - 0///" + newestVisible);
     if (newestVisible) {
+      console.log("PTR - 1");
       setRefreshingNewer(true);
-
+  
       try {
+        console.log("PTR - 2");
         let query = firestore()
           .collection('posts')
           .where('post_actflag', '==', true);
-
+  
         if (viewMode === '내 주변 보기' && currentUserAddress) {
+          console.log("PTR - 3");
           const userRegion = currentUserAddress
             .split(' ')
             .slice(0, 2)
             .join(' ');
           query = query.where('userRegion', '==', userRegion);
         }
-
+  
         if (selectedSortOption === '최신순') {
           query = query.orderBy('post_created', 'desc');
         } else if (selectedSortOption === '추천순') {
@@ -263,36 +267,38 @@ const CommunityBoard = ({route}) => {
         } else if (selectedSortOption === '댓글순') {
           query = query.orderBy('commentCount', 'desc');
         }
-
+  
         const querySnapshot = await query
           .endBefore(newestVisible)
           .limit(10)
           .get();
-
+  
         const newerPosts = querySnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data(),
         }));
-
-        const uniquePosts = [...newerPosts, ...posts].reduce((acc, post) => {
-          if (!acc.find(p => p.id === post.id)) {
-            acc.push(post);
-          }
-          return acc;
-        }, []);
-
-        setPosts(uniquePosts);
-        setNewestVisible(newerPosts[0]);
-        setRefreshingNewer(false);
-        if (querySnapshot.size > 0) {
+  
+        if (newerPosts.length > 0) {
+          const uniquePosts = [...newerPosts, ...posts].reduce((acc, post) => {
+            if (!acc.find(p => p.id === post.id)) {
+              acc.push(post);
+            }
+            return acc;
+          }, []);
+  
+          setPosts(uniquePosts);
+          setNewestVisible(newerPosts[0]);
+  
+          console.log("PTR - 4-1");
           setToastMessage({
-            message: `${querySnapshot.size}개의 새로운 게시글을 불러왔습니다!`,
+            message: `${newerPosts.length}개의 새로운 게시글을 불러왔습니다!`,
             leftIcon: 'successIcon',
             closeButton: true,
             progressBar: true,
           });
           setToastVisible(true);
         } else {
+          console.log("PTR - 4-2");
           setToastMessage({
             message: '새로운 게시글이 없습니다.',
             leftIcon: 'otherIcon',
@@ -302,9 +308,12 @@ const CommunityBoard = ({route}) => {
           setToastVisible(true);
         }
       } catch (e) {
+        console.log("PTR - 2-2");
         console.log(e);
-        setRefreshingNewer(false);
       }
+  
+      setRefreshingNewer(false);
+      console.log("PTR - 5");
     }
   };
 
@@ -524,7 +533,6 @@ const CommunityBoard = ({route}) => {
     <SafeAreaView style={{flex: 1, backgroundColor: '#FEFFFE'}}>
       <View style={{flex: 1}}>
         <CommunityHeader
-          showBackButton={false}
           rightIcon={PencilIcon}
           title={'실시간 게시판'}
           onPressRightIcon={() => navigation.navigate('CommunityAddPost')}
