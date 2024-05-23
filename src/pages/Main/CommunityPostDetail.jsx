@@ -474,10 +474,7 @@ const CommunityPostDetail = ({route}) => {
   };
 
   const editPost = () => {
-    navigation.navigate('CommunityEditPost', {
-      postId,
-      prevScreen: 'CommunityPostDetail',
-    });
+    navigation.navigate('CommunityEditPost', {postId, prevScreen: 'CommunityPostDetail'});
   };
 
   const handleCommentDelete = commentId => {

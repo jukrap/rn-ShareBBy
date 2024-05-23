@@ -13,7 +13,7 @@ import {
 
 import firestore from '@react-native-firebase/firestore';
 
-import {useFocusEffect} from '@react-navigation/native';
+import {useNavigation, useFocusEffect} from '@react-navigation/native';
 
 import PostCard from '../../components/Community/PostCard';
 import auth from '@react-native-firebase/auth';
@@ -25,7 +25,8 @@ import SortModal from '../../components/Community/SortModal';
 import {WarningIcon, PencilIcon, SortIcon} from '../../assets/assets';
 const {width, height} = Dimensions.get('window');
 
-const CommunityBoard = ({navigation, route}) => {
+const CommunityBoard = ({route}) => {
+  const navigation = useNavigation();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [oldestVisible, setOldestVisible] = useState(null);
@@ -82,6 +83,20 @@ const CommunityBoard = ({navigation, route}) => {
   useEffect(() => {
     fetchInitialPosts(viewMode, currentUserAddress);
   }, [viewMode, currentUserAddress]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const updatedPost = route.params?.updatedPost;
+      if (updatedPost) {
+        setPosts(prevPosts =>
+          prevPosts.map(post =>
+            post.id === updatedPost.id ? {...post, ...updatedPost} : post
+          )
+        );
+        navigation.setParams({updatedPost: null});
+      }
+    }, [route.params])
+  );
 
   useFocusEffect(
     React.useCallback(() => {
@@ -392,7 +407,7 @@ const CommunityBoard = ({navigation, route}) => {
   };
 
   const editPost = postId => {
-    navigation.navigate('CommunityEditPost', {postId});
+    navigation.navigate('CommunityEditPost', {postId, prevScreen: 'CommunityBoard'});
   };
 
   const handleProfilePress = userId => {

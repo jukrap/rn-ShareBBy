@@ -123,16 +123,27 @@ const CommunityEditPost = ({route}) => {
             progressBar: true,
           });
           setToastVisible(true);
-      
-          navigation.navigate('CommunityPostDetail', {
-            postId: postId,
-            updatedPost: {
-              id: postId,
-              post_content: postContent,
-              post_files: [...selectedImages.existingImages, ...newImageUrls],
-            },
-            sendToastMessage: '성공적으로 게시글이 수정됐습니다!',
-          });
+
+          if (route.params?.prevScreen === 'CommunityPostDetail') {
+            navigation.navigate('CommunityPostDetail', {
+              postId: postId,
+              updatedPost: {
+                id: postId,
+                post_content: postContent,
+                post_files: [...selectedImages.existingImages, ...newImageUrls],
+              },
+              sendToastMessage: '성공적으로 게시글이 수정됐습니다!',
+            });
+          } else {
+            navigation.navigate('CommunityBoard', {
+              updatedPost: {
+                id: postId,
+                post_content: postContent,
+                post_files: [...selectedImages.existingImages, ...newImageUrls],
+              },
+              sendToastMessage: '성공적으로 게시글이 수정됐습니다!',
+            });
+          }
         } catch (error) {
         console.log('게시글을 수정하는 중 오류 발생:', error);
       }
