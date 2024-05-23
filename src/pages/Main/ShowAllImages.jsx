@@ -43,7 +43,7 @@ const ShowAllImages = ({navigation, route}) => {
   };
 
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <SafeAreaView style={{flex: 1, backgroundColor: '#fefffe'}}>
       <View
         style={{
           paddingTop: 8,
