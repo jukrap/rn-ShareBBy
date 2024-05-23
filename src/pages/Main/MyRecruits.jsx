@@ -115,7 +115,7 @@ const MyRecruits = ({navigation, route}) => {
 };
 
 const styles = StyleSheet.create({
-  containerView: {flex: 1},
+  containerView: {flex: 1, backgroundColor: '#FEFFFE'},
   header: {
     flexDirection: 'row',
     alignItems: 'center',
