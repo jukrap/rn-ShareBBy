@@ -343,6 +343,16 @@ const CommunityPostDetail = ({route}) => {
     }
   };
 
+const handleGoBack = () => {
+  navigation.navigate('CommunityBoard', {
+    updatedPost: {
+      id: postId,
+      post_content: posts.post_content,
+      post_files: posts.post_files,
+    },
+  });
+};
+
   const submitComment = async () => {
     if (!commentContent || commentContent.trim() === '') {
       setToastMessage({
@@ -706,7 +716,7 @@ const CommunityPostDetail = ({route}) => {
       behavior={Platform.OS === 'ios' ? 'padding' : null}
       keyboardVerticalOffset={8}
       style={{flex: 1, backgroundColor: '#FEFFFE'}}>
-      <CommunityHeader title={'게시글'} />
+      <CommunityHeader title={'게시글'} onPressBackButton={handleGoBack}/>
       <FlatList
         data={comments}
         ListHeaderComponent={renderPostContent}

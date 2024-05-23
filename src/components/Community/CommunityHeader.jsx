@@ -19,22 +19,17 @@ const CommunityHeader = ({
   onPressLeftIcon,
   title,
   currentPage,
-  showBackButton = true,
+  onPressBackButton,
   centerComponent,
 }) => {
   const navigation = useNavigation();
-
-  // 뒤로 가기 버튼 클릭 시 호출되는 함수
-  const handleGoBack = () => {
-    navigation.goBack();
-  };
 
   return (
     <SafeAreaView style={{backgroundColor: '#FEFFFE'}}>
       <View style={styles.topbarView}>
         <View style={styles.leftButtonContainer}>
-          {showBackButton && (
-            <TouchableOpacity onPress={handleGoBack} style={styles.leftButton}>
+          {onPressBackButton && (
+            <TouchableOpacity onPress={onPressBackButton} style={styles.leftButton}>
               <Image source={BackIcon} style={{width: 20, height: 20}} />
             </TouchableOpacity>
           )}

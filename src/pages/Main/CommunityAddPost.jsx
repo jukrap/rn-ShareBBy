@@ -200,6 +200,10 @@ const CommunityAddPost = () => {
     setIsUploading(false);
   };
 
+  const handleGoBack = () => {
+    navigation.navigate('CommunityBoard');
+  };
+
   // 게시글 내용 변경 핸들러
   const handlePostContentChange = text => {
     if (text.length <= maxPostContentLength) {
@@ -342,6 +346,7 @@ const CommunityAddPost = () => {
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: '#FEFFFE'}}>
       <CommunityHeader
+        onPressBackButton={handleGoBack}
         onPressRightText={handlePostSubmit}
         rightText={'등록'}
         title={'새로운 게시글'}
