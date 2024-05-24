@@ -963,13 +963,13 @@ PODS:
   - BVLinearGradient (2.8.3):
     - React-Core
   - DoubleConversion (1.1.6)
-  - FasterImage (1.5.2):
-    - FasterImage/Nuke (= 1.5.2)
-    - FasterImage/NukeUI (= 1.5.2)
+  - FasterImage (1.5.3):
+    - FasterImage/Nuke (= 1.5.3)
+    - FasterImage/NukeUI (= 1.5.3)
     - React-Core
-  - FasterImage/Nuke (1.5.2):
+  - FasterImage/Nuke (1.5.3):
     - React-Core
-  - FasterImage/NukeUI (1.5.2):
+  - FasterImage/NukeUI (1.5.3):
     - React-Core
   - FBLazyVector (0.74.0)
   - Firebase/Auth (10.24.0):
@@ -2162,7 +2162,7 @@ PODS:
     - React
   - react-native-safe-area-context (4.10.1):
     - React-Core
-  - react-native-webview (13.8.7):
+  - react-native-webview (13.10.2):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2412,6 +2412,8 @@ PODS:
     - React-perflogger (= 0.74.0)
     - React-utils (= 0.74.0)
   - RecaptchaInterop (100.0.0)
+  - RNAppleAuthentication (2.3.0):
+    - React-Core
   - RNCAsyncStorage (1.23.1):
     - React-Core
   - RNFastImage (8.6.3):
@@ -2439,7 +2441,7 @@ PODS:
     - Firebase/Storage (= 10.24.0)
     - React-Core
     - RNFBApp
-  - RNGestureHandler (2.16.1):
+  - RNGestureHandler (2.16.2):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2472,7 +2474,7 @@ PODS:
     - React-Core
     - React-RCTImage
     - TOCropViewController
-  - RNNaverLogin (4.0.0):
+  - RNNaverLogin (4.0.1):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2618,6 +2620,7 @@ DEPENDENCIES:
   - React-runtimescheduler (from `../node_modules/react-native/ReactCommon/react/renderer/runtimescheduler`)
   - React-utils (from `../node_modules/react-native/ReactCommon/react/utils`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
+  - "RNAppleAuthentication (from `../node_modules/@invertase/react-native-apple-authentication`)"
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
   - RNFastImage (from `../node_modules/react-native-fast-image`)
   - "RNFBApp (from `../node_modules/@react-native-firebase/app`)"
@@ -2798,6 +2801,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/react/utils"
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
+  RNAppleAuthentication:
+    :path: "../node_modules/@invertase/react-native-apple-authentication"
   RNCAsyncStorage:
     :path: "../node_modules/@react-native-async-storage/async-storage"
   RNFastImage:
@@ -2837,7 +2842,7 @@ SPEC CHECKSUMS:
   BoringSSL-GRPC: 1e2348957acdbcad360b80a264a90799984b2ba6
   BVLinearGradient: 880f91a7854faff2df62518f0281afb1c60d49a3
   DoubleConversion: 76ab83afb40bddeeee456813d9c04f67f78771b5
-  FasterImage: 4242647a08a8d846bf81803f16d8e1b65dcdf82b
+  FasterImage: 1629449c43994ad7235c7d7c2e485f6c29976ce3
   FBLazyVector: 026c8f4ae67b06e088ae01baa2271ef8a26c0e8c
   Firebase: 91fefd38712feb9186ea8996af6cbdef41473442
   FirebaseAppCheckInterop: 5da5ce93e8797a215e3f677fb0654b74e736c8b8
@@ -2899,7 +2904,7 @@ SPEC CHECKSUMS:
   react-native-date-picker: 90687f1dbd374ff0265dca99d949998364c22fa9
   react-native-geolocation-service: 608e1da71a1ac31b4de64d9ef2815f697978c55b
   react-native-safe-area-context: dcab599c527c2d7de2d76507a523d20a0b83823d
-  react-native-webview: 02b52dcd0c974c3a5430404f8c2a1a39afec2ac9
+  react-native-webview: bd1c6c2661bb51e45469c7badb02ccdcef93671b
   React-nativeconfig: fef0a46effa630d72f137636a990d7df2f6a5f7c
   React-NativeModulesApple: 8257dd73991f2e410b9c9d12801691439a0dc821
   React-perflogger: 271f1111779fef70f9502d1d38da5132e5585230
@@ -2924,6 +2929,7 @@ SPEC CHECKSUMS:
   React-utils: e3a1dd8f290ecc2a015d8de54c9ffbc04ada7605
   ReactCommon: caf0aeedbd8afc25731582379f15a4f86407ae29
   RecaptchaInterop: 7d1a4a01a6b2cb1610a47ef3f85f0c411434cb21
+  RNAppleAuthentication: e99eaf3c4c01ad8ecb6125dd6f0cfd98871685b5
   RNCAsyncStorage: 826b603ae9c0f88b5ac4e956801f755109fa4d5c
   RNFastImage: 5c9c9fed9c076e521b3f509fe79e790418a544e8
   RNFBApp: 91311b27bc9a33e23b76a62825afd1635501018a
@@ -2931,10 +2937,10 @@ SPEC CHECKSUMS:
   RNFBDynamicLinks: b342064ffb51770091d9269c4c015fde962c93fe
   RNFBFirestore: 58f9f2f1d61eadcf16bf6d75737d92ad651bb264
   RNFBStorage: 2ef3bcc956d6c771f94efda0c3714c04019dde86
-  RNGestureHandler: ad030559c93b4fa018c35e84466021a03a71198c
+  RNGestureHandler: 20a4307fd21cbff339abfcfa68192f3f0a6a518b
   RNGoogleSignin: 24d3b3261f78b0fae0aa013f8ab6f8d25e369b0c
   RNImageCropPicker: e7ab6fb43d2fc3e84651e786ef4a080d63b0ed3d
-  RNNaverLogin: 4cf478363dae75da6d055a543f0789d3b777b3cb
+  RNNaverLogin: 1e5f1b4c23191f077680e7258df65c725265fdba
   RNPermissions: 294531ede5a64d1528463e88fffef05675842042
   RNReanimated: 82d44098f1640ac390d073bca26264d52a67dc7d
   RNScreens: 30249f9331c3b00ae7cb7922e11f58b3ed369c07

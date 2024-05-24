@@ -1,5 +1,8 @@
-import {Alert} from 'react-native';
-import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import {Alert, Platform} from 'react-native';
+import {
+  GoogleSignin,
+  statusCodes,
+} from '@react-native-google-signin/google-signin'; // statusCodes 추가
 import * as KakaoLogin from '@react-native-seoul/kakao-login';
 import NaverLogin from '@react-native-seoul/naver-login';
 import auth from '@react-native-firebase/auth';
@@ -7,8 +10,68 @@ import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import userStore from './userStore';
+import {appleAuth} from '@invertase/react-native-apple-authentication';
 
-// 네이버 로그인 초기화
+// 애플 로그인 처리
+export const onAppleButtonPress = async navigation => {
+  try {
+    const appleAuthRequestResponse = await appleAuth.performRequest({
+      requestedOperation: appleAuth.Operation.LOGIN,
+      requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
+    });
+
+    const {identityToken, nonce} = appleAuthRequestResponse;
+    const appleCredential = auth.AppleAuthProvider.credential(
+      identityToken,
+      nonce,
+    );
+    await auth().signInWithCredential(appleCredential);
+
+    const user = auth().currentUser;
+
+    if (user) {
+      const email = user.email;
+      const displayName = user.displayName;
+      const profileImageUrl = await storage()
+        .ref('dummyprofile.png')
+        .getDownloadURL();
+
+      const storedUserInfo = await AsyncStorage.getItem('userInfo');
+      if (!storedUserInfo) {
+        const userInfo = {
+          id: user.uid,
+          email: email,
+          nickname: displayName,
+          profileImage: profileImageUrl,
+        };
+        await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
+      }
+
+      const userDoc = await firestore().collection('users').doc(user.uid).get();
+      if (!userDoc.exists) {
+        const userInfo = {
+          id: user.uid,
+          email: email,
+          nickname: displayName,
+          profileImage: profileImageUrl,
+        };
+        await firestore().collection('users').doc(user.uid).set(userInfo);
+      }
+
+      await AsyncStorage.setItem('userToken', user.uid);
+      navigation.navigate('BottomTab');
+    } else {
+      console.log('사용자 정보가 없습니다.');
+    }
+  } catch (error) {
+    if (error.code === 'auth/cancelled') {
+      console.log('Apple 로그인 취소:', error.message);
+    } else {
+      console.log('애플 로그인 중 오류가 발생했습니다:', error.message);
+    }
+  }
+};
+
 const initializeNaverLogin = async () => {
   try {
     await NaverLogin.initialize({
@@ -23,7 +86,6 @@ const initializeNaverLogin = async () => {
   }
 };
 
-// 구글 로그인 초기화
 const initializeGoogleLogin = async () => {
   try {
     let clientId = '';
@@ -44,7 +106,6 @@ const initializeGoogleLogin = async () => {
   }
 };
 
-// 네이버 로그인 처리
 export const handleNaverLogin = async navigation => {
   try {
     await initializeNaverLogin();
@@ -53,18 +114,17 @@ export const handleNaverLogin = async navigation => {
       userStore.setState({userToken: 'accessToken'});
       await getNaverProfiles(navigation);
     } else {
-      Alert.alert('네이버 로그인 실패', '네이버 로그인에 실패하였습니다.');
+      console.log('네이버 로그인에 실패하였습니다.');
     }
   } catch (error) {
-    console.error('네이버 로그인 오류:', error);
-    Alert.alert(
-      '네이버 로그인 오류',
-      '네이버 로그인 중 오류가 발생하였습니다.',
-    );
+    if (error.message === 'user_cancel') {
+      console.log('Naver 로그인 취소:', error.message);
+    } else {
+      console.log('네이버 로그인 오류:', error);
+    }
   }
 };
 
-// 네이버 프로필 가져오기 및 사용자 등록
 const getNaverProfiles = async navigation => {
   try {
     const {
@@ -88,7 +148,6 @@ const getNaverProfiles = async navigation => {
 
       const email = profileData.response.email;
 
-      // Firestore에서 이메일로 사용자 조회
       const userQuerySnapshot = await firestore()
         .collection('users')
         .where('email', '==', email)
@@ -96,14 +155,12 @@ const getNaverProfiles = async navigation => {
 
       let user;
       if (!userQuerySnapshot.empty) {
-        // 사용자가 존재하면 해당 사용자 정보를 가져옴
         const userData = userQuerySnapshot.docs[0].data();
         user = await auth().signInWithEmailAndPassword(
           email,
           'temporary_password',
         );
       } else {
-        // 사용자가 존재하지 않으면 새로운 사용자 생성
         const newUserCredential = await auth().createUserWithEmailAndPassword(
           email,
           'temporary_password',
@@ -117,29 +174,20 @@ const getNaverProfiles = async navigation => {
           profileImage: profileImageUrl,
         };
 
-        // Firestore에 사용자 정보 저장
         await firestore().collection('users').doc(user.uid).set(userInfo);
-
-        // AsyncStorage에 사용자 정보 저장
         await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
       }
 
-      // 사용자 토큰 저장 및 화면 전환
       await AsyncStorage.setItem('userToken', user.uid);
       navigation.navigate('BottomTab');
     } else {
-      Alert.alert(
-        '네이버 프로필 정보 가져오기 실패',
-        '네이버 프로필 정보를 가져오는 데 실패했습니다.',
-      );
+      console.log('네이버 프로필 정보를 가져오는 데 실패했습니다.');
     }
   } catch (error) {
-    Alert.alert('네이버 로그인 오류', '이미 사용 중인 이메일입니다.');
-    console.log(error);
+    console.log('이미 사용 중인 이메일입니다.', error);
   }
 };
 
-// 구글 로그인 처리
 export const onGoogleButtonPress = async navigation => {
   try {
     await initializeGoogleLogin();
@@ -156,7 +204,6 @@ export const onGoogleButtonPress = async navigation => {
         .ref('dummyprofile.png')
         .getDownloadURL();
 
-      // 사용자 정보를 AsyncStorage에 저장 (최초 로그인 시에만 저장)
       const storedUserInfo = await AsyncStorage.getItem('userInfo');
       if (!storedUserInfo) {
         const userInfo = {
@@ -168,7 +215,6 @@ export const onGoogleButtonPress = async navigation => {
         await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
       }
 
-      // Firestore에 사용자 정보 저장 (최초 로그인 시에만 저장)
       const userDoc = await firestore().collection('users').doc(user.uid).get();
       if (!userDoc.exists) {
         const userInfo = {
@@ -180,23 +226,24 @@ export const onGoogleButtonPress = async navigation => {
         await firestore().collection('users').doc(user.uid).set(userInfo);
       }
 
-      // 사용자 토큰 및 화면 전환
       await AsyncStorage.setItem('userToken', user.uid);
       navigation.navigate('BottomTab');
     } else {
       Alert.alert('사용자 정보가 없습니다.');
     }
   } catch (error) {
-    // 화면에 실패 이유를 표시
-    Alert.alert(
-      '구글 로그인 실패',
-      `구글 로그인 중 오류가 발생했습니다: ${error.message}`,
-    );
-    console.log(error); // 디버깅용 로그, 필요시 주석 해제
+    if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+      console.log('Google 로그인 취소:', error.message);
+    } else {
+      Alert.alert(
+        '구글 로그인 실패',
+        `구글 로그인 중 오류가 발생했습니다: ${error.message}`,
+      );
+      console.log(error);
+    }
   }
 };
 
-// 카카오 로그인 처리
 export const kakaoLogins = async navigation => {
   try {
     const result = await KakaoLogin.login();
@@ -204,29 +251,29 @@ export const kakaoLogins = async navigation => {
       await getKakaoProfile(navigation);
       userStore.setState({userToken: 'user.uid'});
     } else {
-      Alert.alert('카카오 로그인 실패', '카카오 로그인에 실패했습니다.');
+      console.log('카카오 로그인에 실패했습니다.');
     }
   } catch (error) {
-    Alert.alert('카카오 로그인 오류', '카카오 로그인 중 오류가 발생했습니다.');
+    if (error.code === 'E_CANCELLED_OPERATION') {
+      console.log('Kakao 로그인 취소:', error.message);
+    } else {
+      console.log('카카오 로그인 중 오류가 발생했습니다:', error.message);
+    }
   }
 };
 
-// 카카오 프로필 가져오기 및 사용자 등록
 const getKakaoProfile = async navigation => {
   try {
     const profile = await KakaoLogin.getProfile();
     if (profile) {
       await registerKakaoUser(profile, navigation);
     } else {
-      Alert.alert(
-        '카카오 프로필 정보 가져오기 실패',
-        '카카오 프로필 정보를 가져오는 데 실패했습니다.',
-      );
+      console.log('카카오 프로필 정보를 가져오는 데 실패했습니다.');
     }
   } catch (error) {
-    Alert.alert(
-      '카카오 프로필 정보 가져오기 오류',
-      '카카오 프로필 정보를 가져오는 데 오류가 발생했습니다.',
+    console.log(
+      '카카오 프로필 정보를 가져오는 데 오류가 발생했습니다:',
+      error.message,
     );
   }
 };
@@ -235,7 +282,6 @@ const registerKakaoUser = async (profile, navigation) => {
   try {
     const email = profile.email;
 
-    // Firestore에서 이메일로 사용자 조회
     const userQuerySnapshot = await firestore()
       .collection('users')
       .where('email', '==', email)
@@ -243,14 +289,12 @@ const registerKakaoUser = async (profile, navigation) => {
 
     let user;
     if (!userQuerySnapshot.empty) {
-      // 사용자가 존재하면 해당 사용자 정보를 가져옴
       const userData = userQuerySnapshot.docs[0].data();
       user = await auth().signInWithEmailAndPassword(
         email,
         'temporary_password',
       );
     } else {
-      // 사용자가 존재하지 않으면 새로운 사용자 생성
       const newUserCredential = await auth().createUserWithEmailAndPassword(
         email,
         'temporary_password',
@@ -268,18 +312,16 @@ const registerKakaoUser = async (profile, navigation) => {
         profileImage: profileImageUrl,
       };
 
-      // Firestore에 사용자 정보 저장
       await firestore().collection('users').doc(user.uid).set(userInfo);
-
-      // AsyncStorage에 사용자 정보 저장
       await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
     }
 
-    // 사용자 토큰 저장 및 화면 전환
     await AsyncStorage.setItem('userToken', user.uid);
     navigation.navigate('BottomTab');
   } catch (error) {
-    Alert.alert('오류', '사용자 등록 및 정보 저장 중 오류가 발생했습니다.');
-    console.log(error);
+    console.log(
+      '사용자 등록 및 정보 저장 중 오류가 발생했습니다:',
+      error.message,
+    );
   }
 };

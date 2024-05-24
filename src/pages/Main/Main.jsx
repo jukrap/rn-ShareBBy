@@ -37,7 +37,7 @@ const OptimizedImageItem = React.memo(({item}) => {
 const Main = ({navigation}) => {
   const [currUserData, setCurrUserData] = useState({});
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [imageUrl, setImageUrl] = useState(null);
+  const [imageUrl, setImageUrl] = useState('');
   const [eventBanner, setEventBanner] = useState([]);
   const bannerRef = useRef('');
   const userData = userStore(state => state.userData);

@@ -17,19 +17,20 @@ buildscript {
         classpath("com.facebook.react:react-native-gradle-plugin")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin")
         classpath("com.google.gms:google-services:4.4.1")
+
     }
-    allprojects {
-        repositories {
-            maven { url 'https://www.jitpack.io' }
-            maven { url 'https://devrepo.kakao.com/nexus/content/groups/public/' } // 추가
-            google()
+}
+
+allprojects {
+    repositories {
+        maven { url 'https://www.jitpack.io' }
+        maven { url 'https://devrepo.kakao.com/nexus/content/groups/public/' } // 추가
+        google()
         jcenter()
-        // 네이버 지도 저장소
         maven {
             url "https://repository.map.naver.com/archive/maven"
-        }
         }
     }
 }
 
-apply plugin: 'com.google.gms.google-services' 
+apply plugin: 'com.google.gms.google-services'

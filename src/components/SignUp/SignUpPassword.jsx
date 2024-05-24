@@ -10,11 +10,11 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import LoginToast from './LoginToast';
-
 import {PasswordHideIcon} from '../../assets/assets';
 
 const {width, height} = Dimensions.get('window');
+const androidMarginTop = Platform.OS === 'android' ? 10 : 0;
+
 
 const SignUpPassword = ({onNextStep}) => {
   const [password, setPassword] = useState('');
@@ -23,29 +23,24 @@ const SignUpPassword = ({onNextStep}) => {
   const [isLengthValid, setIsLengthValid] = useState(false);
   const [isUppercaseValid, setIsUppercaseValid] = useState(false);
   const [isSpecialCharacterValid, setIsSpecialCharacterValid] = useState(false);
-  const [showToast, setShowToast] = useState(false); // 토스트 표시 여부 상태 추가
-  const [toastMessage, setToastMessage] = useState(''); // 토스트 메시지 상태 추가
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleNext = () => {
     if (password.trim() === '') {
-      setToastMessage('비밀번호를 입력해주세요.'); // 토스트 메시지 설정
-      setShowToast(true); // 토스트 표시
+      setErrorMessage('비밀번호를 입력해주세요.');
       return;
     }
     if (password !== confirmPassword) {
-      setToastMessage('비밀번호가 일치하지 않습니다.'); // 토스트 메시지 설정
-      setShowToast(true); // 토스트 표시
+      setErrorMessage('비밀번호가 일치하지 않습니다.');
       return;
     }
     if (!isLengthValid || !isUppercaseValid || !isSpecialCharacterValid) {
-      setToastMessage('비밀번호가 조건을 충족하지 않습니다.'); // 토스트 메시지 설정
-      setShowToast(true); // 토스트 표시
+      setErrorMessage('비밀번호가 조건을 충족하지 않습니다.');
       return;
     }
     onNextStep({password});
   };
 
-  // 비밀번호 유효성 검사 함수
   const isValidPassword = password => {
     const containsUppercase = /[A-Z]/.test(password);
     const containsLowercase = /[a-z]/.test(password);
@@ -65,18 +60,27 @@ const SignUpPassword = ({onNextStep}) => {
   };
 
   const handlePasswordChange = text => {
-    // 한글이 포함되어 있으면 입력을 막고 알림을 표시합니다.
     if (/[\uAC00-\uD7A3]/.test(text)) {
-      setToastMessage('비밀번호에는 한글을 사용할 수 없습니다.'); // 토스트 메시지 설정
-      setShowToast(true); // 토스트 표시
+      setErrorMessage('비밀번호에는 한글을 사용할 수 없습니다.');
       return;
     }
     setPassword(text);
-    if (text.trim() !== '') {
+    if (text.trim() === '') {
+      setIsLengthValid(false);
+      setIsUppercaseValid(false);
+      setIsSpecialCharacterValid(false);
+    } else {
       const isValid = isValidPassword(text);
       if (!isValid) {
-        // 비밀번호가 유효하지 않으면 여기에서 상태를 설정하거나 처리할 수 있습니다.
+        setErrorMessage('');
       }
+    }
+  };
+
+  const handleConfirmPasswordChange = text => {
+    setConfirmPassword(text);
+    if (errorMessage) {
+      setErrorMessage('');
     }
   };
 
@@ -87,7 +91,7 @@ const SignUpPassword = ({onNextStep}) => {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={150}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? '150' : '130'}
       style={styles.container}>
       <View style={styles.secondContainer}>
         <View>
@@ -141,11 +145,14 @@ const SignUpPassword = ({onNextStep}) => {
             style={styles.passwordConfirmInput}
             secureTextEntry={true}
             value={confirmPassword}
-            onChangeText={setConfirmPassword}
+            onChangeText={handleConfirmPasswordChange}
             placeholder="비밀번호 확인"
             placeholderTextColor={'#A7A7A7'}
             autoCapitalize="none"
           />
+          {errorMessage ? (
+            <Text style={styles.errorMessage}>{errorMessage}</Text>
+          ) : null}
         </View>
         <View>
           <TouchableOpacity style={styles.button} onPress={handleNext}>
@@ -153,12 +160,6 @@ const SignUpPassword = ({onNextStep}) => {
           </TouchableOpacity>
         </View>
       </View>
-      {/* 토스트 컴포넌트 */}
-      <LoginToast
-        text={toastMessage}
-        visible={showToast}
-        handleCancel={() => setShowToast(false)}
-      />
     </KeyboardAvoidingView>
   );
 };
@@ -178,6 +179,7 @@ const styles = StyleSheet.create({
   },
   passwordInputContainer: {
     flexDirection: 'row',
+    
   },
   passwordInput: {
     width: width * 0.92,
@@ -188,12 +190,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 8,
+    
   },
   passwordHideIcon: {
     position: 'absolute',
     width: 24,
     height: 24,
     right: width * 0.04,
+    marginTop: androidMarginTop, 
   },
   text: {
     color: '#07AC7D',
@@ -238,6 +242,11 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  errorMessage: {
+    color: 'red',
+    marginLeft: 16,
+    marginTop: 8,
   },
 });
 

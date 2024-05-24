@@ -12,6 +12,7 @@
   "dependencies": {
     "@actbase/react-daum-postcode": "^1.0.4",
     "@candlefinance/faster-image": "^1.5.2",
+    "@invertase/react-native-apple-authentication": "^2.3.0",
     "@mj-studio/react-native-naver-map": "^1.5.0",
     "@react-native-async-storage/async-storage": "^1.23.1",
     "@react-native-firebase/app": "^19.2.2",
@@ -46,6 +47,7 @@
     "react-native-select-dropdown": "^4.0.1",
     "react-native-swiper-flatlist": "^3.2.4",
     "react-native-webview": "^13.8.6",
+    "watchman": "^1.0.0",
     "zustand": "^4.5.2"
   },
   "devDependencies": {
