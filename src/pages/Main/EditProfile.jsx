@@ -12,6 +12,10 @@ import {
 import firestore from '@react-native-firebase/firestore';
 import ImagePicker from 'react-native-image-crop-picker';
 import storage from '@react-native-firebase/storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import LoginModal from '../../components/SignUp/LoginModal';
+import auth from '@react-native-firebase/auth';
+
 import {BackIcon} from '../../assets/assets';
 const EditProfile = ({navigation, route}) => {
   const [nickname, setNickname] = useState(route.params.nickname);
@@ -20,6 +24,7 @@ const EditProfile = ({navigation, route}) => {
     ImageUrl: '',
   });
   const [loading, setLoading] = useState(false);
+  const [showDeleteModal, setDeleteShowModal] = useState(null);
   const usersCollection = firestore().collection('users');
 
   const getPhotos = async () => {
@@ -75,6 +80,62 @@ const EditProfile = ({navigation, route}) => {
       routes: [{name: 'BottomTab', params: {screen: 'Profile'}}],
     });
   };
+
+  const handleDelete = async () => {
+    try {
+      setLoading(true);
+      const user = auth().currentUser;
+
+      if (user) {
+        // 사용자 정보 삭제
+        await usersCollection.doc(user.uid).delete();
+
+        // 사용자 인증 정보 삭제
+        await user.delete();
+
+        // 사용자가 속한 채팅방 찾아서 삭제
+        const chatRoomsSnapshot = await firestore()
+          .collection('chatRooms')
+          .where('members', 'array-contains', user.uid)
+          .get();
+
+        const deleteChatPromises = [];
+        chatRoomsSnapshot.forEach(async doc => {
+          const chatRoomRef = firestore().collection('chatRooms').doc(doc.id);
+          const currentMembers = doc.data().members;
+          const updatedMembers = currentMembers.filter(
+            memberUID => memberUID !== user.uid,
+          );
+          deleteChatPromises.push(
+            chatRoomRef.update({members: updatedMembers}),
+          );
+        });
+        await Promise.all(deleteChatPromises);
+
+        // 기타 사용자 관련 데이터 삭제
+        // 예: 프로필 이미지 등
+
+        // AsyncStorage 초기화
+        await AsyncStorage.clear();
+
+        // 모달 닫기 및 로그인 화면으로 이동
+        setDeleteShowModal(false);
+        navigation.reset({
+          index: 0,
+          routes: [{name: 'Login'}],
+        });
+      }
+    } catch (error) {
+      console.log('회원탈퇴 오류:', error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteModalClose = () => {
+    setDeleteShowModal(false);
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -113,6 +174,13 @@ const EditProfile = ({navigation, route}) => {
           <View style={styles.addressBox}>
             <Text style={styles.addressText}>{route.params.address}</Text>
           </View>
+          <View style={{marginTop: 16, marginLeft: 2}}>
+            <TouchableOpacity onPress={() => setDeleteShowModal(true)}>
+              <Text style={{color: '#898989', fontSize: 16}}>
+                <Text style={{textDecorationLine: 'underline'}}>회원탈퇴</Text>
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
 
@@ -129,6 +197,16 @@ const EditProfile = ({navigation, route}) => {
         style={styles.submitBox}>
         <Text style={styles.sumbitText}>완료</Text>
       </TouchableOpacity>
+      <LoginModal
+        animationType="slide"
+        visible={showDeleteModal}
+        closeModal={handleDeleteModalClose}
+        message="회원탈퇴"
+        message2="정말 탈퇴하시겠어요?"
+        LeftButton="취소"
+        RightButton="탈퇴하기"
+        onConfirm={handleDelete}
+      />
     </KeyboardAvoidingView>
   );
 };
