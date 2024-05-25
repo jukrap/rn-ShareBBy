@@ -185,6 +185,7 @@ const ChatRoom = ({route, navigation}) => {
   };
 
   const uploadImage = async (localImagePath, chatRoomId) => {
+    console.log('localImagePath:', localImagePath);
     try {
       const fileName = localImagePath.substring(
         localImagePath.lastIndexOf('/') + 1,
@@ -208,11 +209,12 @@ const ChatRoom = ({route, navigation}) => {
         multiple: false,
         cropping: true,
         mediaType: 'photo',
-        cropperChooseText: '이미지 변경',
+        cropperChooseText: '이미지 선택',
         cropperCancelText: '취소',
         cropperRotateButtonsHidden: true,
       });
-      const imageUrl = await uploadImage(image.sourceURL, chatRoomId);
+
+      const imageUrl = await uploadImage(image.path, chatRoomId);
 
       const currentUser = auth().currentUser;
 
@@ -256,11 +258,11 @@ const ChatRoom = ({route, navigation}) => {
         multiple: false,
         cropping: true,
         mediaType: 'photo',
-        cropperChooseText: '이미지 변경',
+        cropperChooseText: '이미지 선택',
         cropperCancelText: '취소',
         cropperRotateButtonsHidden: true,
       });
-      const imageUrl = await uploadImage(image.sourceURL, chatRoomId);
+      const imageUrl = await uploadImage(image.path, chatRoomId);
 
       const currentUser = auth().currentUser;
 
@@ -340,7 +342,7 @@ const ChatRoom = ({route, navigation}) => {
         cropperRotateButtonsHidden: true,
       });
 
-      const imageUrl = await uploadProfileImage(image.sourceURL, chatRoomId);
+      const imageUrl = await uploadProfileImage(image.path, chatRoomId);
       await firestore()
         .collection('chatRooms')
         .doc(chatRoomId)
@@ -766,7 +768,7 @@ const ChatRoom = ({route, navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#fefffe',
   },
   topBar: {
     flexDirection: 'row',
@@ -778,12 +780,13 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ccc',
   },
   roomName: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'center',
     paddingVertical: 16,
     fontFamily: 'Pretendard',
   },
+
   showDateSeparatorContainer: {
     justifyContent: 'center',
     alignItems: 'center',

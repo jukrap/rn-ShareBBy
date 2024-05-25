@@ -37,7 +37,7 @@ const EditProfile = ({navigation, route}) => {
       // const imageUrl = image.path
       setEditImage({
         IsEdit: true,
-        ImageUrl: image.sourceURL,
+        ImageUrl: image.path,
       });
     });
   };

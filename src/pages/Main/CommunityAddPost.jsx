@@ -159,16 +159,18 @@ const CommunityAddPost = () => {
       }
 
       // Firestore에 게시글 추가
-      const postRef = await firestore().collection('posts').add({
-        userId: currentUser.uid,
-        post_content: postContent,
-        post_files: imageUrls,
-        post_created: firestore.Timestamp.fromDate(new Date()),
-        post_actflag: true,
-        likeCount: 0,
-        commentCount: 0,
-        userRegion: userRegion,
-      });
+      const postRef = await firestore()
+        .collection('posts')
+        .add({
+          userId: currentUser.uid,
+          post_content: postContent,
+          post_files: imageUrls,
+          post_created: firestore.Timestamp.fromDate(new Date()),
+          post_actflag: true,
+          likeCount: 0,
+          commentCount: 0,
+          userRegion: userRegion,
+        });
 
       navigation.navigate('CommunityBoard', {
         newPost: {
@@ -196,6 +198,10 @@ const CommunityAddPost = () => {
     }
 
     setIsUploading(false);
+  };
+
+  const handleGoBack = () => {
+    navigation.navigate('CommunityBoard');
   };
 
   // 게시글 내용 변경 핸들러
@@ -340,6 +346,7 @@ const CommunityAddPost = () => {
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: '#FEFFFE'}}>
       <CommunityHeader
+        onPressBackButton={handleGoBack}
         onPressRightText={handlePostSubmit}
         rightText={'등록'}
         title={'새로운 게시글'}

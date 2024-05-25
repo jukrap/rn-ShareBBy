@@ -14,7 +14,7 @@ const SplashScreen = ({navigation}) => {
   const checkUser = async () => {
     // AsyncStorage에서 사용자 정보를 가져옴
     const storedUserData = await AsyncStorage.getItem('userInfo');
-    
+
     if (storedUserData) {
       // 사용자 정보가 있는 경우 Zustand 스토어에 설정
       setUserData(storedUserData);

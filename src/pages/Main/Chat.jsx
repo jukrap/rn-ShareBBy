@@ -133,7 +133,6 @@ const Chat = () => {
             flex: 1,
             justifyContent: 'center',
             alignItems: 'flex-start',
-            
           }}>
           <Image
             style={{width: 52, height: 52, borderRadius: 8}}
@@ -207,6 +206,7 @@ const Chat = () => {
   };
 
   return (
+
     <SafeAreaView style={{flex: 1, backgroundColor:'#fefffe'}}>
       <View
         style={{
