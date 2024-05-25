@@ -13,27 +13,33 @@ import {signIn} from '../../lib/auth';
 import firestore from '@react-native-firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import userStore from '../../lib/userStore';
-import LoginToast from '../../components/SignUp/LoginToast';
 
 import {
   onGoogleButtonPress,
   handleNaverLogin,
   kakaoLogins,
+  onAppleButtonPress,
 } from '../../lib/SocialLogin';
 import {Naver, Google, Kakao} from '../../assets/assets';
+import {appleIcon} from '../../assets/assets';
 const LoginTitle = require('../../assets/images/LoginTitle.png');
 
 const Login = ({navigation}) => {
-  const [email, setEmail] = useState();
-  const [password, setPassword] = useState();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [isEmailValid, setIsEmailValid] = useState(false);
-  const [showToast, setShowToast] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const setUserData = userStore(state => state.setUserData); // Zustand 스토어 custom hook 사용
   const setUserToken = userStore(state => state.setUserToken);
 
   const onSignIn = async () => {
     try {
+      if (!email || !password) {
+        setErrorMessage('이메일과 비밀번호를 모두 입력해주세요.');
+        return;
+      }
+
       const {user} = await signIn({email, password});
 
       // 사용자의 문서를 가져와서 전체 정보를 가져옴
@@ -51,9 +57,7 @@ const Login = ({navigation}) => {
       // navigation을 여기서 호출
       navigation.navigate('BottomTab');
     } catch (error) {
-      // 로그인 실패 시에는 토스트 메시지를 표시합니다.
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 3000);
+      setErrorMessage('아이디 또는 비밀번호를 확인해주세요.');
     }
   };
 
@@ -65,8 +69,31 @@ const Login = ({navigation}) => {
 
   const handleEmailChange = email => {
     setEmail(email);
+
+    // 빈 공간인 경우에만 에러 메시지를 숨깁니다.
+    if (email.trim() === '') {
+      setErrorMessage('');
+      return;
+    }
+
     const isValid = validateEmail(email);
     setIsEmailValid(isValid);
+
+    // 유효한 이메일인 경우 에러 메시지를 지웁니다.
+    if (isValid) {
+      setErrorMessage('');
+    } else {
+      setErrorMessage('유효한 이메일 주소를 입력해주세요.');
+    }
+  };
+
+  const handlePasswordChange = password => {
+    setPassword(password);
+
+    // 비밀번호 입력값이 변경될 때마다 에러 메시지를 초기화합니다.
+    if (password.trim() !== '') {
+      setErrorMessage('');
+    }
   };
 
   return (
@@ -84,6 +111,12 @@ const Login = ({navigation}) => {
               </Text>
             </View>
           </View>
+
+          {errorMessage ? (
+            <Text style={styles.errorText}>{errorMessage}</Text>
+          ) : (
+            <Text style={{marginVertical: 9.5}} />
+          )}
 
           <View style={styles.loginTextInput}>
             <TextInput
@@ -103,7 +136,7 @@ const Login = ({navigation}) => {
               style={{paddingLeft: 12}}
               value={password}
               placeholder="비밀번호를 입력해주세요"
-              onChangeText={setPassword}
+              onChangeText={handlePasswordChange}
               placeholderTextColor={'#A7A7A7'}
               autoCapitalize="none"
               secureTextEntry={true}
@@ -111,14 +144,16 @@ const Login = ({navigation}) => {
           </View>
 
           <TouchableOpacity
-            onPress={onSignIn}
-            style={[
-              styles.loginButton,
-              !isEmailValid && {backgroundColor: '#A7A7A7'},
-            ]}
-            disabled={!isEmailValid}>
-            <Text style={styles.loginButtonText}>로그인</Text>
-          </TouchableOpacity>
+  onPress={onSignIn}
+  style={[
+    styles.loginButton,
+    !isEmailValid || password.length < 1 || errorMessage
+      ? {backgroundColor: '#A7A7A7'}
+      : null,
+  ]}
+  disabled={!isEmailValid || errorMessage ? true : false}>
+  <Text style={styles.loginButtonText}>로그인</Text>
+</TouchableOpacity>
 
           <View style={styles.searchContainer}>
             <TouchableOpacity onPress={() => navigation.navigate('SearchId')}>
@@ -144,6 +179,7 @@ const Login = ({navigation}) => {
             <Text style={styles.orText}>또는</Text>
             <View style={styles.orRightBar} />
           </View>
+
           <View style={styles.loginIconCantainer}>
             <TouchableOpacity onPress={() => handleNaverLogin(navigation)}>
               <Image source={Naver} />
@@ -154,15 +190,14 @@ const Login = ({navigation}) => {
             <TouchableOpacity onPress={() => onGoogleButtonPress(navigation)}>
               <Image source={Google} />
             </TouchableOpacity>
+            {Platform.OS === 'ios' ? (
+              <TouchableOpacity onPress={() => onAppleButtonPress(navigation)}>
+                <Image source={appleIcon} />
+              </TouchableOpacity>
+            ) : null}
           </View>
         </View>
       </View>
-
-      <LoginToast
-        text="아이디 또는 비밀번호를 확인해주세요."
-        visible={showToast}
-        handleCancel={() => setShowToast(false)}
-      />
     </KeyboardAvoidingView>
   );
 };
@@ -189,12 +224,17 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
   },
+  errorText: {
+    color: 'red',
+    alignSelf: 'center',
+    marginVertical: 8,
+  },
   loginTextInput: {
     backgroundColor: '#d3d3d3',
     borderRadius: 10,
     flex: Platform.OS === 'android' ? 0.15 : 0.12,
     justifyContent: 'center',
-    marginTop: 44,
+    marginTop: 10,
     marginBottom: 13,
   },
   passwordTextInput: {

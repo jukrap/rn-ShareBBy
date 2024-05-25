@@ -11,13 +11,11 @@ import {
   Platform,
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
-import LoginToast from './LoginToast';
 
 const SignUpNickname = ({onNextStep}) => {
   const {width, height} = Dimensions.get('window');
   const [nickname, setNickname] = useState('');
-  const [showToast, setShowToast] = useState(false); // 토스트 표시 여부 상태 추가
-  const [toastMessage, setToastMessage] = useState(''); // 토스트 메시지 상태 추가
+  const [errorMessage, setErrorMessage] = useState(''); // 에러 메시지 상태 추가
 
   const handleNext = async () => {
     try {
@@ -29,45 +27,39 @@ const SignUpNickname = ({onNextStep}) => {
       if (!validateNickname(nickname)) return;
 
       if (!userQuery.empty) {
-        setToastMessage('이미 사용 중인 닉네임입니다.'); // 토스트 메시지 설정
-        setShowToast(true); // 토스트 표시
+        setErrorMessage('이미 사용 중인 닉네임입니다.');
       } else {
         onNextStep({nickname});
+        setNickname(''); // 닉네임 초기화
+        setErrorMessage(''); // 에러 메시지 초기화
       }
     } catch (error) {
       console.error('닉네임 중복 확인 오류:', error);
-      setToastMessage('닉네임 중복 확인 중 오류가 발생했습니다.'); // 토스트 메시지 설정
-      setShowToast(true); // 토스트 표시
+      setErrorMessage('닉네임 중복 확인 중 오류가 발생했습니다.');
     }
   };
 
   const validateNickname = nickname => {
     if (nickname.trim().length === 0) {
-      setToastMessage('닉네임을 입력해주세요.'); // 토스트 메시지 설정
-      setShowToast(true); // 토스트 표시
+      setErrorMessage('닉네임을 입력해주세요.');
       return false;
     }
     if (nickname.length > 12) {
-      setToastMessage('닉네임은 12글자 이내로 작성해주세요.'); // 토스트 메시지 설정
-      setShowToast(true); // 토스트 표시
+      setErrorMessage('닉네임은 12글자 이내로 작성해주세요.');
       return false;
     }
     if (/[!@#$%^&*(),.?":{}|<>]/.test(nickname)) {
-      setToastMessage('특수문자를 사용할 수 없습니다.'); // 토스트 메시지 설정
-      setShowToast(true); // 토스트 표시
+      setErrorMessage('특수문자를 사용할 수 없습니다.');
       return false;
     }
+    setErrorMessage(''); // 유효한 닉네임일 경우 에러 메시지 초기화
     return true;
-  };
-
-  const handleInfo = () => {
-    Alert.alert('닉네임 안내', '띄어쓰기 포함 12글자 이내로 입력해 주세요.');
   };
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : null}
-      keyboardVerticalOffset={150}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? '150' : '130'}
       style={styles.container}>
       <View style={{justifyContent: 'space-between', flex: 1}}>
         <View>
@@ -75,7 +67,6 @@ const SignUpNickname = ({onNextStep}) => {
             <View style={styles.textContainer}>
               <Text style={styles.text}>닉네임을 </Text>
               <Text style={styles.text}>입력해주세요.</Text>
-              <TouchableOpacity onPress={handleInfo}>
                 <Text
                   style={{
                     color: '#A7A7A7',
@@ -85,10 +76,8 @@ const SignUpNickname = ({onNextStep}) => {
                   }}>
                   띄어쓰기 포함 12글자 이내로 입력해 주세요.
                 </Text>
-              </TouchableOpacity>
             </View>
           </View>
-
           <View style={{flexDirection: 'row'}}>
             <TextInput
               style={{
@@ -97,7 +86,7 @@ const SignUpNickname = ({onNextStep}) => {
                 borderColor: '#07AC7D',
                 marginHorizontal: 16,
                 paddingBottom: 8,
-                marginBottom: 40,
+                marginBottom: 8,
                 fontSize: 16,
                 fontWeight: 'bold',
               }}
@@ -108,9 +97,13 @@ const SignUpNickname = ({onNextStep}) => {
               value={nickname}
               onChangeText={text => {
                 setNickname(text);
+                setErrorMessage(''); // 텍스트 변경 시 에러 메시지 초기화
               }}
             />
           </View>
+          {errorMessage ? (
+            <Text style={styles.errorMessage}>{errorMessage}</Text>
+          ) : null}
         </View>
 
         <View>
@@ -123,12 +116,6 @@ const SignUpNickname = ({onNextStep}) => {
           </TouchableOpacity>
         </View>
       </View>
-      {/* 토스트 컴포넌트 */}
-      <LoginToast
-        text={toastMessage}
-        visible={showToast}
-        handleCancel={() => setShowToast(false)}
-      />
     </KeyboardAvoidingView>
   );
 };
@@ -140,18 +127,9 @@ const styles = StyleSheet.create({
   textContainer: {
     marginTop: 40,
     marginLeft: 16,
-    marginBottom: 95,
-  },
-  backIcon: {
-    marginHorizontal: 8,
-    marginBottom: 24,
+    marginBottom: 45,
   },
   text: {
-    color: '#07AC7D',
-    fontWeight: 'bold',
-    fontSize: 24,
-  },
-  secondText: {
     color: '#07AC7D',
     fontWeight: 'bold',
     fontSize: 24,
@@ -165,6 +143,12 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     marginBottom: 36,
     height: 55,
+  },
+  errorMessage: {
+    color: 'red',
+    marginLeft: 16,
+    marginTop: 8,
+    fontSize: 14,
   },
 });
 

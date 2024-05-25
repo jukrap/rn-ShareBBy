@@ -508,6 +508,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = HobbyShare/HobbyShare.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = NB9VQW8X3H;
 
 				CODE_SIGN_IDENTITY = "Apple Distribution: HanSol Kim (NB9VQW8X3H)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Distribution: HanSol Kim (NB9VQW8X3H)";
@@ -532,6 +536,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.sharebby;
 				PRODUCT_NAME = HobbyShare;
 				PROVISIONING_PROFILE_SPECIFIER = "";
+
 
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "sharebby Release Profile";
 
@@ -642,7 +647,7 @@
 					"${PODS_CONFIGURATION_BUILD_DIR}/React-graphics/React_graphics.framework/Headers",
 					"${PODS_CONFIGURATION_BUILD_DIR}/React-graphics/React_graphics.framework/Headers/react/renderer/graphics/platform/ios",
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
 				LD = "";
 				LDPLUSPLUS = "";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -727,7 +732,7 @@
 					"${PODS_CONFIGURATION_BUILD_DIR}/React-graphics/React_graphics.framework/Headers",
 					"${PODS_CONFIGURATION_BUILD_DIR}/React-graphics/React_graphics.framework/Headers/react/renderer/graphics/platform/ios",
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
 				LD = "";
 				LDPLUSPLUS = "";
 				LD_RUNPATH_SEARCH_PATHS = (
