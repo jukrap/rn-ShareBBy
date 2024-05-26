@@ -146,10 +146,10 @@ const CommunityPostDetail = ({route}) => {
     React.useCallback(() => {
       const updatedPost = route.params?.updatedPost;
       if (updatedPost && updatedPost.id === postId) {
-        setPosts({...posts, ...updatedPost});
+        setPosts(prevPosts => ({...prevPosts, ...updatedPost}));
         navigation.setParams({updatedPost: null});
       }
-    }, [route.params, postId, posts]),
+    }, [route.params, postId]),
   );
 
   useFocusEffect(
@@ -343,6 +343,16 @@ const CommunityPostDetail = ({route}) => {
     }
   };
 
+const handleGoBack = () => {
+  navigation.navigate('CommunityBoard', {
+    updatedPost: {
+      id: postId,
+      post_content: posts.post_content,
+      post_files: posts.post_files,
+    },
+  });
+};
+
   const submitComment = async () => {
     if (!commentContent || commentContent.trim() === '') {
       setToastMessage({
@@ -474,10 +484,7 @@ const CommunityPostDetail = ({route}) => {
   };
 
   const editPost = () => {
-    navigation.navigate('CommunityEditPost', {
-      postId,
-      prevScreen: 'CommunityPostDetail',
-    });
+    navigation.navigate('CommunityEditPost', {postId, prevScreen: 'CommunityPostDetail'});
   };
 
   const handleCommentDelete = commentId => {
@@ -709,7 +716,7 @@ const CommunityPostDetail = ({route}) => {
       behavior={Platform.OS === 'ios' ? 'padding' : null}
       keyboardVerticalOffset={8}
       style={{flex: 1, backgroundColor: '#FEFFFE'}}>
-      <CommunityHeader title={'게시글'} />
+      <CommunityHeader title={'게시글'} onPressBackButton={handleGoBack}/>
       <FlatList
         data={comments}
         ListHeaderComponent={renderPostContent}
@@ -810,6 +817,8 @@ const CommunityPostDetail = ({route}) => {
     </KeyboardAvoidingView>
   );
 };
+export default CommunityPostDetail;
+
 
 const styles = StyleSheet.create({
   container: {
@@ -1017,5 +1026,3 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
-
-export default CommunityPostDetail;

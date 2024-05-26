@@ -77,47 +77,47 @@ const Join = ({ navigation, route }) => {
         }
     }
 
-const deadLineHobbiesData = data => {
-    const deadlineData = data.filter(
-        v => dayjs(v.data._data.deadline).diff(now, 'days') > 0,
-    );
-    setCurrentData(deadlineData);
-};
+    const deadLineHobbiesData = data => {
+        const deadlineData = data.filter(
+            v => dayjs(v.data._data.deadline).diff(now, 'days') > 0,
+        );
+        setCurrentData(deadlineData);
+    };
 
-const handleMarkerPress = markerElements => {
-    navigation.navigate('Show', markerElements);
-};
+    const handleMarkerPress = markerElements => {
+        navigation.navigate('Show', markerElements);
+    };
 
-const percentFun = (curr, total) => {
-    return Math.round((curr / total) * 100);
-};
+    const percentFun = (curr, total) => {
+        return Math.round((curr / total) * 100);
+    };
 
-const moveCurrLocation = () => {
-    mapView?.current?.setLocationTrackingMode('Follow');
-};
+    const moveCurrLocation = () => {
+        mapView?.current?.setLocationTrackingMode('Follow');
+    };
 
-const onCameraChanged = async event => {
-    const { latitude, longitude } = event;
-    const centerAddress = await userFetchAddress(latitude, longitude);
-    const centerGu = centerAddress.split(' ', 3).join(' ');
-    const finalHobbiesData = await getNearHobbies(centerGu);
+    const onCameraChanged = async event => {
+        const { latitude, longitude } = event;
+        const centerAddress = await userFetchAddress(latitude, longitude);
+        const centerGu = centerAddress.split(' ', 3).join(' ');
+        const finalHobbiesData = await getNearHobbies(centerGu);
 
-    const deadlineData = finalHobbiesData.filter(
-        v => dayjs(v.data._data.deadline).diff(now, 'days') > 0,
-    );
-    console.log(centerGu);
-    setHobbiesData(deadlineData);
-};
+        const deadlineData = finalHobbiesData.filter(
+            v => dayjs(v.data._data.deadline).diff(now, 'days') > 0,
+        );
+        console.log(centerGu);
+        setHobbiesData(deadlineData);
+    };
 
-const renderMarker = useCallback(marker => {
-    return (
-        <NaverMapMarkerOverlay
-            key={marker.id}
-            latitude={marker.data._data.latitude}
-            longitude={marker.data._data.longitude}
-            onPress={() => handleMarkerPress(marker)}
-        />
-    );
+    const renderMarker = useCallback(marker => {
+        return (
+            <NaverMapMarkerOverlay
+                key={marker.id}
+                latitude={marker.data._data.latitude}
+                longitude={marker.data._data.longitude}
+                onPress={() => handleMarkerPress(marker)}
+            />
+        );
     }, []);
 
     const renderItem = ({ item }) => {
@@ -155,36 +155,36 @@ const renderMarker = useCallback(marker => {
                     {
                         percentFun(item.data._data.personNumber, item.data._data.peopleCount) < 50 ?
                             (
-                                <Text style={[styles.listRcruit, { color: '#07AC7D' }]}>모집중</Text>
+                                <Text style={[styles.listRcruit, { color: '#07AC7D', fontWeight: 'bold' }]}>모집중</Text>
                             ) : percentFun(item.data._data.personNumber, item.data._data.peopleCount) == 100 ?
                                 (
-                                    <Text style={[styles.listRcruit, { color: '#898989' }]}>모집마감</Text>
+                                    <Text style={[styles.listRcruit, { color: '#898989', fontWeight: 'bold' }]}>모집마감</Text>
                                 ) : (
-                                    <Text style={[styles.listRcruit, { color: '#E4694E' }]}>마감임박</Text>
+                                    <Text style={[styles.listRcruit, { color: '#E4694E', fontWeight: 'bold' }]}>마감임박</Text>
                                 )
                     }
                 </View>
                 <View style={{ justifyContent: 'space-between', alignItems: 'stretch', flexDirection: 'row' }}>
                     <Text style={styles.listLocation}>{item.data._data.address}</Text>
-                    <Text style={[styles.listRcruit, { color: '#4E8FE4' }]}>{item.data._data.personNumber} \ {item.data._data.peopleCount} 명</Text>
+                    <Text style={[styles.listRcruit, { color: '#4E8FE4', fontWeight: 'bold' }]}>{item.data._data.personNumber} \ {item.data._data.peopleCount} 명</Text>
                 </View>
                 <View>
                     <Text>{item.data._data.tag}</Text>
                 </View>
                 <View style={{ justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row' }}>
-                    <Text><Text style={{ fontWeight: 700 }}>{diffDays}</Text> 일 <Text style={{ fontWeight: 700 }}>{diffHours % 24}</Text> 시간 <Text style={{ fontWeight: 700 }}>{diffMins % 60}</Text> 분 전</Text>
+                    <Text><Text style={{ fontWeight: 'bold' }}>{diffDays}</Text> 일 <Text style={{ fontWeight: 'bold' }}>{diffHours % 24}</Text> 시간 <Text style={{ fontWeight: 'bold' }}>{diffMins % 60}</Text> 분 전</Text>
                     {
                         percentFun(item.data._data.personNumber, item.data._data.peopleCount) == 100 ? (
                             <TouchableOpacity
                                 style={[styles.showBtn, { backgroundColor: '#898989' }]}
                                 onPress={() => navigation.navigate('Show', route)}>
-                                <Text style={[styles.showCommText, { fontWeight: 600, fontSize: 14, color: '#FEFFFE' }]}>모집마감</Text>
+                                <Text style={[styles.showCommText, { fontWeight: 'bold', fontSize: 14, color: '#FEFFFE' }]}>모집마감</Text>
                             </TouchableOpacity>
                         ) : (
                             <TouchableOpacity
                                 style={styles.showBtn}
                                 onPress={() => navigation.navigate('Show', item)}>
-                                <Text style={[styles.showCommText, { fontWeight: 600, fontSize: 14, color: '#FEFFFE' }]}>참여신청</Text>
+                                <Text style={[styles.showCommText, { fontWeight: 'bold', fontSize: 14, color: '#FEFFFE' }]}>참여신청</Text>
                             </TouchableOpacity>
                         )
                     }
@@ -337,13 +337,13 @@ const styles = StyleSheet.create({
     listRcruit: {
         fontFamily: 'Pretendard',
         fontSize: 12,
-        fontWeight: 700,
+        fontWeight: 'bold', 
     },
     listLocation: {
         color: '#07AC7D',
         width: 200,
         fontFamily: 'Pretendard',
-        fontWeight: 400,
+        fontWeight: 'bold', 
     },
     showBtn: {
         paddingHorizontal: 12,

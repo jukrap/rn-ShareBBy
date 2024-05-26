@@ -169,6 +169,7 @@ const Profile = ({navigation, route}) => {
               style={styles.noticeWrapper}>
               <Text style={styles.noticeStyle}>로그아웃</Text>
             </TouchableOpacity>
+            
           </View>
         </ScrollView>
       ) : (

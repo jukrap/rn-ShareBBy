@@ -36,7 +36,7 @@ const Recruit = ({ navigation, route }) => {
 
     const requestPermission = async () => {
         try {
-            if (Platform.OS === "ios") {
+            if (Platform.OS === "ios")  {
                 return await Geolocation.requestAuthorization("always");
             }
         } catch (e) {

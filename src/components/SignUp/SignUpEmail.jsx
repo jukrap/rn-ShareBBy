@@ -9,12 +9,10 @@ import {
   Platform,
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
-import LoginToast from './LoginToast';
 
 const SignUpEmail = ({onNextStep}) => {
   const [email, setEmail] = useState('');
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const validateEmail = email => {
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -23,40 +21,39 @@ const SignUpEmail = ({onNextStep}) => {
 
   const handleNext = async () => {
     if (!validateEmail(email)) {
-      // 유효하지 않은 이메일인 경우
-      setToastMessage('유효하지 않은 이메일입니다.');
-      setShowToast(true);
+      setErrorMessage('유효하지 않은 이메일입니다.');
       return;
     }
 
     try {
-      // 파이어베이스에서 이메일 중복 확인
       const userQuery = await firestore()
         .collection('users')
         .where('email', '==', email)
         .get();
       if (!userQuery.empty) {
-        // 중복된 이메일인 경우
-        setToastMessage('중복된 이메일입니다. 다른 이메일을 사용해주세요.');
-        setShowToast(true);
+        setErrorMessage('중복된 이메일입니다. 다른 이메일을 사용해주세요.');
         return;
       } else {
-        // 중복된 이메일이 없으면 다음 단계로 진행
         onNextStep({email});
       }
     } catch (error) {
-      // 에러가 발생한 경우
-      setToastMessage('오류가 발생했습니다. 나중에 다시 시도해주세요.');
-      setShowToast(true);
+      setErrorMessage('오류가 발생했습니다. 나중에 다시 시도해주세요.');
+    }
+  };
+
+  const handleEmailChange = text => {
+    setEmail(text);
+    if (errorMessage) {
+      setErrorMessage('');
     }
   };
 
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={150}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? '150' : '130'}
       style={styles.container}>
-      <View style={styles.secondContariner}>
+      <View style={styles.secondContainer}>
         <View>
           <View style={styles.textContainer}>
             <Text style={styles.text}>이메일을 입력해주세요.</Text>
@@ -68,13 +65,16 @@ const SignUpEmail = ({onNextStep}) => {
             style={styles.input}
             placeholder="이메일을 입력해주세요."
             placeholderTextColor={'#A7A7A7'}
-            onChangeText={setEmail}
+            onChangeText={handleEmailChange}
             value={email}
             autoFocus={true}
             autoCompleteType="email"
             autoCapitalize="none"
             keyboardType="email-address"
           />
+          {errorMessage ? (
+            <Text style={styles.errorMessage}>{errorMessage}</Text>
+          ) : null}
         </View>
         <View>
           <TouchableOpacity style={styles.button} onPress={handleNext}>
@@ -82,11 +82,6 @@ const SignUpEmail = ({onNextStep}) => {
           </TouchableOpacity>
         </View>
       </View>
-      <LoginToast
-        text={toastMessage}
-        visible={showToast}
-        handleCancel={() => setShowToast(false)}
-      />
     </KeyboardAvoidingView>
   );
 };
@@ -95,7 +90,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  secondContariner: {
+  secondContainer: {
     justifyContent: 'space-between',
     flex: 1,
   },
@@ -138,6 +133,11 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  errorMessage: {
+    color: 'red',
+    marginLeft: 16,
+    marginTop: 8,
   },
 });
 

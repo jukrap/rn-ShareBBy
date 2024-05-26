@@ -39,8 +39,8 @@
             </intent-filter>
         </activity>
         <meta-data
-          android:name="com.naver.maps.map.cycfhnicdh"
-         android:value="cycfhnicdh" /> 
+          android:name="com.naver.maps.map.CLIENT_ID"
+         android:value="xibup77388" />
     </application>
      <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
   <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
