@@ -47,7 +47,7 @@ const Chat = () => {
           id: doc.id,
           ...doc.data(),
         }))
-        .filter(room => room.members.includes(userToken)); //합쳐보기 방법 고민 필요.
+        .filter(room => room.members.includes(userToken)); //합쳐보기 방법 고민 필요
 
       const latestChats = {};
 
@@ -222,7 +222,7 @@ const Chat = () => {
         <View style={{flex: 1, alignItems: 'center'}}>
           <Text
             style={{fontSize: 24, fontWeight: '700', fontFamily: 'Pretendard'}}>
-            채팅목록
+            채팅목
           </Text>
         </View>
         <View style={{flex: 1, backgroundColor: 'green'}} />
