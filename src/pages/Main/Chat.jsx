@@ -206,8 +206,7 @@ const Chat = () => {
   };
 
   return (
-
-    <SafeAreaView style={{flex: 1, backgroundColor:'#fefffe'}}>
+    <SafeAreaView style={{flex: 1, backgroundColor: '#fefffe'}}>
       <View
         style={{
           paddingTop: 8,
