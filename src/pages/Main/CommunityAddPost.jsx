@@ -269,6 +269,8 @@ const CommunityAddPost = () => {
     }
   };
 
+    //TODO: 지금 작성한 openImagePicker 카메라 및 이미지 권한은 애플쪽에서 작동안할 가능성큼. 플랫폼 기능으로 애플 쪽은 권한 코드 작동안하게 해야 할 것 같음.
+
   // 이미지 선택기 열기
   const openImagePicker = async () => {
     if (Platform.OS === 'android') {
