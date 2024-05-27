@@ -10,7 +10,6 @@ import {
   KeyboardAvoidingView,
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore'; // firestore import 추가
-import LoginToast from '../../components/SignUp/LoginToast';
 import LoginModal from '../../components/SignUp/LoginModal';
 
 import {BackIcon2} from '../../assets/assets';
@@ -19,8 +18,7 @@ const SignUpEmail = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [showSignUpModal, setSignUpShowModal] = useState(false); // 모달 표시 여부 상태 추가
   const [showLoginModal, setLoginShowModal] = useState(false); // 모달 표시 여부 상태 추가
-  const [toastMessage, setToastMessage] = useState('');
-  const [showToast, setShowToast] = useState(false);
+  const [invalidEmail, setInvalidEmail] = useState(false); // 이메일 유효성 상태 추가
 
   const validateEmail = email => {
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -28,10 +26,12 @@ const SignUpEmail = ({navigation}) => {
   };
 
   const handleNext = async () => {
+    if (!email) {
+      return; // 이메일이 비어있으면 아무것도 하지 않음
+    }
+
     if (!validateEmail(email)) {
-      setToastMessage('유효하지 않은 이메일입니다.');
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 3000);
+      setInvalidEmail(true);
       return;
     }
     try {
@@ -49,50 +49,43 @@ const SignUpEmail = ({navigation}) => {
       }
     } catch (error) {
       // 에러가 발생한 경우
-      setToastMessage('오류가 발생했습니다. 나중에 다시 시도해주세요.');
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 3000);
+      console.log(error);
     }
-  };
-
-  const handleModalClose1 = () => {
-    // 모달 닫기
-    setLoginShowModal(false);
-  };
-
-  const handleLogin = () => {
-    // 회원가입 화면으로 이동
-    navigation.navigate('Login');
-    setLoginShowModal(false);
   };
 
   const handleModalClose = () => {
     // 모달 닫기
     setSignUpShowModal(false);
+    setLoginShowModal(false);
   };
 
   const handleSignUp = () => {
     // 회원가입 화면으로 이동
     navigation.navigate('SignUp');
-    setSignUpShowModal(false);
+    handleModalClose();
+  };
+
+  const handleLogin = () => {
+    // 로그인 화면으로 이동
+    navigation.navigate('Login');
+    handleModalClose();
   };
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: '#fefffe'}}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={1}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? '1' : '30'}
         style={{flex: 1}}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}>
-          <Image style={{marginLeft:8}} source={BackIcon2} />
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Image style={{marginLeft: 8}} source={BackIcon2} />
         </TouchableOpacity>
         <View style={{justifyContent: 'space-between', flex: 1}}>
           <View>
             <View style={styles.textContainer}>
               <Text style={styles.text}>아이디 찾기</Text>
               <Text style={styles.secondText}>
-                이메일 주소를 입력하여 가입여부를 확인해 주세요.
+                이메일 주소를 입력하여 가입 여부를 확인해 주세요.
               </Text>
             </View>
             <TextInput
@@ -106,6 +99,9 @@ const SignUpEmail = ({navigation}) => {
               autoCapitalize="none"
               keyboardType="email-address"
             />
+            {invalidEmail && email && (
+              <Text style={styles.errorText}>유효하지 않은 이메일입니다.</Text>
+            )}
           </View>
           <View>
             <TouchableOpacity style={styles.button} onPress={handleNext}>
@@ -128,17 +124,12 @@ const SignUpEmail = ({navigation}) => {
       <LoginModal
         animationType="slide"
         visible={showLoginModal}
-        closeModal={handleModalClose1}
+        closeModal={handleModalClose}
         message="아이디 찾기 결과"
         message2="가입되어 있는 이메일입니다."
         LeftButton="취소"
         RightButton="로그인"
         onConfirm={handleLogin}
-      />
-      <LoginToast
-        text={toastMessage}
-        visible={showToast}
-        handleCancel={() => setShowToast(false)}
       />
     </SafeAreaView>
   );
@@ -183,47 +174,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 20,
-    width: '80%',
-    alignItems: 'center',
-  },
-  modalText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 16,
-  },
-  modalButtonContainer: {
-    flexDirection: 'row',
-    gap: 8,
-    marginTop: 16,
-  },
-  modalButton1: {
-    backgroundColor: '#A7A7A7',
-    paddingVertical: 10,
-    width: 130,
-    borderRadius: 5,
-    alignItems: 'center',
-  },
-  modalButton: {
-    backgroundColor: '#07AC7D',
-    paddingVertical: 10,
-    width: 130,
-    borderRadius: 5,
-    alignItems: 'center',
-  },
-  modalButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 16,
+  errorText: {
+    color: 'red',
+    fontSize: 14,
+    marginLeft: 16,
+    marginTop: 8,
   },
 });
 

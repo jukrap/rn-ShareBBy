@@ -47,6 +47,7 @@ export const ShareIcon = require('../assets/newIcons/shareIcon.png');
 export const SuccessIcon = require('../assets/newIcons/successIcon.png');
 export const WarningIcon = require('../assets/newIcons/warningIcon.png');
 export const WritecommentIcon = require('../assets/newIcons/writeCommentIcon.png');
+export const appleIcon = require('../assets/newIcons/appleIcon.png');
 
 //Images
 export const DefaultProfileIcon = require('../assets/images/defaultProfileImg.jpeg');

@@ -50,7 +50,7 @@
             </intent-filter>
         </activity>
         <meta-data
-          android:name="com.naver.maps.map.cycfhnicdh"
-         android:value="cycfhnicdh" /> 
+          android:name="com.naver.maps.map.CLIENT_ID"
+         android:value="xibup77388" />
     </application>
 </manifest>

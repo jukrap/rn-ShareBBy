@@ -15,9 +15,10 @@ import firestore from '@react-native-firebase/firestore';
 import Postcode from '@actbase/react-daum-postcode';
 import storage from '@react-native-firebase/storage';
 import LoginToast from './LoginToast';
+import {AddressSearch} from '../../assets/assets';
 
 const {width} = Dimensions.get('window');
-import {AddressSearch} from '../../assets/assets';
+const androidMarginTop = Platform.OS === 'android' ? 10 : 0;
 
 const SignUpAddress = ({
   navigation,
@@ -73,8 +74,8 @@ const SignUpAddress = ({
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : null}
-      keyboardVerticalOffset={150}
+    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    keyboardVerticalOffset={Platform.OS === 'ios' ? '150' : '130'}
       style={styles.container}>
       <View style={{justifyContent: 'space-between', flex: 1}}>
         <View>
@@ -91,7 +92,7 @@ const SignUpAddress = ({
               borderColor: '#07AC7D',
               marginHorizontal: 16,
             }}>
-            <Image style={{width: 21, height: 21}} source={AddressSearch} />
+            <Image style={{width: 21, height: 21, marginTop: androidMarginTop}} source={AddressSearch} />
             <TextInput
               style={styles.addressTextInput}
               placeholder="지번, 도로명, 건물명으로 검색"

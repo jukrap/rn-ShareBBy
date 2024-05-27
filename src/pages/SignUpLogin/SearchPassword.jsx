@@ -12,21 +12,23 @@ import {
 
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore'; // firestore import 추가
-import LoginToast from '../../components/SignUp/LoginToast';
 import {BackIcon2} from '../../assets/assets';
 
 const SearchPassword = ({navigation}) => {
   const [email, setEmail] = useState('');
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
+  const [invalidEmail, setInvalidEmail] = useState(false);
+  const [message, setMessage] = useState('');
 
   const handleResetPassword = async () => {
     if (!validateEmail(email)) {
-      setToastMessage('올바른 이메일 형식이 아닙니다.');
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 3000);
+      setInvalidEmail(true);
+      setMessage('올바른 이메일 형식이 아닙니다.');
       return;
+    } else {
+      setInvalidEmail(false);
+      setMessage('');
     }
+
     try {
       // 이메일이 존재하는지 확인
       const userSnapshot = await firestore()
@@ -34,20 +36,15 @@ const SearchPassword = ({navigation}) => {
         .where('email', '==', email)
         .get();
       if (userSnapshot.empty) {
-        setToastMessage('해당 이메일 주소가 존재하지 않습니다.');
-        setShowToast(true);
-        setTimeout(() => setShowToast(false), 3000);
+        setInvalidEmail(true);
+        setMessage('해당 이메일 주소가 존재하지 않습니다.');
         return;
       }
       // 이메일이 존재하면 비밀번호 재설정 이메일 전송
       await auth().sendPasswordResetEmail(email);
-      setToastMessage('비밀번호 재설정 이메일을 전송했습니다.');
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 3000);
+      setMessage('비밀번호 재설정 이메일을 전송했습니다.');
     } catch (error) {
-      setToastMessage('비밀번호 재설정 이메일 전송 중 오류가 발생했습니다.');
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 3000);
+      setMessage('비밀번호 재설정 이메일 전송 중 오류가 발생했습니다.');
     }
   };
 
@@ -60,11 +57,10 @@ const SearchPassword = ({navigation}) => {
     <SafeAreaView style={{flex: 1, backgroundColor: '#fefffe'}}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={1}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? '1' : '30'}
         style={{flex: 1}}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}>
-          <Image  style={{marginLeft:8}} source={BackIcon2} />
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Image style={{marginLeft: 8}} source={BackIcon2} />
         </TouchableOpacity>
         <View style={{justifyContent: 'space-between', flex: 1}}>
           <View>
@@ -78,13 +74,27 @@ const SearchPassword = ({navigation}) => {
               style={styles.input}
               placeholder="이메일을 입력해주세요."
               placeholderTextColor={'#A7A7A7'}
-              onChangeText={setEmail}
+              onChangeText={text => {
+                setEmail(text);
+                setInvalidEmail(false);
+                setMessage('');
+              }}
               value={email}
               autoFocus={true}
               autoCompleteType="email"
               autoCapitalize="none"
               keyboardType="email-address"
             />
+            {!!message && (
+              <Text
+                style={[
+                  styles.messageText,
+                  message === '비밀번호 재설정 이메일을 전송했습니다.' &&
+                    styles.blueText,
+                ]}>
+                {message}
+              </Text>
+            )}
           </View>
           <View>
             <TouchableOpacity
@@ -94,11 +104,6 @@ const SearchPassword = ({navigation}) => {
             </TouchableOpacity>
           </View>
         </View>
-        <LoginToast
-          text={toastMessage}
-          visible={showToast}
-          handleCancel={() => setShowToast(false)}
-        />
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -143,47 +148,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  messageText: {
+    color: 'red',
+    fontSize: 14,
+    marginLeft: 16,
+    marginTop: 8,
   },
-  modalContent: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 20,
-    width: '80%',
-    alignItems: 'center',
-  },
-  modalText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 16,
-  },
-  modalButtonContainer: {
-    flexDirection: 'row',
-    gap: 8,
-    marginTop: 16,
-  },
-  modalButton1: {
-    backgroundColor: '#07AC7D',
-    paddingVertical: 10,
-    width: 130,
-    borderRadius: 5,
-    alignItems: 'center',
-  },
-  modalButton: {
-    backgroundColor: '#07AC7D',
-    paddingVertical: 10,
-    width: 130,
-    borderRadius: 5,
-    alignItems: 'center',
-  },
-  modalButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 16,
+  blueText: {
+    color: '#07AC7D',
   },
 });
 
