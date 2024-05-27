@@ -9,9 +9,11 @@ import {
 } from 'react-native';
 import dayjs from 'dayjs';
 import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 import Modal from 'react-native-modal';
 
 import {BackIcon} from '../../assets/assets';
+import Toast from '../../components/Main/Toast';
 
 const NoticeDetail = ({navigation, route}) => {
   const {notices, chatRoomId} = route.params;
@@ -19,6 +21,8 @@ const NoticeDetail = ({navigation, route}) => {
   const formattedTime = dayjs(date).format('YYYY년 MM월 DD일 A hh:mm');
   const [profileImg, setProfileImg] = useState('');
   const [chatOutModalVisible, setChatOutModalVisible] = useState(false);
+  const [isToastVisible, setIsToastVisible] = useState(false);
+  const [isToast, setIsToast] = useState('');
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -40,14 +44,22 @@ const NoticeDetail = ({navigation, route}) => {
 
   const handleDelete = async () => {
     try {
-      await firestore()
-        .collection('chatRooms')
-        .doc(chatRoomId)
-        .collection('notice')
-        .doc(notices.id)
-        .delete();
+      const currentUserUid = auth().currentUser.uid;
+      if (currentUserUid === notices.senderId) {
+        await firestore()
+          .collection('chatRooms')
+          .doc(chatRoomId)
+          .collection('notice')
+          .doc(notices.id)
+          .delete();
 
-      navigation.goBack();
+        navigation.goBack();
+      } else {
+        setChatOutModalVisible(false);
+        setTimeout(() => {
+          setIsToastVisible(true);
+        }, 200);
+      }
     } catch (error) {
       console.error('Error deleting notice:', error);
     }
@@ -160,6 +172,13 @@ const NoticeDetail = ({navigation, route}) => {
           </View>
         </View>
       </Modal>
+      <Toast
+        text={'본인의 공지사항만 삭제할 수 있습니다.'}
+        visible={isToastVisible}
+        handleCancel={() => {
+          setIsToast(false);
+        }}
+      />
     </SafeAreaView>
   );
 };
