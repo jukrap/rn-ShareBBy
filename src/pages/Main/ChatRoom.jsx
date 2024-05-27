@@ -684,7 +684,7 @@ const ChatRoom = ({route, navigation}) => {
               flex: 2,
               width: '100%',
               borderBottomWidth: 1,
-              borderBottomColor: '#E0E0E0',
+              borderBottomColor: '#4e3131',
               gap: 8,
               paddingHorizontal: 12,
             }}>

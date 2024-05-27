@@ -12,11 +12,8 @@ import {
 import firestore from '@react-native-firebase/firestore';
 import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import dayjs from 'dayjs';
-import ChatListTime from '../../components/Chat/ChatListTime';
+import ChatRoomItem from '../../components/Chat/ChatRoomItem';
 import {BackIcon} from '../../assets/assets';
-
-const {width, height} = Dimensions.get('window');
 
 const Chat = () => {
   const [chatRooms, setChatRooms] = useState([]);
@@ -76,25 +73,6 @@ const Chat = () => {
     }
   };
 
-  const formatMessageTime = timestamp => {
-    const date = dayjs(timestamp);
-    const today = dayjs().startOf('day');
-    const yesterday = dayjs().subtract(1, 'day').startOf('day');
-
-    switch (true) {
-      case date.isSame(today, 'day'):
-        return {type: 'timeOnly', time: date.format('A hh:mm')};
-      case date.isSame(yesterday, 'day'):
-        return {type: 'yesterday'};
-      default:
-        return {
-          type: 'monthAndDay',
-          month: date.format('MM'),
-          day: date.format('DD'),
-        };
-    }
-  };
-
   const sortLast = () => {
     return chatRooms.sort((roomA, roomB) => {
       const latestChatA = lastChat[roomA.id];
@@ -111,102 +89,14 @@ const Chat = () => {
       }
     });
   };
+
   const renderGroups = ({item}) => {
-    const goToChatRoom = () => {
-      navigation.navigate('ChatRoom', {
-        chatRoomId: item.id,
-        chatRoomName: item.name,
-        hobbiesId: item.hobbiesId,
-        members: item.members,
-      });
-    };
-
     const latestChat = lastChat[item.id];
-    const formattedTime = latestChat
-      ? formatMessageTime(latestChat.timestamp)
-      : {type: 'none'};
-
-    return (
-      <TouchableOpacity onPress={goToChatRoom} style={styles.chatRoomItem}>
-        <View
-          style={{
-            flex: 1,
-            justifyContent: 'center',
-            alignItems: 'flex-start',
-          }}>
-          <Image
-            style={{width: 52, height: 52, borderRadius: 8}}
-            source={{uri: item.chatRoomImage}}
-          />
-        </View>
-        <View
-          style={{
-            flex: 3.5,
-            alignItems: 'flex-start',
-            justifyContent: 'center',
-          }}>
-          <View
-            style={{
-              flex: 1.5,
-              flexDirection: 'row',
-              alignItems: 'flex-end',
-              gap: 4,
-            }}>
-            <Text
-              style={{
-                fontSize: 16,
-                fontWeight: '600',
-                fontFamily: 'Pretendard',
-              }}>
-              {item.name}
-            </Text>
-            <Text
-              style={{
-                fontSize: 14,
-                color: '#A7A7A7',
-                fontFamily: 'Pretendard',
-              }}>
-              {item.members.length}
-            </Text>
-          </View>
-          <View
-            style={{
-              flex: 1,
-              justifyContent: 'flex-end',
-              paddingBottom: 8,
-              fontSize: 10,
-            }}>
-            {latestChat && (
-              <Text
-                style={{
-                  color: '#A7A7A7',
-                  fontSize: 13,
-                  fontFamily: 'Pretendard',
-                }}>
-                {latestChat.text}
-              </Text>
-            )}
-          </View>
-        </View>
-        <View
-          style={{
-            flex: 0.8,
-            alignItems: 'flex-end',
-            justifyContent: 'flex-end',
-          }}>
-          <ChatListTime
-            type={formattedTime.type}
-            month={formattedTime.month}
-            day={formattedTime.day}
-            time={formattedTime.time}
-          />
-        </View>
-      </TouchableOpacity>
-    );
+    return <ChatRoomItem item={item} latestChat={latestChat} />;
   };
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: '#fefffe'}}>
+    <SafeAreaView style={styles.container}>
       <View
         style={{
           paddingTop: 8,
@@ -241,7 +131,7 @@ const Chat = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#fefffe',
   },
   modal: {
     margin: 0,
@@ -254,17 +144,6 @@ const styles = StyleSheet.create({
     flex: 1,
     marginTop: 150,
     gap: 16,
-  },
-  chatRoomItem: {
-    justifyContent: 'space-between',
-    paddingHorizontal: 8,
-    width: width / 1.1,
-    height: height / 12,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    marginBottom: 12,
-    flexDirection: 'row',
   },
 });
 
