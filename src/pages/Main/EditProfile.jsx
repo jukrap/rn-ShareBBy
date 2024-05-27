@@ -112,13 +112,9 @@ const EditProfile = ({navigation, route}) => {
         });
         await Promise.all(deleteChatPromises);
 
-        // 기타 사용자 관련 데이터 삭제
-        // 예: 프로필 이미지 등
-
         // AsyncStorage 초기화
         await AsyncStorage.clear();
 
-        // 모달 닫기 및 로그인 화면으로 이동
         setDeleteShowModal(false);
         navigation.reset({
           index: 0,

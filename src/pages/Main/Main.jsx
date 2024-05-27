@@ -27,10 +27,7 @@ const defaultImage = require('../../assets/images/dummyprofile.png');
 const OptimizedImageItem = React.memo(({item}) => {
   const source = useMemo(() => (item.bgImg ? item.bgImg : null), [item.bgImg]);
   return source ? (
-    <Image
-      source={source}
-      style={{width: width, height: height / 4}}
-    />
+    <Image source={source} style={{width: width, height: height / 4}} />
   ) : null;
 });
 
@@ -184,7 +181,6 @@ const Main = ({navigation}) => {
     }
   }, [currentIndex, eventBanner.length]);
 
-
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: '#fff'}}>
       <View style={styles.topbarView}>
@@ -199,7 +195,7 @@ const Main = ({navigation}) => {
           borderBottomWidth: 1,
           borderBottomColor: '#DBDBDB',
         }}></View>
-      <ScrollView style={{height: '50%'}}>
+      <ScrollView showsVerticalScrollIndicator={false} style={{height: '50%'}}>
         <View>
           <FlatList
             data={eventBanner}
@@ -216,7 +212,7 @@ const Main = ({navigation}) => {
           />
         </View>
         <View style={styles.divisionView} />
-        <View style={{marginBottom: 20, paddingHorizontal: 16, gap: 6}}>
+        <View style={{marginBottom: 20, paddingHorizontal: 12, gap: 6}}>
           <View style={styles.hobbyNameView}>
             <TouchableOpacity
               style={{flexDirection: 'row', alignItems: 'center', gap: 8}}
@@ -242,7 +238,11 @@ const Main = ({navigation}) => {
               님, 취미활동 하러 가보실까요?
             </Text>
           </View>
-          <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
+          <View
+            style={{
+              justifyContent: 'space-between',
+              flexDirection: 'row',
+            }}>
             <TouchableOpacity
               activeOpacity={0.8}
               style={[styles.hobbyBox, {backgroundColor: '#703CA0'}]}
@@ -373,24 +373,23 @@ const Main = ({navigation}) => {
                     : '농구왕'}{' '}
                 </Text>
               </View>
-              
-                <View style={styles.gradeLow}>
-                  <Text>6등 : </Text>
-                  <Image
-                    source={
-                      sixthPlace && sixthPlace.imageUrl
-                        ? {uri: sixthPlace.imageUrl}
-                        : defaultImage
-                    }
-                    style={{borderRadius: 25, width: 50, height: 50}}
-                  />
-                  <Text>
-                    {sixthPlace && sixthPlace.nickname
-                      ? sixthPlace.nickname
-                      : '배구왕'}{' '}
-                  </Text>
-                </View>
-              
+
+              <View style={styles.gradeLow}>
+                <Text>6등 : </Text>
+                <Image
+                  source={
+                    sixthPlace && sixthPlace.imageUrl
+                      ? {uri: sixthPlace.imageUrl}
+                      : defaultImage
+                  }
+                  style={{borderRadius: 25, width: 50, height: 50}}
+                />
+                <Text>
+                  {sixthPlace && sixthPlace.nickname
+                    ? sixthPlace.nickname
+                    : '배구왕'}{' '}
+                </Text>
+              </View>
             </View>
           </View>
         </View>
@@ -442,8 +441,8 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   hobbyBox: {
-    width: 176,
-    height: 176,
+    width: width / 2.2,
+    height: width / 2.2,
     overflow: 'hidden',
     borderRadius: 15,
   },
