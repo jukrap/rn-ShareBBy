@@ -53,22 +53,30 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
   const toggleReportModal = async () => {
     try {
       // 해당 유저 정보 가져오기
-      const userDoc = await firestore().collection('users').doc(item.userId).get();
+      const userDoc = await firestore()
+        .collection('users')
+        .doc(item.userId)
+        .get();
       if (userDoc.exists) {
         const userData = userDoc.data();
         let reportCount = userData.report || 0;
-        reportCount++; 
-        
-        await firestore().collection('users').doc(item.userId).update({ report: reportCount });
+        reportCount++;
+
+        await firestore()
+          .collection('users')
+          .doc(item.userId)
+          .update({report: reportCount});
         // 모달이 닫힐 때 토스트를 보여주기
         setIsModalVisible(!isModalVisible);
         setShowToast(true);
-
       } else {
-        console.log("해당 유저 정보가 존재하지 않습니다.");
+        console.log('해당 유저 정보가 존재하지 않습니다.');
       }
     } catch (error) {
-      console.error("유저 정보를 업데이트하는 중에 오류가 발생했습니다:", error);
+      console.error(
+        '유저 정보를 업데이트하는 중에 오류가 발생했습니다:',
+        error,
+      );
     }
   };
 
@@ -139,24 +147,24 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
     }
   };
 
+  //아래 handleIsLike로 함수명 변경
   const handleLikePress = async () => {
-    //handleIsLike로 함수명 변경
     if (currentUser && !isLikeProcessing) {
       setIsLikeProcessing(true);
 
       try {
-        if (isLiked) {
+        // likes 컬렉션에서 해당 사용자의 추천 여부 확인
+        const likeQuery = await firestore()
+          .collection('likes')
+          .where('postId', '==', item.id)
+          .where('userId', '==', currentUser.uid)
+          .get();
+
+        if (!likeQuery.empty) {
           // 좋아요 취소 처리
-          await firestore()
-            .collection('likes')
-            .where('postId', '==', item.id)
-            .where('userId', '==', currentUser.uid)
-            .get()
-            .then(querySnapshot => {
-              querySnapshot.forEach(doc => {
-                doc.ref.delete();
-              });
-            });
+          likeQuery.forEach(doc => {
+            doc.ref.delete();
+          });
 
           setIsLiked(false);
           setLikeCount(prevCount => prevCount - 1);
@@ -174,7 +182,7 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
             userId: currentUser.uid,
             createdAt: firestore.FieldValue.serverTimestamp(),
           });
-          //try catch 깊이 좀 줄이기 (특정 부분 함수로 빼던지 하기)
+
           setIsLiked(true);
           setLikeCount(prevCount => prevCount + 1);
 
@@ -196,8 +204,7 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
   return (
     <View style={styles.card}>
       <View style={styles.userInfoContainer}>
-        <View
-          style={styles.userInfoWrapper}>
+        <View style={styles.userInfoWrapper}>
           <FasterImageView
             style={[styles.userProfileImage, {overflow: 'hidden'}]}
             source={{
@@ -309,7 +316,7 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
             <Image source={DeleteIcon} style={{width: 20, height: 20}} />
             <Text style={styles.modalButtonText}>게시글 삭제</Text>
           </TouchableOpacity>
-          
+
           <TouchableOpacity
             style={styles.modalButton}
             onPress={toggleReportModal}>
@@ -327,10 +334,10 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
         />
       )}
       <LoginToast
-          text="신고되었습니다."
-          visible={showToast}
-          handleCancel={() => setShowToast(false)}
-        />
+        text="신고되었습니다."
+        visible={showToast}
+        handleCancel={() => setShowToast(false)}
+      />
     </View>
   );
 };
@@ -342,7 +349,7 @@ import {
   ShareIcon,
   PencilIcon,
   DeleteIcon,
-  CautionIcon ,
+  CautionIcon,
   DefaultProfileIcon,
 } from '../../assets/assets';
 export default PostCard;
