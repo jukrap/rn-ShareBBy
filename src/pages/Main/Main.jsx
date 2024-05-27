@@ -447,8 +447,8 @@ const styles = StyleSheet.create({
     borderRadius: 15,
   },
   hobbyText: {
-    left: 45,
-    top: 70,
+    left: width / 7.5,
+    top: width / 5,
     fontSize: 24,
     fontWeight: '700',
     color: '#fff',
