@@ -272,17 +272,20 @@ const CommunityPostDetail = ({route}) => {
       setIsLikeProcessing(true);
 
       try {
+        // likes 컬렉션에서 해당 사용자의 추천 여부 확인
+        const likeQuery = await firestore()
+          .collection('likes')
+          .where('postId', '==', postId)
+          .where('userId', '==', currentUser.uid)
+          .get();
+
+        const isLiked = !likeQuery.empty;
+
         if (isLiked) {
-          await firestore()
-            .collection('likes')
-            .where('postId', '==', postId)
-            .where('userId', '==', currentUser.uid)
-            .get()
-            .then(querySnapshot => {
-              querySnapshot.forEach(doc => {
-                doc.ref.delete();
-              });
-            });
+          // 좋아요 취소 처리
+          likeQuery.forEach(doc => {
+            doc.ref.delete();
+          });
 
           setIsLiked(false);
           setLikeCount(prevCount => prevCount - 1);
@@ -294,6 +297,7 @@ const CommunityPostDetail = ({route}) => {
               likeCount: firestore.FieldValue.increment(-1),
             });
         } else {
+          // 좋아요 추가 처리
           await firestore().collection('likes').add({
             postId: postId,
             userId: currentUser.uid,
@@ -343,15 +347,15 @@ const CommunityPostDetail = ({route}) => {
     }
   };
 
-const handleGoBack = () => {
-  navigation.navigate('CommunityBoard', {
-    updatedPost: {
-      id: postId,
-      post_content: posts.post_content,
-      post_files: posts.post_files,
-    },
-  });
-};
+  const handleGoBack = () => {
+    navigation.navigate('CommunityBoard', {
+      updatedPost: {
+        id: postId,
+        post_content: posts.post_content,
+        post_files: posts.post_files,
+      },
+    });
+  };
 
   const submitComment = async () => {
     if (!commentContent || commentContent.trim() === '') {
@@ -484,7 +488,10 @@ const handleGoBack = () => {
   };
 
   const editPost = () => {
-    navigation.navigate('CommunityEditPost', {postId, prevScreen: 'CommunityPostDetail'});
+    navigation.navigate('CommunityEditPost', {
+      postId,
+      prevScreen: 'CommunityPostDetail',
+    });
   };
 
   const handleCommentDelete = commentId => {
@@ -716,7 +723,7 @@ const handleGoBack = () => {
       behavior={Platform.OS === 'ios' ? 'padding' : null}
       keyboardVerticalOffset={8}
       style={{flex: 1, backgroundColor: '#FEFFFE'}}>
-      <CommunityHeader title={'게시글'} onPressBackButton={handleGoBack}/>
+      <CommunityHeader title={'게시글'} onPressBackButton={handleGoBack} />
       <FlatList
         data={comments}
         ListHeaderComponent={renderPostContent}
@@ -818,7 +825,6 @@ const handleGoBack = () => {
   );
 };
 export default CommunityPostDetail;
-
 
 const styles = StyleSheet.create({
   container: {
