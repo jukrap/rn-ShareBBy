@@ -1,5 +1,6 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
+  ActivityIndicator,
   Image,
   SafeAreaView,
   ScrollView,
@@ -23,47 +24,72 @@ const rightArrow = require('../../assets/newIcons/rightIcon.png');
 const Profile = ({navigation, route}) => {
   const [users, setUsers] = useState(null);
   const [userUid, setUserUid] = useState(null);
-  const [showLogoutModal, setLogoutShowModal] = useState(null);
+  const [showLogoutModal, setLogoutShowModal] = useState(false);
+  const [loading, setLoading] = useState(true);
   const usersCollection = firestore().collection('users');
-  const userToken = useStore(state => state.userToken); // 토큰 상태 추가
+  const userToken = useStore(state => state.userToken);
 
   const fetchUserUid = async () => {
     try {
       const user = auth().currentUser;
       if (user) {
-        // set uuid
         const userUID = user.uid;
         setUserUid(userUID);
+      } else {
+        // 유저가 없을 경우 로그인 페이지로 이동
+        navigation.reset({
+          index: 0,
+          routes: [{name: 'Login'}],
+        });
       }
     } catch (error) {
       console.error('Error fetching current user: ', error);
+      // 오류가 발생한 경우 로그인 페이지로 이동
+      navigation.reset({
+        index: 0,
+        routes: [{name: 'Login'}],
+      });
     }
   };
+
   const fetchUserData = async () => {
     try {
       const querySnapshot = (await usersCollection.doc(userUid).get()).data();
-
-      setUsers(querySnapshot); // 사용자 데이터 상태 설정
+      if (querySnapshot) {
+        setUsers(querySnapshot);
+      } else {
+        // 사용자 데이터가 없을 경우 로그인 페이지로 이동
+        navigation.reset({
+          index: 0,
+          routes: [{name: 'Login'}],
+        });
+      }
     } catch (error) {
       console.log(error.message);
+      // 오류가 발생한 경우 로그인 페이지로 이동
+      navigation.reset({
+        index: 0,
+        routes: [{name: 'Login'}],
+      });
+    } finally {
+      setLoading(false);
     }
   };
+
   useFocusEffect(
     useCallback(() => {
       fetchUserUid();
-    }, [setUserUid]), // setUserUid를 의존성 배열에 포함
+    }, []),
   );
+
   useEffect(() => {
     if (userUid) {
-      // userUid가 설정된 후에 fetchUserData 호출
-
       fetchUserData();
     }
   }, [userUid]);
 
   const handleLogout = async () => {
     try {
-      // Firebase에서 로그아웃
       await auth().signOut();
       await AsyncStorage.removeItem('userInfo');
       setLogoutShowModal(false);
@@ -77,108 +103,100 @@ const Profile = ({navigation, route}) => {
   };
 
   const handleLogoutModalClose = () => {
-    // 모달 닫기
     setLogoutShowModal(false);
   };
+
   const handleLogoutShowModal = () => {
     setLogoutShowModal(true);
   };
 
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.loader}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.safeAreaViewStyle}>
-      {users ? (
-        <ScrollView>
-          <Text style={styles.title}>마이페이지</Text>
-          <View style={styles.profileHeader}>
-            <Image
-              source={{uri: users.profileImage}}
-              style={styles.profileImageStyle}
-            />
-            <View style={styles.profileName}>
-              <TouchableOpacity
-                onPress={() =>
-                  navigation.navigate('EditProfile', {
-                    address: users.address,
-                    nickname: users.nickname,
-                    profileImage: users.profileImage,
-                    uuid: userUid,
-                  })
-                }
-                style={styles.name}>
-                <Text style={styles.nameStyle}>{users.nickname}</Text>
-                <Image source={rightArrow} style={styles.arrow} />
-              </TouchableOpacity>
-              <Text style={styles.emailStyle}>{users.email}</Text>
-            </View>
-          </View>
-          <View style={styles.infoStyle}>
+      <ScrollView>
+        <Text style={styles.title}>마이페이지</Text>
+        <View style={styles.profileHeader}>
+          <Image
+            source={{uri: users.profileImage}}
+            style={styles.profileImageStyle}
+          />
+          <View style={styles.profileName}>
             <TouchableOpacity
               onPress={() =>
-                navigation.navigate('MyPosts', {
-                  uuid: userUid,
+                navigation.navigate('EditProfile', {
+                  address: users.address,
                   nickname: users.nickname,
                   profileImage: users.profileImage,
-                })
-              }
-              style={styles.myList}>
-              <Image source={PencilIcon} style={styles.icon} />
-              <Text style={styles.listStyle}>내가 쓴 글</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() =>
-                navigation.navigate('MyLikes', {
                   uuid: userUid,
                 })
               }
-              style={styles.myList}>
-              <Image source={HeartIcon} style={styles.icon} />
-              <Text style={styles.listStyle}>찜한 글</Text>
+              style={styles.name}>
+              <Text style={styles.nameStyle}>{users.nickname}</Text>
+              <Image source={rightArrow} style={styles.arrow} />
             </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() =>
-                navigation.navigate('MyRecruits', {
-                  uuid: userUid,
-                })
-              }
-              style={styles.myList}>
-              <Image source={MarkerIcon} style={styles.icon} />
-              <Text
-                // onPress={() => navigation.navigate('Home')}
-                style={styles.listStyle}>
-                내 모집 공고
-              </Text>
-            </TouchableOpacity>
+            <Text style={styles.emailStyle}>{users.email}</Text>
           </View>
-          <View style={styles.additionalInfo}>
-            <Text style={styles.info}>기타</Text>
-            <TouchableOpacity
-              // onPress={() => navigation.navigate('Home')}
-              style={styles.noticeWrapper}>
-              <Text style={styles.noticeStyle}>공지사항</Text>
-              <Image style={styles.arrow} source={rightArrow} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('SynthesisAgree')}
-              style={styles.noticeWrapper}>
-              <Text style={styles.noticeStyle}>약관 및 개인정보 처리 방침</Text>
-              <Image style={styles.arrow} source={rightArrow} />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={handleLogoutShowModal}
-              style={styles.noticeWrapper}>
-              <Text style={styles.noticeStyle}>로그아웃</Text>
-            </TouchableOpacity>
-            
-          </View>
-        </ScrollView>
-      ) : (
-        <ScrollView>
-          <Text style={styles.title}>마이페이지</Text>
-
-          <Text>not users</Text>
-        </ScrollView>
-      )}
+        </View>
+        <View style={styles.infoStyle}>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('MyPosts', {
+                uuid: userUid,
+                nickname: users.nickname,
+                profileImage: users.profileImage,
+              })
+            }
+            style={styles.myList}>
+            <Image source={PencilIcon} style={styles.icon} />
+            <Text style={styles.listStyle}>내가 쓴 글</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('MyLikes', {
+                uuid: userUid,
+              })
+            }
+            style={styles.myList}>
+            <Image source={HeartIcon} style={styles.icon} />
+            <Text style={styles.listStyle}>찜한 글</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('MyRecruits', {
+                uuid: userUid,
+              })
+            }
+            style={styles.myList}>
+            <Image source={MarkerIcon} style={styles.icon} />
+            <Text style={styles.listStyle}>내 모집 공고</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.additionalInfo}>
+          <Text style={styles.info}>기타</Text>
+          <TouchableOpacity style={styles.noticeWrapper}>
+            <Text style={styles.noticeStyle}>공지사항</Text>
+            <Image style={styles.arrow} source={rightArrow} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('SynthesisAgree')}
+            style={styles.noticeWrapper}>
+            <Text style={styles.noticeStyle}>약관 및 개인정보 처리 방침</Text>
+            <Image style={styles.arrow} source={rightArrow} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={handleLogoutShowModal}
+            style={styles.noticeWrapper}>
+            <Text style={styles.noticeStyle}>로그아웃</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
       <LoginModal
         animationType="slide"
         visible={showLogoutModal}
@@ -225,7 +243,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#212529',
-    // paddingBottom: 10,
   },
   arrow: {
     width: 15,
@@ -244,7 +261,6 @@ const styles = StyleSheet.create({
     height: 70,
     marginRight: 22,
   },
-
   icon: {
     width: 16,
     height: 16,
@@ -262,7 +278,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginLeft: 30,
     marginRight: 30,
-    fontSize: 16,
     fontWeight: 'bold',
   },
   myList: {
@@ -275,7 +290,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: 'bold',
     color: '#3f3f3f',
-    // alignItems: 'center',
     marginLeft: 5,
   },
   noticeWrapper: {
@@ -298,5 +312,11 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     marginTop: 25,
   },
+  loader: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });
+
 export default Profile;

@@ -343,15 +343,20 @@ const CommunityPostDetail = ({route}) => {
     }
   };
 
-const handleGoBack = () => {
-  navigation.navigate('CommunityBoard', {
-    updatedPost: {
-      id: postId,
-      post_content: posts.post_content,
-      post_files: posts.post_files,
-    },
-  });
-};
+  const handleGoBack = () => {
+    if (route.params?.prevScreen) {
+      navigation.navigate(route.params.prevScreen, {
+        updatedPost: {
+          id: postId,
+          post_content: posts.post_content,
+          post_files: posts.post_files,
+        },
+      });
+    } else {
+      navigation.goBack();
+    }
+  };
+  
 
   const submitComment = async () => {
     if (!commentContent || commentContent.trim() === '') {
