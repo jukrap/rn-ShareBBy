@@ -21,6 +21,7 @@ import CommunityHeader from '../../components/Community/CommunityHeader';
 import BottomSheetModal from '../../components/Community/BottomSheetModal';
 import CommunityActionToast from '../../components/Community/CommunityActionToast';
 import CommunityActionModal from '../../components/Community/CommunityActionModal';
+import {requestCameraPermission, requestExternalWritePermission} from '../../lib/androidPermission';
 import {
   WarningIcon,
   CautionIcon,
@@ -226,8 +227,30 @@ const CommunityEditPost = ({route}) => {
   };
 
   // 이미지 선택기 열기
-  const openImagePicker = () => {
-    setIsImagePickerModalVisible(true);
+  const openImagePicker = async () => {
+    if (Platform.OS === 'android') {
+      try {
+        const cameraPermission = await requestCameraPermission();
+  
+        if (!cameraPermission) {
+          setToastMessage({
+            message: '카메라 접근 권한이 없어 이미지 업로드가 제한됩니다.',
+            leftIcon: 'warningIcon',
+            closeButton: true,
+            progressBar: true,
+          });
+          setToastVisible(true);
+        }
+  
+        if (cameraPermission) {
+          setIsImagePickerModalVisible(true);
+        }
+      } catch (error) {
+        console.log('권한 요청 중 오류 발생:', error);
+      }
+    } else {
+      setIsImagePickerModalVisible(true);
+    }
   };
 
   // 카메라로 사진 촬영
@@ -252,10 +275,12 @@ const CommunityEditPost = ({route}) => {
       width: 900,
       height: 900,
       cropping: true,
+      useFrontCamera: true,
+      mediaType: 'photo', // 이 부분을 추가하면 비디오 녹화 권한을 요청하지 않습니다.
     })
       .then(image => {
         console.log(image);
-        const imageUri = Platform.OS === 'ios' ? image.sourceURL : image.path;
+        const imageUri = image.path;
         setSelectedImages(prevState => ({
           ...prevState,
           newImages: [...prevState.newImages, imageUri],
@@ -292,7 +317,7 @@ const CommunityEditPost = ({route}) => {
     })
       .then(image => {
         console.log(image);
-        const imageUri = Platform.OS === 'ios' ? image.sourceURL : image.path;
+        const imageUri = image.path;
         setSelectedImages(prevState => ({
           ...prevState,
           newImages: [...prevState.newImages, imageUri],
