@@ -78,6 +78,7 @@ yarn-error.log
 
 .env
 **/ios/GoogleService-Info.plist
+**/ios/GoogleService-Info-2.plist
 
 # KEY
 **/android/app/google-services.json
