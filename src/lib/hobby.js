@@ -9,6 +9,11 @@ import firestore, {
 
 export const hobbiesCollection = firestore().collection('hobbies');
 
+// 주소를 정규화하는 함수 (소문자 변환 및 트림)
+function normalizeAddress(address) {
+  return address.trim().toLowerCase();
+}
+
 export async function recruitHobby({
   user_id,
   nickname,
@@ -23,12 +28,13 @@ export async function recruitHobby({
   content,
   writeTime,
 }) {
+  const normalizedAddress = normalizeAddress(address);
   const res = await hobbiesCollection.add({
     user_id,
     nickname,
     latitude,
     longitude,
-    address,
+    address: normalizedAddress,
     detail_address,
     tag,
     deadline,
@@ -47,14 +53,16 @@ export async function getHobbies() {
 }
 
 export async function getNearHobbies(userAddress) {
+  const normalizedAddress = normalizeAddress(userAddress);
   const querySnapshot = await getDocs(
     query(
       hobbiesCollection,
       orderBy('address'),
-      startAt(userAddress),
-      endAt(userAddress + '\uf8ff'),
+      startAt(normalizedAddress),
+      endAt(normalizedAddress + '\uf8ff'),
     ),
   );
+
   return querySnapshot.docs.map(data => ({
     id: data._ref._documentPath._parts[1],
     data: data,

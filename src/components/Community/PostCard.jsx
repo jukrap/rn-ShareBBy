@@ -1,4 +1,5 @@
-import React, {useEffect, useState} from 'react';
+
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Image,
@@ -7,20 +8,21 @@ import {
   Dimensions,
   StyleSheet,
 } from 'react-native';
-import {useFocusEffect} from '@react-navigation/native';
-import {formatDistanceToNow} from 'date-fns';
-import {ko} from 'date-fns/locale';
+import { useFocusEffect } from '@react-navigation/native';
+import { formatDistanceToNow } from 'date-fns';
+import { ko } from 'date-fns/locale';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import BottomSheetModal from './BottomSheetModal';
 import ImageDetailModal from './ImageDetailModal';
-import {FasterImageView} from '@candlefinance/faster-image';
+import { FasterImageView } from '@candlefinance/faster-image';
 import ImageSlider from './ImageSlider';
 import LoginToast from '../SignUp/LoginToast';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const {width, height} = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
-const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
+const PostCard = ({ item, onDelete, onComment, onEdit, onProfile, onDetail }) => {
   const [postUserData, setPostUserData] = useState(null);
   const [currentUser, setCurrentUser] = useState(null); //나중에 전부 통일해서 빈문자열로 교체
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -34,21 +36,60 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isChatOutModalVisible, setIsChatOutModalVisible] = useState(false);
   const [showToast, setShowToast] = useState(false);
-
-  const handleSharePress = () => {
-    setIsChatOutModalVisible(true);
-  };
-
-  const colors = ['tomato', 'thistle', 'skyblue', 'teal'];
+  const [isBlockProcessing, setIsBlockProcessing] = useState(false);
+  const [isBlocked, setIsBlocked] = useState(false); // isBlocked 상태 추가
 
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged(user => {
       setCurrentUser(user);
     });
 
-    fetchPostUserData();
+    fetchPostUserData(); // 여기서 fetchPostUserData 함수 호출
+
     return () => unsubscribe();
-  }, []);
+  }, [item.id, isBlocked]); // isBlocked를 의존성 배열에 추가
+
+
+  const handleBlockUser = async () => {
+    if (currentUser && !isBlockProcessing) {
+      setIsBlockProcessing(true);
+      try {
+        const blockRef = firestore().collection('blocks').doc(currentUser.uid);
+        await blockRef.set(
+          {
+            blockedUsers: firestore.FieldValue.arrayUnion(item.userId),
+          },
+          { merge: true },
+        );
+  
+        // 어싱크 스토리지에도 차단한 사용자 목록을 업로드
+        const blockedUsersList = await firestore()
+          .collection('blocks')
+          .doc(currentUser.uid)
+          .get();
+  
+        if (blockedUsersList.exists) {
+          const blockedUsersData = blockedUsersList.data();
+          const blockedUsers = blockedUsersData.blockedUsers || [];
+  
+          // 어싱크 스토리지에 차단한 사용자 목록 업로드
+          await AsyncStorage.setItem('blockedUsers', JSON.stringify(blockedUsers));
+        }
+  
+        setShowToast(true);
+      } catch (error) {
+        console.log('사용자를 차단하는 중 오류 발생:', error);
+      }
+      setIsBlockProcessing(false);
+    }
+  };
+  
+
+  const handleSharePress = () => {
+    setIsChatOutModalVisible(true);
+  };
+
+  const colors = ['tomato', 'thistle', 'skyblue', 'teal'];
 
   const toggleReportModal = async () => {
     try {
@@ -65,7 +106,7 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
         await firestore()
           .collection('users')
           .doc(item.userId)
-          .update({report: reportCount});
+          .update({ report: reportCount });
         // 모달이 닫힐 때 토스트를 보여주기
         setIsModalVisible(!isModalVisible);
         setShowToast(true);
@@ -129,79 +170,102 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
   };
 
   // 게시글 작성자 정보 가져오기
-  const fetchPostUserData = async () => {
-    try {
-      const documentSnapshot = await firestore()
-        .collection('users')
-        .doc(item.userId)
+ // fetchPostUserData 함수 내에서 현재 사용자가 차단한 사용자의 목록을 가져오는 로직 추가
+ const fetchPostUserData = async () => {
+  try {
+    const documentSnapshot = await firestore()
+      .collection('users')
+      .doc(item.userId)
+      .get();
+    if (documentSnapshot.exists) {
+      const userData = documentSnapshot.data();
+      setPostUserData({
+        profileImage: userData.profileImage,
+        nickname: userData.nickname,
+      });
+
+      // 현재 사용자가 차단한 사용자의 목록 가져오기
+      const blockListSnapshot = await firestore()
+        .collection('blocks')
+        .doc(currentUser.uid)
         .get();
-      if (documentSnapshot.exists) {
-        const userData = documentSnapshot.data();
-        setPostUserData({
-          profileImage: userData.profileImage,
-          nickname: userData.nickname,
-        });
-      }
-    } catch (error) {
-      console.log('사용자 데이터를 가져오는 중에 오류가 발생했습니다:', error);
-    }
-  };
+      if (blockListSnapshot.exists) {
+        const blockListData = blockListSnapshot.data();
+        const blockedUsers = blockListData.blockedUsers || [];
 
-  //아래 handleIsLike로 함수명 변경
-  const handleLikePress = async () => {
-    if (currentUser && !isLikeProcessing) {
-      setIsLikeProcessing(true);
+        // 게시글 작성자가 차단된 사용자인지 확인하고 숨김
+        const isBlockedUser = blockedUsers.includes(item.userId);
 
-      try {
-        // likes 컬렉션에서 해당 사용자의 추천 여부 확인
-        const likeQuery = await firestore()
-          .collection('likes')
-          .where('postId', '==', item.id)
-          .where('userId', '==', currentUser.uid)
-          .get();
-
-        if (!likeQuery.empty) {
-          // 좋아요 취소 처리
-          likeQuery.forEach(doc => {
-            doc.ref.delete();
-          });
-
-          setIsLiked(false);
-          setLikeCount(prevCount => prevCount - 1);
-
-          await firestore()
-            .collection('posts')
-            .doc(item.id)
-            .update({
-              likeCount: firestore.FieldValue.increment(-1),
-            });
-        } else {
-          // 좋아요 추가 처리
-          await firestore().collection('likes').add({
-            postId: item.id,
-            userId: currentUser.uid,
-            createdAt: firestore.FieldValue.serverTimestamp(),
-          });
-
-          setIsLiked(true);
-          setLikeCount(prevCount => prevCount + 1);
-
-          await firestore()
-            .collection('posts')
-            .doc(item.id)
-            .update({
-              likeCount: firestore.FieldValue.increment(1),
-            });
+        // 사용자가 차단된 경우 렌더링 중지
+        if (isBlockedUser) {
+          setIsBlocked(true);
+          return;
         }
-      } catch (error) {
-        console.log('좋아요 처리 중 오류 발생:', error);
       }
-
-      setIsLikeProcessing(false);
     }
-  };
+  } catch (error) {
+    console.log('사용자 데이터를 가져오는 중에 오류가 발생했습니다:', error);
+  }
+};
 
-  return (
+
+
+
+
+const handleLikePress = async () => {
+if (currentUser && !isLikeProcessing) {
+setIsLikeProcessing(true);
+
+try {
+// likes 컬렉션에서 해당 사용자의 추천 여부 확인
+const likeQuery = await firestore()
+.collection('likes')
+.where('postId', '==', item.id)
+.where('userId', '==', currentUser.uid)
+.get();
+
+if (!likeQuery.empty) {
+// 좋아요 취소 처리
+likeQuery.forEach(doc => {
+  doc.ref.delete();
+});
+
+setIsLiked(false);
+setLikeCount(prevCount => prevCount - 1);
+
+await firestore()
+  .collection('posts')
+  .doc(item.id)
+  .update({
+    likeCount: firestore.FieldValue.increment(-1),
+  });
+} else {
+// 좋아요 추가 처리
+await firestore().collection('likes').add({
+  postId: item.id,
+  userId: currentUser.uid,
+  createdAt: firestore.FieldValue.serverTimestamp(),
+});
+
+setIsLiked(true);
+setLikeCount(prevCount => prevCount + 1);
+
+await firestore()
+  .collection('posts')
+  .doc(item.id)
+  .update({
+    likeCount: firestore.FieldValue.increment(1),
+  });
+}
+} catch (error) {
+console.log('좋아요 처리 중 오류 발생:', error);
+}
+
+setIsLikeProcessing(false);
+}
+};
+
+  return isBlocked ? null : (
     <View style={styles.card}>
       <View style={styles.userInfoContainer}>
         <View style={styles.userInfoWrapper}>
@@ -323,6 +387,15 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
             <Image source={CautionIcon} style={{width: 20, height: 20}} />
             <Text style={styles.modalButtonText}>신고하기</Text>
           </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.modalButton}
+            onPress={() => {
+              handleBlockUser();
+              toggleModal();
+            }}>
+            <Image source={CautionIcon} style={{width: 20, height: 20}} />
+            <Text style={styles.modalButtonText}>사용자 차단</Text>
+          </TouchableOpacity>
         </View>
       </BottomSheetModal>
       {isImageModalVisible && (
@@ -334,13 +407,19 @@ const PostCard = ({item, onDelete, onComment, onEdit, onProfile, onDetail}) => {
         />
       )}
       <LoginToast
-        text="신고되었습니다."
+        text="신고되었습니다. 24시간 내에 처리될 예정입니다."
+        visible={showToast}
+        handleCancel={() => setShowToast(false)}
+      />
+      <LoginToast
+        text="사용자가 차단되었습니다."
         visible={showToast}
         handleCancel={() => setShowToast(false)}
       />
     </View>
   );
 };
+
 import {
   MoreIcon,
   CommentLineIcon,
