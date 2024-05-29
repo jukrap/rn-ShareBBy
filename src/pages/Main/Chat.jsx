@@ -7,7 +7,6 @@ import {
   Text,
   FlatList,
   Image,
-  Dimensions,
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import {useNavigation} from '@react-navigation/native';
@@ -44,7 +43,7 @@ const Chat = () => {
           id: doc.id,
           ...doc.data(),
         }))
-        .filter(room => room.members.includes(userToken)); //합쳐보기 방법 고민 필요.
+        .filter(room => room.members.includes(userToken));
 
       const latestChats = {};
 
@@ -97,27 +96,16 @@ const Chat = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View
-        style={{
-          paddingTop: 8,
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          paddingHorizontal: 16,
-          marginBottom: 32,
-        }}>
+      <View style={styles.topBarWrapperl}>
         <TouchableOpacity style={{flex: 1}} onPress={() => navigation.goBack()}>
-          <Image source={BackIcon} style={{width: 24, height: 24}} />
+          <Image source={BackIcon} style={styles.topBarLeft} />
         </TouchableOpacity>
-        <View style={{flex: 1, alignItems: 'center'}}>
-          <Text
-            style={{fontSize: 24, fontWeight: '700', fontFamily: 'Pretendard'}}>
-            채팅목록
-          </Text>
+        <View style={styles.topBarTextWrapper}>
+          <Text style={styles.topBarText}>채팅목록</Text>
         </View>
-        <View style={{flex: 1, backgroundColor: 'green'}} />
+        <View style={styles.topBarRight} />
       </View>
-      <View style={{flex: 1, alignItems: 'center'}}>
+      <View style={styles.items}>
         <FlatList
           data={sortLast()}
           renderItem={renderGroups}
@@ -133,18 +121,19 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fefffe',
   },
-  modal: {
-    margin: 0,
-    justifyContent: 'flex-end',
-  },
-  modalContent: {
-    backgroundColor: '#fff',
-    justifyContent: 'flex-end',
+  topBarWrapperl: {
+    paddingTop: 8,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    flex: 1,
-    marginTop: 150,
-    gap: 16,
+    paddingHorizontal: 16,
+    marginBottom: 32,
   },
+  topBarLeft: {width: 24, height: 24},
+  topBarTextWrapper: {flex: 1, alignItems: 'center'},
+  topBarText: {fontSize: 24, fontWeight: '700', fontFamily: 'Pretendard'},
+  topBarRight: {flex: 1},
+  items: {flex: 1, alignItems: 'center'},
 });
 
 export default Chat;

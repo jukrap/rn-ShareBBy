@@ -12,6 +12,9 @@ import {
 } from 'react-native';
 import Modal from 'react-native-modal';
 
+import {getMessages} from '../../lib/getMessages';
+import {getChatRoomMembers} from '../../lib/getChatRoomMembers';
+
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
 import auth from '@react-native-firebase/auth';
@@ -47,52 +50,21 @@ const ChatRoom = ({route, navigation}) => {
   const [imageUri, setImageUri] = useState('');
 
   useEffect(() => {
-    const messageListener = firestore()
-      .collection('chatRooms')
-      .doc(chatRoomId)
-      .collection('messages')
-      .orderBy('timestamp', 'desc')
-      .onSnapshot(querySnapshot => {
-        if (querySnapshot) {
-          const newMessages = querySnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
-          setMessages(newMessages);
-        }
-      });
+    const messageListener = getMessages(chatRoomId, setMessages);
     return () => messageListener();
   }, [chatRoomId]);
 
   useEffect(() => {
-    getChatRoomMembers();
-  }, []);
-
-  const getChatRoomMembers = async () => {
-    try {
-      const chatRoomRef = firestore().collection('chatRooms').doc(chatRoomId);
-      const chatRoomSnapshot = await chatRoomRef.get();
-      if (chatRoomSnapshot.exists) {
-        const {members} = chatRoomSnapshot.data();
-        const memberDetails = [];
-        for (const memberId of members) {
-          const userSnapshot = await firestore()
-            .collection('users')
-            .doc(memberId)
-            .get();
-          if (userSnapshot.exists) {
-            const userData = userSnapshot.data();
-            memberDetails.push(userData);
-          }
-        }
-        setChatMembers(memberDetails);
-      } else {
-        console.log('Chat room does not exist.');
+    const fetchChatMembers = async () => {
+      try {
+        const members = await getChatRoomMembers(chatRoomId);
+        setChatMembers(members);
+      } catch (error) {
+        console.error('Error fetching chat room members:', error);
       }
-    } catch (error) {
-      console.error('Error fetching chat room members:', error);
-    }
-  };
+    };
+    fetchChatMembers();
+  }, [chatRoomId]);
 
   const sendMessage = async () => {
     try {
@@ -185,7 +157,6 @@ const ChatRoom = ({route, navigation}) => {
   };
 
   const uploadImage = async (localImagePath, chatRoomId) => {
-    console.log('localImagePath:', localImagePath);
     try {
       const fileName = localImagePath.substring(
         localImagePath.lastIndexOf('/') + 1,
