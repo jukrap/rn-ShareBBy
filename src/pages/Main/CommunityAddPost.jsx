@@ -383,7 +383,7 @@ const CommunityAddPost = () => {
           <View style={styles.postInputContainer}>
             <Text style={styles.postInputLabel}>내용</Text>
             <TextInput
-              placeholder="여기에 작성"
+              placeholder="부적절하거나 불쾌감을 줄 수 있는 컨텐츠를 게시할 경우 제재를 받을 수 있습니다."
               multiline
               numberOfLines={4}
               value={postContent}
