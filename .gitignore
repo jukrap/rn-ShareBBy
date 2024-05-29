@@ -77,6 +77,8 @@ yarn-error.log
 !.yarn/versions
 
 .env
+**/ios/GoogleService-Info.plist
+**/ios/GoogleService-Info-2.plist
 
 # KEY
 **/android/app/google-services.json
@@ -88,4 +90,3 @@ yarn-error.log
 **/android/gradle.properties
 **/android/local.properties
 
-.env
