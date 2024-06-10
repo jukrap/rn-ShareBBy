@@ -19,6 +19,12 @@ import Modal from 'react-native-modal';
 import Geolocation from 'react-native-geolocation-service';
 
 import {getHobbies} from '../../lib/hobby';
+import CHANGE_API from '../../lib/changeAddress';
+
+
+// TODO: coordinateToScreen 사용
+// TODO : isStopGesturesEnabled 사용
+
 
 const {width, height} = Dimensions.get('window');
 
@@ -62,25 +68,52 @@ const Recruit = ({navigation, route}) => {
     mapView?.current?.setLocationTrackingMode('Follow');
   };
 
-  const fetchAddress = async (latitude, longitude) => {
-    const res = await fetch(
-      `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyCKEnmMSbRzEbeqOwoO_zKm7qLhNhhhDKs&language=ko`,
-    );
-    const json = await res.json();
-    if (json.results && json.results.length > 0) {
-      const pickLocation = json.results[0].formatted_address;
-      const {lat, lng} = json.results[0].geometry.location;
+  // ------------------ google Geocoding API ------------------ //
+  // const fetchAddress = async (latitude, longitude) => {
+  //   const res = await fetch(
+  //     `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyCKEnmMSbRzEbeqOwoO_zKm7qLhNhhhDKs&language=ko`,
+  //   );
+  //   const json = await res.json();
+  //   if (json.results && json.results.length > 0) {
+  //     const pickLocation = json.results[0].formatted_address;
+  //     const {lat, lng} = json.results[0].geometry.location;
+  //     setPickedLocation(prevState => ({
+  //       ...prevState,
+  //       pickAddress: pickLocation,
+  //       pickLatitude: lat,
+  //       pickLongitude: lng,
+  //     }));
+  //     setIsModalVisible(true);
+  //   } else {
+  //     console.error('no results');
+  //   }
+  // };
+
+  const getChangeLocation = async (lat, lon) => {
+    const res = await CHANGE_API.get(`request=coordsToaddr&coords=${lon},${lat}&sourcecrs=epsg:4326&output=json&orders=addr,admcode`)
+    
+    if (res.ok) {
+      // console.log('location ===========> ', res.data.results[1].region);
+      const areaZip = Object.keys(res.data.results[1].region)
+      .filter(key => key.startsWith('area') && key !== 'area0') 
+      .map(key => res.data.results[1].region[key].name) 
+      .filter(name => name.trim() !== '') 
+      .join(' ');
+
       setPickedLocation(prevState => ({
         ...prevState,
-        pickAddress: pickLocation,
+        pickAddress: areaZip,
         pickLatitude: lat,
-        pickLongitude: lng,
+        pickLongitude: lon,
       }));
+
       setIsModalVisible(true);
+
+      console.log('location ===========> ', areaZip);
     } else {
-      console.error('no results');
+      console.log('location ===========> ', res.status, res.problem);
     }
-  };
+  }
 
   const getHobbiesData = async () => {
     const res = await getHobbies();
@@ -95,7 +128,8 @@ const Recruit = ({navigation, route}) => {
   const handleMapPress = e => {
     if (e && e.latitude && e.longitude) {
       const {latitude, longitude} = e;
-      fetchAddress(latitude, longitude);
+      getChangeLocation(latitude, longitude);
+      // fetchAddress(latitude, longitude);
     }
   };
 
@@ -126,6 +160,7 @@ const Recruit = ({navigation, route}) => {
     getMyLocation();
     getHobbiesData();
   }, []);
+
   useEffect(() => {
     const getLocationAsync = async () => {
       const result = await requestPermission();
@@ -204,7 +239,6 @@ const Recruit = ({navigation, route}) => {
         isExtentBoundedInKorea
         locale={'ko'}
         onTapMap={props => {
-          console.log('🚀 ===============>  : ', props);
           handleMapPress(props);
         }}>
         {hobbiesData.map(v => renderMarker(v))}
