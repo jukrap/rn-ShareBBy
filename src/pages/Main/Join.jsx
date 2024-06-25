@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState, useCallback} from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import {
   SafeAreaView,
   View,
@@ -16,10 +16,10 @@ import {
 import Geolocation from 'react-native-geolocation-service';
 import dayjs from 'dayjs';
 
-import {getNearHobbies} from '../../lib/hobby';
+import { getNearHobbies } from '../../lib/hobby';
 import userFetchAddress from '../../hooks/userFetchAddress';
 
-const {width, height} = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 const LATITUDE_DELTA = 0.05;
 const LONGITUDE_DELTA = LATITUDE_DELTA * (width / height);
@@ -33,7 +33,7 @@ const layerGroups = {
   TRANSIT: false,
 };
 
-const Join = ({navigation, route}) => {
+const Join = ({ navigation, route }) => {
   const mapView = useRef(null);
   const now = dayjs();
   const [initialRegion, setInitialRegion] = useState({
@@ -45,30 +45,35 @@ const Join = ({navigation, route}) => {
   const [hobbiesData, setHobbiesData] = useState([]);
   const [currentData, setCurrentData] = useState([]);
 
-  useEffect(() => {
-    initSetData();
-    deadLineHobbiesData(hobbiesData);
-  }, []);
+  // useEffect(() => {
+  //   initSetData(hobbiesData);
+  // }, []);
 
   const initSetData = async () => {
     const permission = await Geolocation.requestAuthorization('always');
     if (permission === 'granted') {
       Geolocation.getCurrentPosition(
         async pos => {
-          const {latitude, longitude} = pos.coords;
+          const { latitude, longitude } = pos.coords;
           setInitialRegion({
             latitude,
             longitude,
             latitudeDelta: 0.0024,
             longitudeDelta: 0.0024,
           });
+
           const currentAddress = await userFetchAddress(latitude, longitude);
-          const splitAddress = currentAddress.split(' ', 3).join(' ');
+          const splitAddress = currentAddress.split(" ", 3).join(" ");
           const nearHobbiesData = await getNearHobbies(splitAddress);
-          setHobbiesData(nearHobbiesData);
-          deadLineHobbiesData(nearHobbiesData);
+          // setHobbiesData(nearHobbiesData);
+          console.log('nearHobbiesData, splitAddress =======> ', nearHobbiesData.data, splitAddress);
+          const deadlineData = nearHobbiesData.filter(
+            v => 
+              dayjs(v.data.deadline).diff(now, 'days') >= 0
+          );
+          setHobbiesData(deadlineData);
         },
-        error => {},
+        error => { },
         {
           enableHighAccuracy: false,
           timeout: 2000,
@@ -96,19 +101,28 @@ const Join = ({navigation, route}) => {
     mapView?.current?.setLocationTrackingMode('Follow');
   };
 
+  const onTapMap = (event) => {
+    // console.log('event ========> ', event );
+  }
+
   const onCameraChanged = async event => {
-    const {latitude, longitude} = event;
-    const centerAddress = await userFetchAddress(latitude, longitude);
-    const centerGu = centerAddress.split(' ', 3).join(' ');
-    const finalHobbiesData = await getNearHobbies(centerGu);
+    const { latitude, longitude } = event;
+    const currentAddress = await userFetchAddress(latitude, longitude);
+    const splitAddress = currentAddress.split(' ', 3).join(' ');
+
+    const finalHobbiesData = await getNearHobbies(splitAddress);
+
+    console.log('제스처로 한 주소 ======> ', splitAddress);
 
     const deadlineData = finalHobbiesData.filter(
-      v => dayjs(v.data._data.deadline).diff(now, 'days') >= 0,
+      v => 
+        dayjs(v.data._data.deadline).diff(now, 'days') >= 0
     );
     setHobbiesData(deadlineData);
   };
 
   const renderMarker = useCallback(marker => {
+    // console.log('marker =====> ', marker);
     return (
       <NaverMapMarkerOverlay
         key={marker.id}
@@ -119,16 +133,16 @@ const Join = ({navigation, route}) => {
     );
   }, []);
 
-  const renderItem = ({item}) => {
+  const renderItem = ({ item }) => {
     const diffDays = dayjs(item.data._data.deadline).diff(now, 'days');
     const diffHours = dayjs(item.data._data.deadline).diff(now, 'hours');
     const diffMins = dayjs(item.data._data.deadline).diff(now, 'minutes');
 
     const moveMarkerLocation = () => {
       const Region = {
-        latitude: item.data._data.latitude,
+        latitude: item._data.latitude,
         latitudeDelta: 0,
-        longitude: item.data._data.longitude,
+        longitude: item._data.longitude,
         longitudeDelta: 0,
       };
       const CameraMoveBaseParams = {
@@ -162,18 +176,18 @@ const Join = ({navigation, route}) => {
             <Text
               style={[
                 styles.listRcruit,
-                {color: '#07AC7D', fontWeight: 'bold'},
+                { color: '#07AC7D', fontWeight: 'bold' },
               ]}>
               모집중
             </Text>
           ) : percentFun(
-              item.data._data.personNumber,
-              item.data._data.peopleCount,
-            ) == 100 ? (
+            item.data._data.personNumber,
+            item.data._data.peopleCount,
+          ) == 100 ? (
             <Text
               style={[
                 styles.listRcruit,
-                {color: '#898989', fontWeight: 'bold'},
+                { color: '#898989', fontWeight: 'bold' },
               ]}>
               모집마감
             </Text>
@@ -181,7 +195,7 @@ const Join = ({navigation, route}) => {
             <Text
               style={[
                 styles.listRcruit,
-                {color: '#E4694E', fontWeight: 'bold'},
+                { color: '#E4694E', fontWeight: 'bold' },
               ]}>
               마감임박
             </Text>
@@ -195,7 +209,7 @@ const Join = ({navigation, route}) => {
           }}>
           <Text style={styles.listLocation}>{item.data._data.address}</Text>
           <Text
-            style={[styles.listRcruit, {color: '#4E8FE4', fontWeight: 'bold'}]}>
+            style={[styles.listRcruit, { color: '#4E8FE4', fontWeight: 'bold' }]}>
             {item.data._data.personNumber} \ {item.data._data.peopleCount} 명
           </Text>
         </View>
@@ -209,21 +223,21 @@ const Join = ({navigation, route}) => {
             flexDirection: 'row',
           }}>
           <Text>
-            <Text style={{fontWeight: 'bold'}}>{diffDays}</Text> 일{' '}
-            <Text style={{fontWeight: 'bold'}}>{diffHours % 24}</Text> 시간{' '}
-            <Text style={{fontWeight: 'bold'}}>{diffMins % 60}</Text> 분 전
+            <Text style={{ fontWeight: 'bold' }}>{diffDays}</Text> 일{' '}
+            <Text style={{ fontWeight: 'bold' }}>{diffHours % 24}</Text> 시간{' '}
+            <Text style={{ fontWeight: 'bold' }}>{diffMins % 60}</Text> 분 전
           </Text>
           {percentFun(
             item.data._data.personNumber,
             item.data._data.peopleCount,
           ) == 100 ? (
             <TouchableOpacity
-              style={[styles.showBtn, {backgroundColor: '#898989'}]}
+              style={[styles.showBtn, { backgroundColor: '#898989' }]}
               onPress={() => navigation.navigate('Show', route)}>
               <Text
                 style={[
                   styles.showCommText,
-                  {fontWeight: 'bold', fontSize: 14, color: '#FEFFFE'},
+                  { fontWeight: 'bold', fontSize: 14, color: '#FEFFFE' },
                 ]}>
                 모집마감
               </Text>
@@ -235,7 +249,7 @@ const Join = ({navigation, route}) => {
               <Text
                 style={[
                   styles.showCommText,
-                  {fontWeight: 'bold', fontSize: 14, color: '#FEFFFE'},
+                  { fontWeight: 'bold', fontSize: 14, color: '#FEFFFE' },
                 ]}>
                 참여신청
               </Text>
@@ -247,22 +261,22 @@ const Join = ({navigation, route}) => {
   };
 
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.searchView}>
         <TouchableOpacity
-          style={{marginLeft: 'auto', paddingTop: 10}}
+          style={{ marginLeft: 'auto', paddingTop: 10 }}
           onPress={moveCurrLocation}>
-          <Image source={currGpsIcon} style={{width: 40, height: 40}} />
+          <Image source={currGpsIcon} style={{ width: 40, height: 40 }} />
         </TouchableOpacity>
       </View>
-      <View style={{bottom: 30, position: 'absolute', zIndex: 2}}>
+      <View style={{ bottom: 30, position: 'absolute', zIndex: 2 }}>
         <FlatList
           data={hobbiesData}
           renderItem={renderItem}
           keyExtractor={item => item.id}
           horizontal={true}
           showsHorizontalScrollIndicator={false}
-          style={{paddingLeft: 8}}
+          style={{ paddingLeft: 8 }}
           automaticallyAdjustContentInsets={false}
           decelerationRate="fast"
           pagingEnabled
@@ -272,16 +286,19 @@ const Join = ({navigation, route}) => {
       </View>
       <NaverMapView
         ref={mapView}
-        style={{flex: 1}}
+        style={{ flex: 1 }}
         layerGroups={layerGroups}
         initialRegion={initialRegion}
         locale={'ko'}
+        animationDuration={2}
         isShowIndoorLevelPicker={true}
         isShowLocationButton={false}
         onCameraChanged={onCameraChanged}
+        onTapMap={onTapMap}
+        isStopGesturesEnabled={true}
         isExtentBoundedInKorea
         maxZoom={15}
-        minZoom={10}>
+        minZoom={5}>
         {hobbiesData.map(v => renderMarker(v))}
       </NaverMapView>
     </SafeAreaView>

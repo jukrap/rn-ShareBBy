@@ -1,8 +1,22 @@
-const userFetchAddress = async (latitude, longitude) => {
-    const res = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyCKEnmMSbRzEbeqOwoO_zKm7qLhNhhhDKs&language=ko`)
+const CLIENT_ID = 'cycfhnicdh';
+const CLIENT_SECRET = 'hRfkTI4OMV8l7zFectg5R7VSe43U1qLW6dTmjuOL';
+
+const userFetchAddress = async (lat, lon) => {
+    const res = await fetch(`https://naveropenapi.apigw.ntruss.com/map-reversegeocode/v2/gc?request=coordsToaddr&coords=${lon},${lat}&sourcecrs=epsg:4326&output=json&orders=addr,admcode`, {
+        headers: {
+            'X-NCP-APIGW-API-KEY-ID': CLIENT_ID,
+            'X-NCP-APIGW-API-KEY': CLIENT_SECRET,
+            'Accept' : 'application/json',
+        },
+    })
     const json = await res.json();
     if (json.results && json.results.length > 0) {
-        const pickLocation = json.results[0].formatted_address;
+        const pickLocation = Object.keys(json.results[1].region)
+        .filter(key => key.startsWith('area') && key !== 'area0') 
+        .map(key => json.results[1].region[key].name) 
+        .filter(name => name.trim() !== '') 
+        .join(' ');
+        
         return pickLocation
     } else {
         console.error('no results');
